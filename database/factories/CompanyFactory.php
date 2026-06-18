@@ -18,13 +18,19 @@ class CompanyFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->company,
-            'description' => fake()->paragraph(5),
-            'city' => fake()->city,
-            'website' => fake()->url,
-            'logo' => fake()->imagePath(),
-            'certification' => fake()->imagePath(),
-            'status' => fake()->randomElement(['pending', 'approved', 'rejected']),
-        ];
+    'name' => fake()->company(),
+    'description' => fake()->paragraph(5),
+    'city' => fake()->city(),
+    'website' => fake()->url(),
+
+    'logo' => fake()->imageUrl(200, 200, 'business', true),
+    'certificate' => fake()->imageUrl(400, 300, 'business', true),
+
+    'status' => fake()->randomElement([
+        'pending',
+        'approved',
+        'rejected'
+    ]),
+];
     }
 }

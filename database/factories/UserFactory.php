@@ -31,7 +31,7 @@ class UserFactory extends Factory
             'role' => 'candidate',
         ];
     }
-    
+
     public function admin(): static
     {
         return $this->state(fn (array $attributes) => [
@@ -43,6 +43,13 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'role' => 'employer',
+        ]);
+    }
+
+    public function candidate(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'candidate',
         ]);
     }
 }

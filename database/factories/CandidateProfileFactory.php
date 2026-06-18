@@ -18,7 +18,9 @@ class CandidateProfileFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'skills' => fake()->words(5),
+            'cover_letter' => fake()->text(),
+            'resume' => fake(),
         ];
     }
 }

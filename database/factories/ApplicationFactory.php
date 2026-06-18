@@ -18,7 +18,19 @@ class ApplicationFactory extends Factory
     public function definition(): array
     {
         return [
-            //
-        ];
+    'status' => fake()->randomElement([
+        'pending',
+        'reviewed',
+        'shortlisted',
+        'rejected',
+        'hired'
+    ]),
+
+    'cover_letter' => fake()->paragraph(),
+
+    'resume_path' => 'resumes/sample.pdf',
+
+    'applied_at' => fake()->dateTime(),
+];
     }
 }
