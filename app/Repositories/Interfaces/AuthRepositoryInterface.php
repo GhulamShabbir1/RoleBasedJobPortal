@@ -2,17 +2,47 @@
 
 namespace App\Repositories\Interfaces;
 
+use App\Models\User;
+
 interface AuthRepositoryInterface
 {
-    public function register(array $data);
+    /**
+     * Create a new user in the database
+     */
+    public function createUser(array $data): User;
 
-    public function login(array $credentials);
+    /**
+     * Find user by email
+     */
+    public function findByEmail(string $email): ?User;
 
-    public function logout();
+    /**
+     * Attempt to authenticate user and return JWT token
+     */
+    public function attemptLogin(array $credentials): ?string;
 
-    public function me();
+    /**
+     * Get currently authenticated user
+     */
+    public function getCurrentUser(): ?User;
 
-    public function forgotPassword(string $email);
+    /**
+     * Invalidate the current JWT token
+     */
+    public function invalidateToken(): bool;
 
-    public function resetPassword(array $data);
+    /**
+     * Refresh the current JWT token
+     */
+    public function refreshToken(): string;
+
+    /**
+     * Send password reset link to user email
+     */
+    public function sendPasswordResetLink(string $email): string;
+
+    /**
+     * Reset user password
+     */
+    public function resetUserPassword(array $data): string;
 }

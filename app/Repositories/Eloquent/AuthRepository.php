@@ -3,65 +3,85 @@
 namespace App\Repositories\Eloquent;
 
 use App\Models\User;
+use App\Repositories\Interfaces\AuthRepositoryInterface;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
-use App\Repositories\Interfaces\AuthRepositoryInterface;
 
 class AuthRepository implements AuthRepositoryInterface
 {
-    public function register(array $data)
+    /**
+     * Create a new user in the database
+     */
+    public function createUser(array $data): User
     {
-        $user = User::create([
+        return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'role' => $data['role'] ?? 'candidate'
+            'role' => $data['role'] ?? 'candidate',
         ]);
-
-        $token = auth()->login($user);
-
-        return [
-            'user' => $user,
-            'token' => $token
-        ];
     }
 
-    public function login(array $credentials)
+    /**
+     * Find user by email
+     */
+    public function findByEmail(string $email): ?User
     {
-        if (!$token = auth()->attempt($credentials)) {
-            return null;
-        }
-
-        return [
-            'user' => auth()->user(),
-            'token' => $token
-        ];
+        return User::where('email', $email)->first();
     }
 
-    public function logout()
+    /**
+     * Attempt to authenticate user and return JWT token
+     */
+    public function attemptLogin(array $credentials): ?string
+    {
+        $token = auth()->attempt($credentials);
+
+        return $token ?: null;
+    }
+
+    /**
+     * Get currently authenticated user
+     */
+    public function getCurrentUser(): ?User
+    {
+        return auth()->user();
+    }
+
+    /**
+     * Invalidate the current JWT token
+     */
+    public function invalidateToken(): bool
     {
         auth()->logout();
 
         return true;
     }
 
-    public function me()
+    /**
+     * Refresh the current JWT token
+     */
+    public function refreshToken(): string
     {
-        return auth()->user();
+        return auth()->refresh();
     }
 
-    public function forgotPassword(string $email)
+    /**
+     * Send password reset link to user email
+     */
+    public function sendPasswordResetLink(string $email): string
     {
-        return Password::sendResetLink([
-            'email' => $email
-        ]);
+        return Password::sendResetLink(['email' => $email]);
     }
 
-    public function resetPassword(array $data)
+    /**
+     * Reset user password
+     */
+    public function resetUserPassword(array $data): string
     {
         return Password::reset(
             $data,
-            function ($user, $password) {
+            function (User $user, string $password) {
                 $user->password = Hash::make($password);
                 $user->save();
             }

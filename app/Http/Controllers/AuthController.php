@@ -2,42 +2,45 @@
 
 namespace App\Http\Controllers;
 
+use App\DTOs\Auth\ForgotPasswordDTO;
+use App\DTOs\Auth\LoginUserDTO;
+use App\DTOs\Auth\RegisterUserDTO;
+use App\DTOs\Auth\ResetPasswordDTO;
+use App\Features\Auth\ForgotPasswordFeature;
+use App\Features\Auth\GetAuthenticatedUserFeature;
+use App\Features\Auth\LoginUserFeature;
+use App\Features\Auth\LogoutUserFeature;
+use App\Features\Auth\RefreshTokenFeature;
+use App\Features\Auth\RegisterUserFeature;
+use App\Features\Auth\ResetPasswordFeature;
+use App\Http\Requests\Auth\ForgetRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
-use App\Http\Requests\Auth\ForgetRequest;
-use App\Repositories\Interfaces\AuthRepositoryInterface;
+use App\Http\Requests\Auth\ResetPasswordRequest;
 use Illuminate\Http\JsonResponse;
 
 class AuthController extends Controller
 {
-    protected $authRepository;
-
-    public function __construct(AuthRepositoryInterface $authRepository)
-    {
-        $this->authRepository = $authRepository;
-    }
-
     /**
      * Register a new user
      */
-    public function register(RegisterRequest $request): JsonResponse
-    {
+    public function register(
+        RegisterRequest $request,
+        RegisterUserFeature $feature
+    ): JsonResponse {
         try {
-            $result = $this->authRepository->register($request->validated());
+            $dto = RegisterUserDTO::fromRequest($request);
+            $result = $feature->handle($dto);
 
             return response()->json([
                 'success' => true,
                 'message' => 'User registered successfully',
-                'data' => [
-                    'user' => $result['user'],
-                    'token' => $result['token'],
-                ],
+                'data' => $result,
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Registration failed',
-                'error' => $e->getMessage(),
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -45,42 +48,34 @@ class AuthController extends Controller
     /**
      * Login user
      */
-    public function login(LoginRequest $request): JsonResponse
-    {
+    public function login(
+        LoginRequest $request,
+        LoginUserFeature $feature
+    ): JsonResponse {
         try {
-            $result = $this->authRepository->login($request->validated());
-
-            if (!$result) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid credentials',
-                ], 401);
-            }
+            $dto = LoginUserDTO::fromRequest($request);
+            $result = $feature->handle($dto);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Login successful',
-                'data' => [
-                    'user' => $result['user'],
-                    'token' => $result['token'],
-                ],
+                'data' => $result,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Login failed',
-                'error' => $e->getMessage(),
-            ], 500);
+                'message' => $e->getMessage(),
+            ], 401);
         }
     }
 
     /**
      * Get authenticated user
      */
-    public function me(): JsonResponse
+    public function me(GetAuthenticatedUserFeature $feature): JsonResponse
     {
         try {
-            $user = $this->authRepository->me();
+            $user = $feature->handle();
 
             return response()->json([
                 'success' => true,
@@ -89,19 +84,18 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to get user',
-                'error' => $e->getMessage(),
-            ], 500);
+                'message' => $e->getMessage(),
+            ], 401);
         }
     }
 
     /**
      * Logout user
      */
-    public function logout(): JsonResponse
+    public function logout(LogoutUserFeature $feature): JsonResponse
     {
         try {
-            $this->authRepository->logout();
+            $feature->handle();
 
             return response()->json([
                 'success' => true,
@@ -110,8 +104,7 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Logout failed',
-                'error' => $e->getMessage(),
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -119,10 +112,13 @@ class AuthController extends Controller
     /**
      * Send password reset link
      */
-    public function forgotPassword(ForgetRequest $request): JsonResponse
-    {
+    public function forgotPassword(
+        ForgetRequest $request,
+        ForgotPasswordFeature $feature
+    ): JsonResponse {
         try {
-            $status = $this->authRepository->forgotPassword($request->email);
+            $dto = ForgotPasswordDTO::fromRequest($request);
+            $feature->handle($dto);
 
             return response()->json([
                 'success' => true,
@@ -131,8 +127,30 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to send reset link',
-                'error' => $e->getMessage(),
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Reset password
+     */
+    public function resetPassword(
+        ResetPasswordRequest $request,
+        ResetPasswordFeature $feature
+    ): JsonResponse {
+        try {
+            $dto = ResetPasswordDTO::fromRequest($request);
+            $feature->handle($dto);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Password reset successfully',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -140,10 +158,10 @@ class AuthController extends Controller
     /**
      * Refresh JWT token
      */
-    public function refresh(): JsonResponse
+    public function refresh(RefreshTokenFeature $feature): JsonResponse
     {
         try {
-            $token = auth()->refresh();
+            $token = $feature->handle();
 
             return response()->json([
                 'success' => true,
@@ -154,9 +172,9 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Token refresh failed',
-                'error' => $e->getMessage(),
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
 }
+
