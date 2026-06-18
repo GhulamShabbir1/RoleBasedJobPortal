@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     use HasFactory;
 
@@ -14,7 +15,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        
+
     ];
 
     protected $hidden = [
