@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('logo')->nullable();
             $table->string('city')->nullable();
             $table->string('website')->nullable();
-            $table->string('Certification');
+            $table->string('certificate')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->foreignId('approved_by')->nullable()->constrained('users')->cascadeOnDelete();
             $table->timestamps();

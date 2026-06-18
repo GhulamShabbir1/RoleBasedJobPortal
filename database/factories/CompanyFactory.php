@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Company;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,6 +19,7 @@ class CompanyFactory extends Factory
     public function definition(): array
     {
         return [
+             'user_id' => User::where('role', 'employer')->inRandomOrder()->first()->id,
     'name' => fake()->company(),
     'description' => fake()->paragraph(5),
     'city' => fake()->city(),

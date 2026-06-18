@@ -16,7 +16,8 @@ class Company extends Model
         'city',
         'website',
         'certification',
-        'status'
+        'status',
+        'approved_by',
     ];
 
     public function user()

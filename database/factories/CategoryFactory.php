@@ -18,10 +18,7 @@ class CategoryFactory extends Factory
     public function definition(): array
     {
         return [
-            'phone' => fake()->phoneNumber(),
-            'city' => fake()->city(),
-            'skills' => fake()->words(5),
-            'experience' => fake()->numberBetween(1, 30),
+            'name'=> fake()->word(),
         ];
     }
 }

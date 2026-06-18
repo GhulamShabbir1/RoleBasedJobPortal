@@ -3,7 +3,10 @@
 namespace Database\Factories;
 
 use App\Models\Application;
+use App\Models\Job;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+
 
 /**
  * @extends Factory<Application>
@@ -18,19 +21,22 @@ class ApplicationFactory extends Factory
     public function definition(): array
     {
         return [
-    'status' => fake()->randomElement([
-        'pending',
-        'reviewed',
-        'shortlisted',
-        'rejected',
-        'hired'
-    ]),
+            'job_id' => Job::inRandomOrder()->first()->id,
+            'candidate_id' => User::where('role', 'candidate')->inRandomOrder()->first()->id,
 
-    'cover_letter' => fake()->paragraph(),
+            'status' => fake()->randomElement([
+                'pending',
+                'reviewed',
+                'shortlisted',
+                'rejected',
+                'hired'
+            ]),
 
-    'resume_path' => 'resumes/sample.pdf',
+            'cover_letter' => fake()->paragraph(),
 
-    'applied_at' => fake()->dateTime(),
-];
+            'resume_path' => 'resumes/sample.pdf',
+
+            'applied_at' => fake()->dateTime(),
+        ];
     }
 }

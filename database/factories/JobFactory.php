@@ -19,6 +19,9 @@ class JobFactory extends Factory
     {
         return [
             'title' => fake()->jobTitle,
+            'company_id' => \App\Models\Company::inRandomOrder()->first()->id,
+            'category_id' => \App\Models\Category::inRandomOrder()->first()->id,
+            'created_by' => \App\Models\User::inRandomOrder()->first()->id,
             'description' => fake()->paragraph(5),
             'city' => fake()->city,
             'job_type' => fake()->randomElement(['full_time', 'part_time', 'contract', 'internship']),
