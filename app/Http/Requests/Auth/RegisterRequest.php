@@ -50,16 +50,4 @@ public function attributes()
     ];
 }
 
-public function withValidator($validator)
-{
-    $validator->after(function ($validator) {
-        if ($this->input('role') === 'employer') {
-            $validator->errors()->add(
-                'role',
-                'Employers cannot register directly. Contact admin for registration.'
-            );
-        }
-    });
-}
-
 }

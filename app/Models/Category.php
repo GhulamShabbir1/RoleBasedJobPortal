@@ -8,12 +8,31 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     use HasFactory;
+
     protected $fillable = [
-        'name'
+        'name',
+        'description',
+        'icon',
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    /**
+     * Get all jobs in this category
+     */
     public function jobs()
     {
         return $this->hasMany(Job::class);
+    }
+
+    /**
+     * Get count of jobs in this category
+     */
+    public function getJobCountAttribute()
+    {
+        return $this->jobs()->count();
     }
 }

@@ -4,6 +4,8 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -14,56 +16,82 @@ class UserRepository implements UserRepositoryInterface
         $this->model = $user;
     }
 
-    public function getAllUsers()
+    /**
+     * Get all users
+     */
+    public function getAllUsers(): Collection
     {
         return $this->model->all();
     }
 
-    public function getCandidates()
+    /**
+     * Get users by role: candidates
+     */
+    public function getCandidates(): Collection
     {
         return $this->model->where('role', 'candidate')->get();
     }
 
-    public function getEmployers()
+    /**
+     * Get users by role: employers
+     */
+    public function getEmployers(): Collection
     {
         return $this->model->where('role', 'employer')->get();
     }
 
-    public function getAdmins()
+    /**
+     * Get users by role: admins
+     */
+    public function getAdmins(): Collection
     {
         return $this->model->where('role', 'admin')->get();
     }
 
-    public function getUserById($id)
+    /**
+     * Find user by ID
+     */
+    public function findById(string $id): ?User
     {
         return $this->model->find($id);
     }
 
-    public function getUserByEmail($email)
+    /**
+     * Find user by email
+     */
+    public function findByEmail(string $email): ?User
     {
         return $this->model->where('email', $email)->first();
     }
 
-    public function createUser(array $data)
+    /**
+     * Create a new user
+     */
+    public function createUser(array $data): User
     {
         return $this->model->create($data);
     }
 
-    public function updateUser($id, array $data)
+    /**
+     * Update user
+     */
+    public function updateUser(string $id, array $data): bool
     {
-        $user = $this->model->find($id);
+        $user = $this->findById($id);
 
         if (!$user) {
-            return null;
+            return false;
         }
 
-        $user->update($data);
-        return $user;
+        return $user->update($data);
     }
 
-    public function deleteUser($id)
+    /**
+     * Delete user
+     */
+    public function deleteUser(string $id): bool
     {
-        $user = $this->model->find($id);
+        $user = $this->findById($id);
 
         if (!$user) {
             return false;
@@ -72,49 +100,38 @@ class UserRepository implements UserRepositoryInterface
         return $user->delete();
     }
 
-    public function updatePassword($id, $password)
+    /**
+     * Update user password
+     */
+    public function updatePassword(string $id, string $password): bool
     {
-        $user = $this->model->find($id);
-
-        if (!$user) {
-            return null;
-        }
-
-        $user->update([
-            'password' => bcrypt($password)
-        ]);
-
-        return $user;
+        return $this->updateUser($id, ['password' => bcrypt($password)]);
     }
 
-
-    public function updateRole($id, $role)
+    /**
+     * Update user role
+     */
+    public function updateRole(string $id, string $role): bool
     {
-        $user = $this->model->find($id);
-
-        if (!$user) {
-            return null;
-        }
-
-        $user->update([
-            'role' => $role
-        ]);
-
-        return $user;
+        return $this->updateUser($id, ['role' => $role]);
     }
 
-    public function updateStatus($id, $status)
+    /**
+     * Filter users by role and search
+     */
+    public function filterUsers(?string $role = null, ?string $search = null, int $page = 1, int $perPage = 15): Paginator
     {
-        $user = $this->model->find($id);
+        $query = $this->model->query();
 
-        if (!$user) {
-            return null;
+        if ($role) {
+            $query->where('role', $role);
         }
 
-        $user->update([
-            'status' => $status
-        ]);
+        if ($search) {
+            $query->where('name', 'like', "%$search%")
+                  ->orWhere('email', 'like', "%$search%");
+        }
 
-        return $user;
+        return $query->paginate($perPage, ['*'], 'page', $page);
     }
 }

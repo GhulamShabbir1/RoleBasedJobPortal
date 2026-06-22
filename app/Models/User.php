@@ -15,7 +15,6 @@ class User extends Authenticatable implements JWTSubject
         'email',
         'password',
         'role',
-
     ];
 
     protected $hidden = [
@@ -27,6 +26,8 @@ class User extends Authenticatable implements JWTSubject
     {
         return [
             'password' => 'hashed',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
         ];
     }
 
@@ -52,27 +53,43 @@ class User extends Authenticatable implements JWTSubject
     |--------------------------------------------------------------------------
     */
 
-    // Employer -> Company
+    /**
+     * Employer -> Company
+     */
     public function company()
     {
         return $this->hasOne(Company::class);
     }
 
-    // Candidate -> Candidate Profile
+    /**
+     * Candidate -> Candidate Profile
+     */
     public function candidateProfile()
     {
         return $this->hasOne(CandidateProfile::class);
     }
 
-    // Candidate -> Applications
+    /**
+     * Candidate -> Applications
+     */
     public function applications()
     {
         return $this->hasMany(Application::class, 'candidate_id');
     }
 
-    // User(Admin/Employer) -> Jobs Created
+    /**
+     * User (Admin/Employer) -> Jobs Created
+     */
     public function jobs()
     {
-        return $this->hasMany(Job::class, 'created_by');
+        return $this->hasMany(Job::class, 'user_id');
+    }
+
+    /**
+     * Admin approved companies
+     */
+    public function approvedCompanies()
+    {
+        return $this->hasMany(Company::class, 'approved_by');
     }
 }

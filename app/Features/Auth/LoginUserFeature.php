@@ -22,7 +22,7 @@ class LoginUserFeature
     {
         try {
             // Attempt login via repository
-            $token = $this->authRepository->attemptLogin($dto->toCredentials());
+            $token = $this->authRepository->attemptLogin($dto->toArray());
 
             if (!$token) {
                 throw new Exception('Invalid credentials provided');

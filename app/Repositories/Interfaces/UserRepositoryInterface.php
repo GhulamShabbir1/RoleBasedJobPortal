@@ -2,29 +2,69 @@
 
 namespace App\Repositories\Interfaces;
 
+use App\Models\User;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
+
 interface UserRepositoryInterface
 {
-    public function getAllUsers();
+    /**
+     * Get all users
+     */
+    public function getAllUsers(): Collection;
 
-    public function getCandidates();
+    /**
+     * Get users by role: candidates
+     */
+    public function getCandidates(): Collection;
 
-    public function getEmployers();
+    /**
+     * Get users by role: employers
+     */
+    public function getEmployers(): Collection;
 
-    public function getAdmins();
+    /**
+     * Get users by role: admins
+     */
+    public function getAdmins(): Collection;
 
-    public function getUserById($id);
+    /**
+     * Find user by ID
+     */
+    public function findById(string $id): ?User;
 
-    public function getUserByEmail($email);
+    /**
+     * Find user by email
+     */
+    public function findByEmail(string $email): ?User;
 
-    public function createUser(array $data);
+    /**
+     * Create a new user
+     */
+    public function createUser(array $data): User;
 
-    public function updateUser($id, array $data);
+    /**
+     * Update user
+     */
+    public function updateUser(string $id, array $data): bool;
 
-    public function deleteUser($id);
+    /**
+     * Delete user
+     */
+    public function deleteUser(string $id): bool;
 
-    public function updatePassword($id, $password);
+    /**
+     * Update user password
+     */
+    public function updatePassword(string $id, string $password): bool;
 
-    public function updateRole($id, $role);
+    /**
+     * Update user role
+     */
+    public function updateRole(string $id, string $role): bool;
 
-    public function updateStatus($id, $status);
+    /**
+     * Filter users by role and search
+     */
+    public function filterUsers(?string $role = null, ?string $search = null, int $page = 1, int $perPage = 15): Paginator;
 }

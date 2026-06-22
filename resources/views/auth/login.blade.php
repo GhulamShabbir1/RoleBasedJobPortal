@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Recruitment Portal</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login · Job Board</title>
+    <!-- Font Awesome (optional, for icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
         * {
             margin: 0;
@@ -12,298 +14,455 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f2f5;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f7f7f7;
+            color: #111;
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .auth-container {
+        /* ---------- MAIN CONTAINER (two columns) ---------- */
+        .auth-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
+            max-width: 1200px;
+            width: 100%;
             min-height: 100vh;
+            background: #fff;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.03);
         }
 
-        /* Left Container - Description */
-        .description-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 3rem 2rem;
+        /* ---------- LEFT: BRAND / DESCRIPTION (black theme) ---------- */
+        .brand-side {
+            background: #111;
+            color: #eee;
+            padding: 3rem 2.5rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-        }
-
-        .description-section h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1.5rem;
-            font-weight: 300;
-        }
-
-        .description-section p {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            margin-bottom: 1rem;
-            opacity: 0.9;
-        }
-
-        .benefits-list {
-            list-style: none;
-            margin-top: 2rem;
-            text-align: left;
-        }
-
-        .benefits-list li {
-            margin: 1rem 0;
-            padding-left: 2rem;
             position: relative;
+            overflow: hidden;
         }
 
-        .benefits-list li:before {
-            content: "✓";
+        .brand-side::after {
+            content: '';
             position: absolute;
-            left: 0;
-            font-weight: bold;
-            font-size: 1.5rem;
+            bottom: -20%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 50%;
+            pointer-events: none;
         }
 
-        /* Right Container - Form */
-        .form-section {
-            background: white;
-            padding: 3rem 2rem;
+        .brand-side .brand-icon {
+            font-size: 3.2rem;
+            color: #fff;
+            margin-bottom: 1.2rem;
+        }
+
+        .brand-side h1 {
+            font-size: 2.6rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #fff;
+            margin-bottom: 0.8rem;
+        }
+
+        .brand-side h1 span {
+            font-weight: 300;
+            color: #aaa;
+        }
+
+        .brand-side .tagline {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #ccc;
+            max-width: 360px;
+            margin: 0 auto 1.2rem;
+        }
+
+        .brand-side .divider-light {
+            width: 60px;
+            height: 2px;
+            background: #333;
+            margin: 1.2rem auto;
+        }
+
+        .brand-side .feature-list {
+            list-style: none;
+            margin-top: 1.5rem;
+            text-align: left;
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .brand-side .feature-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.5rem 0;
+            font-size: 0.95rem;
+            color: #ddd;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .brand-side .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .brand-side .feature-list i {
+            color: #aaa;
+            width: 1.4rem;
+            font-size: 1rem;
+        }
+
+        /* ---------- RIGHT: FORM ---------- */
+        .form-side {
+            background: #fff;
+            padding: 3rem 2.5rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            align-items: center;
         }
 
         .form-wrapper {
             max-width: 400px;
-            margin: 0 auto;
             width: 100%;
         }
 
-        .form-wrapper h2 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-            color: #333;
-        }
-
-        .form-wrapper p {
-            color: #666;
+        .form-wrapper .form-header {
             margin-bottom: 2rem;
         }
 
+        .form-wrapper .form-header h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #111;
+            letter-spacing: -0.02em;
+        }
+
+        .form-wrapper .form-header p {
+            color: #666;
+            margin-top: 0.3rem;
+            font-size: 0.95rem;
+        }
+
+        /* ---------- FORM ELEMENTS (monochrome) ---------- */
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
         }
 
-        label {
+        .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
-            color: #333;
             font-weight: 500;
+            font-size: 0.9rem;
+            color: #222;
+            margin-bottom: 0.3rem;
         }
 
-        input[type="email"],
-        input[type="password"] {
+        .form-group .input-wrap {
+            position: relative;
+        }
+
+        .form-group .input-wrap i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
             width: 100%;
-            padding: 0.8rem;
+            padding: 0.75rem 1rem 0.75rem 2.6rem;
             border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
+            border-radius: 10px;
+            background: #fcfcfc;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            color: #111;
         }
 
-        input[type="email"]:focus,
-        input[type="password"]:focus {
+        .form-group input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 5px rgba(102, 126, 234, 0.1);
+            border-color: #111;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
+            background: #fff;
         }
 
+        .form-group input::placeholder {
+            color: #aaa;
+        }
+
+        /* ---------- MESSAGES ---------- */
+        .message-box {
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.2rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .message-box.error {
+            background: #f8f0f0;
+            color: #b33;
+            border-left: 3px solid #b33;
+        }
+
+        .message-box.success {
+            background: #f0f8f0;
+            color: #2a7a2a;
+            border-left: 3px solid #2a7a2a;
+        }
+
+        /* ---------- LOADING ---------- */
+        .loading-box {
+            display: none;
+            text-align: center;
+            padding: 0.5rem 0;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .loading-box .spinner {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            border: 2px solid #ddd;
+            border-top-color: #111;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin-right: 0.6rem;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ---------- BUTTON ---------- */
         .btn-login {
             width: 100%;
-            padding: 0.8rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            padding: 0.85rem;
+            background: #111;
+            color: #fff;
             border: none;
-            border-radius: 5px;
+            border-radius: 40px;
             font-size: 1rem;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 1rem;
+            transition: all 0.2s;
+            margin-top: 0.5rem;
+            letter-spacing: 0.01em;
         }
 
         .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-login:active {
-            transform: translateY(0);
+            background: #2a2a2a;
+            transform: scale(1.01);
         }
 
         .btn-login:disabled {
-            opacity: 0.7;
+            opacity: 0.6;
             cursor: not-allowed;
             transform: none;
         }
 
-        .links {
+        /* ---------- FOOTER LINKS ---------- */
+        .form-footer {
+            margin-top: 2rem;
             text-align: center;
-            margin-top: 1.5rem;
+            font-size: 0.95rem;
+            color: #555;
         }
 
-        .links a {
-            color: #667eea;
+        .form-footer a {
+            color: #111;
+            font-weight: 500;
             text-decoration: none;
-            margin: 0 0.5rem;
-            transition: color 0.3s;
+            border-bottom: 1.5px solid #ccc;
+            padding-bottom: 1px;
+            transition: border-color 0.2s;
         }
 
-        .links a:hover {
-            color: #764ba2;
+        .form-footer a:hover {
+            border-color: #111;
         }
 
-        .signup-link {
+        .form-footer .forgot-link {
+            display: inline-block;
+            margin-top: 0.5rem;
+            font-weight: 400;
+            color: #777;
+            border-bottom-color: #ddd;
+        }
+
+        .form-footer .forgot-link:hover {
+            color: #111;
+            border-bottom-color: #111;
+        }
+
+        .form-footer .signup-link {
             margin-top: 1rem;
             color: #666;
         }
 
-        .error-message {
-            background: #fee;
-            color: #c33;
-            padding: 1rem;
-            border-radius: 5px;
-            margin-bottom: 1rem;
-            display: none;
-        }
-
-        .success-message {
-            background: #efe;
-            color: #3c3;
-            padding: 1rem;
-            border-radius: 5px;
-            margin-bottom: 1rem;
-            display: none;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            color: #667eea;
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .auth-container {
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 820px) {
+            .auth-grid {
                 grid-template-columns: 1fr;
+                min-height: auto;
+                box-shadow: none;
             }
 
-            .description-section {
-                padding: 2rem 1rem;
-                min-height: 30vh;
+            .brand-side {
+                padding: 2.5rem 1.5rem;
+                min-height: 35vh;
             }
 
-            .description-section h1 {
+            .brand-side h1 {
+                font-size: 2.2rem;
+            }
+
+            .form-side {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .brand-side h1 {
                 font-size: 1.8rem;
             }
 
-            .form-section {
-                padding: 2rem 1rem;
+            .brand-side .feature-list li {
+                font-size: 0.85rem;
+            }
+
+            .form-wrapper .form-header h2 {
+                font-size: 1.6rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="auth-container">
-        <!-- Left: Description Section -->
-        <div class="description-section">
-            <div>
-                <h1>Welcome Back</h1>
-                <p>Log in to your Recruitment Portal account to access job opportunities, manage applications, and advance your career.</p>
-                <ul class="benefits-list">
-                    <li>Browse thousands of job listings</li>
-                    <li>Manage your applications</li>
-                    <li>Connect with employers</li>
-                    <li>Track your career progress</li>
-                </ul>
-            </div>
-        </div>
 
-        <!-- Right: Form Section -->
-        <div class="form-section">
-            <div class="form-wrapper">
-                <h2>Login</h2>
-                <p>Enter your credentials to access your account</p>
+<div class="auth-grid">
 
-                <div class="error-message" id="errorMessage"></div>
-                <div class="success-message" id="successMessage"></div>
-
-                <form id="loginForm">
-                    <div class="form-group">
-                        <label for="email">Email Address</label>
-                        <input type="email" id="email" name="email" placeholder="your@email.com" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" placeholder="Enter your password" required>
-                    </div>
-
-                    <div class="loading" id="loading">
-                        <div class="spinner"></div>
-                        <p>Logging in...</p>
-                    </div>
-
-                    <button type="submit" class="btn-login" id="submitBtn">Login</button>
-                </form>
-
-                <div class="links">
-                    <a href="/forgot-password">Forgot Password?</a>
-                </div>
-
-                <div class="signup-link">
-                    Don't have an account? <a href="/auth/signup">Sign up here</a>
-                </div>
-            </div>
+    <!-- LEFT: Brand / Description (black theme) -->
+    <div class="brand-side">
+        <div class="brand-icon"><i class="fas fa-briefcase"></i></div>
+        <h1>job<span>board</span></h1>
+        <div class="divider-light"></div>
+        <p class="tagline">
+            Welcome back. Access your dashboard, track applications, and connect with top employers.
+        </p>
+        <ul class="feature-list">
+            <li><i class="fas fa-check-circle"></i> 1000+ active job listings</li>
+            <li><i class="fas fa-check-circle"></i> Smart application tracking</li>
+            <li><i class="fas fa-check-circle"></i> Direct employer messaging</li>
+            <li><i class="fas fa-check-circle"></i> Personalized recommendations</li>
+        </ul>
+        <div style="margin-top: 1.8rem; font-size: 0.8rem; color: #555; letter-spacing: 0.02em;">
+            <i class="fas fa-shield-alt" style="margin-right: 0.4rem;"></i> Secure & encrypted
         </div>
     </div>
 
-    <script>
-        const API_URL = 'http://localhost:8000/api';
+    <!-- RIGHT: Login Form -->
+    <div class="form-side">
+        <div class="form-wrapper">
 
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            <div class="form-header">
+                <h2>Welcome back</h2>
+                <p>Log in to your account</p>
+            </div>
+
+            <!-- error & success messages -->
+            <div class="message-box error" id="errorMessage"></div>
+            <div class="message-box success" id="successMessage"></div>
+
+            <form id="loginForm" novalidate>
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="email" placeholder="jane@example.com" required />
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required />
+                    </div>
+                </div>
+
+                <!-- loading indicator -->
+                <div class="loading-box" id="loadingBox">
+                    <span class="spinner"></span> Logging in...
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="btn-login" id="submitBtn">
+                    <i class="fas fa-arrow-right" style="margin-right: 0.5rem;"></i> Log in
+                </button>
+            </form>
+
+            <!-- footer links -->
+            <div class="form-footer">
+                <a href="/forgot-password" class="forgot-link">Forgot password?</a>
+                <div class="signup-link">
+                    Don't have an account? <a href="/auth/signup">Sign up</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const API_URL = 'http://localhost:8000/api'; // adjust to your backend
+
+        const form = document.getElementById('loginForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const loadingBox = document.getElementById('loadingBox');
+        const errorBox = document.getElementById('errorMessage');
+        const successBox = document.getElementById('successMessage');
+
+        // check if already logged in
+        if (localStorage.getItem('token')) {
+            window.location.href = '/dashboard';
+        }
+
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            const submitBtn = document.getElementById('submitBtn');
-            const loading = document.getElementById('loading');
-            const errorMessage = document.getElementById('errorMessage');
-            const successMessage = document.getElementById('successMessage');
 
+            // simple client-side validation
+            if (!email || !password) {
+                errorBox.textContent = 'Please enter your email and password.';
+                errorBox.style.display = 'block';
+                successBox.style.display = 'none';
+                return;
+            }
+
+            // disable UI
             submitBtn.disabled = true;
-            loading.style.display = 'block';
-            errorMessage.style.display = 'none';
-            successMessage.style.display = 'none';
+            loadingBox.style.display = 'block';
+            errorBox.style.display = 'none';
+            successBox.style.display = 'none';
 
             try {
                 const response = await fetch(`${API_URL}/auth/login`, {
@@ -312,46 +471,45 @@
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify({
-                        email: email,
-                        password: password
-                    })
+                    body: JSON.stringify({ email, password })
                 });
 
                 const data = await response.json();
 
                 if (data.success) {
-                    // Store token and user data
+                    // store token & user
                     localStorage.setItem('token', data.data.token);
                     localStorage.setItem('user', JSON.stringify(data.data.user));
 
-                    successMessage.textContent = data.message;
-                    successMessage.style.display = 'block';
+                    successBox.textContent = data.message || 'Login successful!';
+                    successBox.style.display = 'block';
 
-                    // Redirect to dashboard after 1 second
+                    // redirect after short delay
                     setTimeout(() => {
                         window.location.href = '/dashboard';
-                    }, 1000);
+                    }, 800);
                 } else {
-                    errorMessage.textContent = data.message || 'Login failed';
-                    errorMessage.style.display = 'block';
+                    errorBox.textContent = data.message || 'Invalid credentials. Please try again.';
+                    errorBox.style.display = 'block';
                 }
-            } catch (error) {
-                errorMessage.textContent = 'Network error. Please try again.';
-                errorMessage.style.display = 'block';
+            } catch (err) {
+                errorBox.textContent = 'Network error. Please check your connection.';
+                errorBox.style.display = 'block';
             } finally {
                 submitBtn.disabled = false;
-                loading.style.display = 'none';
+                loadingBox.style.display = 'none';
             }
         });
 
-        // Check if already logged in
-        window.addEventListener('load', () => {
-            const token = localStorage.getItem('token');
-            if (token) {
-                window.location.href = '/dashboard';
-            }
+        // clear messages on input
+        document.querySelectorAll('#loginForm input').forEach(input => {
+            input.addEventListener('input', () => {
+                errorBox.style.display = 'none';
+                successBox.style.display = 'none';
+            });
         });
-    </script>
+
+    })();
+</script>
 </body>
 </html>

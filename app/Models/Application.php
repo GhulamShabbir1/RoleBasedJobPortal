@@ -11,6 +11,7 @@ class Application extends Model
 
     protected $fillable = [
         'job_id',
+        'user_id',
         'candidate_id',
         'status',
         'cover_letter',
@@ -18,19 +19,41 @@ class Application extends Model
         'applied_at',
     ];
 
+    protected $casts = [
+        'applied_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    /**
+     * Get the job this application is for
+     */
     public function job()
     {
         return $this->belongsTo(Job::class);
     }
 
+    /**
+     * Get the candidate who applied (using candidate_id or user_id)
+     */
     public function candidate()
     {
         return $this->belongsTo(User::class, 'candidate_id');
     }
 
-    // employer
+    /**
+     * Get the candidate via user_id relationship
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the employer through the job
+     */
     public function employer()
     {
-        return $this->belongsTo(User::class, 'employer_id');
+        return $this->hasOneThrough(User::class, Job::class, 'id', 'id', 'job_id', 'user_id');
     }
 }

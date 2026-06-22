@@ -26,6 +26,31 @@ Route::get('/dashboard', function () {
     return view('dashboard.dashboard');
 });
 
+// Jobs
+Route::get('/jobs', function () {
+    return view('jobs.index');
+});
+
+// Applications
+Route::get('/applications', function () {
+    return view('applications.index');
+});
+
+// Companies
+Route::get('/companies', function () {
+    return view('companies.index');
+});
+
+// Profile
+Route::get('/profile', function () {
+    return view('dashboard.dashboard');
+});
+
+// Settings
+Route::get('/settings', function () {
+    return view('dashboard.dashboard');
+});
+
 // Fallback
 Route::get('/{any}', function () {
     return view('welcome');

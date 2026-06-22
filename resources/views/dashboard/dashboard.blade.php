@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Recruitment Portal</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Job Board · Monochrome</title>
+    <!-- Font Awesome (optional, for icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
         * {
             margin: 0;
@@ -12,497 +14,626 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f2f5;
-            line-height: 1.6;
-            color: #333;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #fafafa;
+            color: #111;
+            line-height: 1.5;
         }
 
-        .layout {
+        /* ---------- LAYOUT ---------- */
+        .app {
             display: grid;
-            grid-template-columns: 250px 1fr;
+            grid-template-columns: 260px 1fr;
             min-height: 100vh;
         }
 
-        /* Sidebar Navigation */
+        /* ---------- SIDEBAR (black/white) ---------- */
         .sidebar {
-            background: #2c3e50;
-            color: white;
-            padding: 2rem 0;
-            position: fixed;
-            left: 0;
+            background: #111;
+            color: #eee;
+            padding: 2rem 0 1.5rem;
+            position: sticky;
             top: 0;
             height: 100vh;
-            width: 250px;
+            display: flex;
+            flex-direction: column;
             overflow-y: auto;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            border-right: 1px solid #2a2a2a;
         }
 
-        .sidebar-header {
-            padding: 1.5rem 2rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 1rem;
+        .sidebar-brand {
+            padding: 0 1.8rem 2rem;
+            border-bottom: 1px solid #2a2a2a;
+            margin-bottom: 1.5rem;
         }
 
-        .sidebar-header h2 {
-            font-size: 1.5rem;
-            font-weight: bold;
+        .sidebar-brand h1 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #fff;
+        }
+        .sidebar-brand h1 span {
+            font-weight: 300;
+            color: #aaa;
         }
 
         .sidebar-nav {
-            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            padding: 0 1rem;
+            flex: 1;
         }
 
         .sidebar-nav a {
-            display: block;
-            padding: 1rem 2rem;
-            color: #ecf0f1;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.7rem 1rem;
+            border-radius: 8px;
+            color: #ccc;
             text-decoration: none;
-            transition: all 0.3s;
-            border-left: 3px solid transparent;
+            font-weight: 450;
+            transition: all 0.15s ease;
+            font-size: 0.95rem;
         }
 
-        .sidebar-nav a:hover,
+        .sidebar-nav a i {
+            width: 1.3rem;
+            font-size: 1rem;
+            color: #888;
+            transition: color 0.15s;
+        }
+
+        .sidebar-nav a:hover {
+            background: #2a2a2a;
+            color: #fff;
+        }
+        .sidebar-nav a:hover i {
+            color: #fff;
+        }
+
         .sidebar-nav a.active {
-            background: rgba(102, 126, 234, 0.2);
-            border-left-color: #667eea;
-            color: white;
+            background: #2a2a2a;
+            color: #fff;
+            font-weight: 500;
+        }
+        .sidebar-nav a.active i {
+            color: #fff;
         }
 
         .sidebar-footer {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding: 1rem 2rem;
+            padding: 1.5rem 1.8rem 0.5rem;
+            border-top: 1px solid #2a2a2a;
+            margin-top: 1rem;
         }
 
-        .logout-btn {
+        .btn-logout {
             width: 100%;
-            padding: 0.8rem;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 5px;
+            background: transparent;
+            border: 1px solid #3a3a3a;
+            color: #ddd;
+            padding: 0.7rem;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.9rem;
             cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-
-        .logout-btn:hover {
-            background: #c0392b;
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: 250px;
-            padding: 2rem;
-        }
-
-        /* Header/Navbar */
-        .header {
-            background: white;
-            padding: 1.5rem 2rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header h1 {
-            font-size: 2rem;
-            color: #2c3e50;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.2rem;
+            gap: 0.6rem;
+        }
+        .btn-logout:hover {
+            background: #2a2a2a;
+            border-color: #666;
+            color: #fff;
         }
 
-        .user-name {
-            text-align: right;
+        /* ---------- MAIN CONTENT ---------- */
+        .main {
+            background: #fafafa;
+            padding: 2rem 2.5rem;
+            min-height: 100vh;
         }
 
-        .user-name p {
-            font-weight: bold;
-            color: #2c3e50;
+        /* TOP BAR */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            margin-bottom: 2.5rem;
         }
 
-        .user-role {
-            font-size: 0.9rem;
-            color: #667eea;
+        .topbar h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #111;
+        }
+        .topbar h2 small {
+            font-weight: 400;
+            font-size: 1rem;
+            color: #555;
+            margin-left: 0.5rem;
         }
 
-        /* Dashboard Grid */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: #fff;
+            padding: 0.3rem 1rem 0.3rem 0.3rem;
+            border-radius: 60px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            border: 1px solid #e6e6e6;
         }
 
-        .dashboard-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            transition: all 0.3s;
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #111;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-transform: uppercase;
         }
 
-        .dashboard-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        .user-meta {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.3;
         }
-
-        .card-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
+        .user-meta strong {
+            font-weight: 600;
+            color: #111;
         }
-
-        .card-title {
-            font-size: 1.3rem;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
-            font-weight: bold;
-        }
-
-        .card-value {
-            font-size: 2rem;
-            color: #667eea;
-            font-weight: bold;
-            margin-bottom: 1rem;
-        }
-
-        .card-description {
+        .user-meta span {
+            font-size: 0.8rem;
             color: #666;
-            font-size: 0.95rem;
         }
 
-        /* Stats Section */
-        .stats-section {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 2rem;
-        }
-
-        .stats-section h2 {
-            margin-bottom: 1.5rem;
-            color: #2c3e50;
-            font-size: 1.5rem;
-        }
-
-        .stats-grid {
+        /* ---------- CARDS (monochrome) ---------- */
+        .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
+            gap: 1.8rem;
+            margin-bottom: 2.8rem;
         }
 
-        .stat-item {
+        .stat-card {
+            background: #fff;
+            padding: 1.6rem 1.8rem;
+            border-radius: 20px;
+            border: 1px solid #ececec;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            transition: transform 0.15s ease, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.04);
+        }
+
+        .stat-card .icon {
+            font-size: 1.8rem;
+            color: #222;
+            margin-bottom: 0.4rem;
+        }
+
+        .stat-card .label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #555;
+            letter-spacing: 0.01em;
+        }
+
+        .stat-card .value {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: #111;
+            margin: 0.2rem 0 0.3rem;
+        }
+
+        .stat-card .sub {
+            font-size: 0.85rem;
+            color: #777;
+        }
+
+        .stat-card .action-link {
+            display: inline-block;
+            margin-top: 1rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #111;
+            text-decoration: none;
+            border-bottom: 1.5px solid #ccc;
+            padding-bottom: 2px;
+            transition: border-color 0.2s;
+        }
+        .stat-card .action-link:hover {
+            border-color: #111;
+        }
+
+        /* ---------- ACTIVITY SECTION ---------- */
+        .activity-section {
+            background: #fff;
+            border-radius: 24px;
+            border: 1px solid #ececec;
+            padding: 2rem 2.2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.01);
+        }
+
+        .activity-section h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #111;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.01em;
+        }
+
+        .activity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .activity-item {
             text-align: center;
+            padding: 0.5rem 0;
         }
 
-        .stat-number {
-            font-size: 2.5rem;
-            color: #667eea;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
+        .activity-item .number {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: #111;
+            line-height: 1.2;
         }
 
-        .stat-label {
-            color: #666;
+        .activity-item .desc {
+            font-size: 0.9rem;
+            color: #555;
+            margin-top: 0.1rem;
+        }
+
+        .divider-light {
+            border: none;
+            height: 1px;
+            background: #ececec;
+            margin: 1.8rem 0;
+        }
+
+        /* ---------- RECENT ACTIVITY (mock) ---------- */
+        .recent-list {
+            list-style: none;
+            margin-top: 0.8rem;
+        }
+        .recent-list li {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.7rem 0;
+            border-bottom: 1px solid #f0f0f0;
             font-size: 0.95rem;
         }
+        .recent-list li:last-child {
+            border-bottom: none;
+        }
+        .recent-list .badge {
+            background: #111;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.7rem;
+            border-radius: 40px;
+            letter-spacing: 0.02em;
+        }
+        .recent-list .time {
+            margin-left: auto;
+            color: #777;
+            font-size: 0.8rem;
+        }
 
-        /* Quick Actions */
-        .quick-actions {
-            display: flex;
-            gap: 1rem;
+        /* ---------- UTILITIES ---------- */
+        .text-muted {
+            color: #777;
+        }
+        .mt-2 {
             margin-top: 1.5rem;
-            flex-wrap: wrap;
         }
 
-        .btn {
-            padding: 0.8rem 1.5rem;
-            border-radius: 5px;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-            display: inline-block;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: #ecf0f1;
-            color: #2c3e50;
-        }
-
-        .btn-secondary:hover {
-            background: #bdc3c7;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .layout {
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 820px) {
+            .app {
                 grid-template-columns: 1fr;
             }
-
             .sidebar {
-                width: 100%;
+                position: relative;
                 height: auto;
-                position: relative;
+                padding: 1.2rem 0;
+                border-right: none;
+                border-bottom: 1px solid #2a2a2a;
             }
-
-            .main-content {
-                margin-left: 0;
-                padding: 1rem;
+            .sidebar-brand {
+                padding: 0 1.5rem 1rem;
+                margin-bottom: 0.5rem;
             }
-
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
+            .sidebar-nav {
+                flex-direction: row;
+                flex-wrap: wrap;
+                padding: 0 1rem;
+                gap: 0.2rem;
             }
-
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
+            .sidebar-nav a {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.85rem;
             }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
             .sidebar-footer {
-                position: relative;
-                bottom: auto;
-                margin-top: 1rem;
+                border-top: none;
+                padding: 0.8rem 1.5rem;
             }
+            .btn-logout {
+                width: auto;
+                padding: 0.4rem 1.2rem;
+            }
+            .main {
+                padding: 1.5rem;
+            }
+            .topbar {
+                flex-direction: column;
+                align-items: start;
+            }
+            .card-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .activity-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            .activity-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .stat-card {
+                padding: 1.2rem;
+            }
+            .topbar h2 {
+                font-size: 1.4rem;
+            }
+        }
+
+        /* small extras */
+        .badge-outline {
+            border: 1px solid #ccc;
+            border-radius: 40px;
+            padding: 0.2rem 0.9rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #333;
+        }
+        .flex {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
     </style>
 </head>
 <body>
-    <div class="layout">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h2>💼 Portal</h2>
-            </div>
-            <nav class="sidebar-nav">
-                <a href="/dashboard" class="active">📊 Dashboard</a>
-                <a href="#" id="navLink_jobs">🔍 Jobs</a>
-                <a href="#" id="navLink_applications">📝 Applications</a>
-                <a href="#" id="navLink_companies">🏢 Companies</a>
-                <a href="#" id="navLink_profile">👤 Profile</a>
-                <a href="#" id="navLink_settings">⚙️ Settings</a>
-            </nav>
-            <div class="sidebar-footer">
-                <button class="logout-btn" onclick="logout()">Logout</button>
-            </div>
-        </aside>
+<div class="app">
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Header -->
-            <div class="header">
-                <h1 id="welcomeMessage">Welcome to Dashboard</h1>
-                <div class="user-info">
-                    <div class="user-avatar" id="userAvatar">J</div>
-                    <div class="user-name">
-                        <p id="userName">John Doe</p>
-                        <p class="user-role" id="userRole">Candidate</p>
-                    </div>
+    <!-- SIDEBAR · monochrome -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <h1>job<span>board</span></h1>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="#" class="active"><i class="fas fa-chart-pie"></i> Dashboard</a>
+            <a href="#"><i class="fas fa-search"></i> Jobs</a>
+            <a href="#"><i class="fas fa-file-alt"></i> Applications</a>
+            <a href="#"><i class="fas fa-building"></i> Companies</a>
+            <a href="#"><i class="fas fa-user"></i> Profile</a>
+            <a href="#"><i class="fas fa-cog"></i> Settings</a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- TOP BAR -->
+        <div class="topbar">
+            <h2>
+                Dashboard
+                <small>· overview</small>
+            </h2>
+            <div class="user-badge">
+                <div class="avatar" id="avatarDisplay">J</div>
+                <div class="user-meta">
+                    <strong id="userNameDisplay">John Doe</strong>
+                    <span id="userRoleDisplay">Candidate</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- STAT CARDS (monochrome) -->
+        <div class="card-grid">
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-briefcase"></i></div>
+                <div class="label">Active jobs</div>
+                <div class="value" id="activeJobs">12</div>
+                <div class="sub">matching your profile</div>
+                <a href="#" class="action-link">Browse jobs →</a>
+            </div>
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-pen-fancy"></i></div>
+                <div class="label">Applications</div>
+                <div class="value" id="totalApplications">3</div>
+                <div class="sub">submitted</div>
+                <a href="#" class="action-link">View all →</a>
+            </div>
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-city"></i></div>
+                <div class="label">Companies</div>
+                <div class="value" id="totalCompanies">25</div>
+                <div class="sub">hiring now</div>
+                <a href="#" class="action-link">Explore →</a>
+            </div>
+        </div>
+
+        <!-- ACTIVITY SECTION -->
+        <div class="activity-section">
+            <h3>Your activity</h3>
+            <div class="activity-grid">
+                <div class="activity-item">
+                    <div class="number" id="viewsCount">142</div>
+                    <div class="desc">Profile views</div>
+                </div>
+                <div class="activity-item">
+                    <div class="number" id="interviews">7</div>
+                    <div class="desc">Interviews</div>
+                </div>
+                <div class="activity-item">
+                    <div class="number" id="saved">18</div>
+                    <div class="desc">Saved jobs</div>
+                </div>
+                <div class="activity-item">
+                    <div class="number" id="messages">9</div>
+                    <div class="desc">Messages</div>
                 </div>
             </div>
 
-            <!-- Dashboard Cards -->
-            <div class="dashboard-grid">
-                <div class="dashboard-card">
-                    <div class="card-icon">🔍</div>
-                    <div class="card-title">Active Jobs</div>
-                    <div class="card-value" id="activeJobs">0</div>
-                    <div class="card-description">Jobs matching your profile</div>
-                    <div class="quick-actions">
-                        <a href="#" class="btn btn-primary">Browse Jobs</a>
-                    </div>
-                </div>
+            <hr class="divider-light" />
 
-                <div class="dashboard-card">
-                    <div class="card-icon">📝</div>
-                    <div class="card-title">Applications</div>
-                    <div class="card-value" id="totalApplications">0</div>
-                    <div class="card-description">Jobs you've applied to</div>
-                    <div class="quick-actions">
-                        <a href="#" class="btn btn-primary">View Applications</a>
-                    </div>
-                </div>
-
-                <div class="dashboard-card">
-                    <div class="card-icon">🏢</div>
-                    <div class="card-title">Companies</div>
-                    <div class="card-value" id="totalCompanies">0</div>
-                    <div class="card-description">Companies hiring now</div>
-                    <div class="quick-actions">
-                        <a href="#" class="btn btn-primary">Explore</a>
-                    </div>
-                </div>
+            <!-- recent activity mock -->
+            <div class="flex" style="justify-content:space-between;">
+                <span style="font-weight:500; color:#111;">Recent activity</span>
+                <span class="badge-outline">last 7 days</span>
             </div>
+            <ul class="recent-list">
+                <li>
+                    <span class="badge">Applied</span>
+                    Senior Frontend Developer · <span class="text-muted">GitHub</span>
+                    <span class="time">2h ago</span>
+                </li>
+                <li>
+                    <span class="badge">Saved</span>
+                    Product Designer · <span class="text-muted">Figma</span>
+                    <span class="time">yesterday</span>
+                </li>
+                <li>
+                    <span class="badge">Interview</span>
+                    Backend Engineer · <span class="text-muted">Stripe</span>
+                    <span class="time">3d ago</span>
+                </li>
+                <li>
+                    <span class="badge">Viewed</span>
+                    DevOps Lead · <span class="text-muted">AWS</span>
+                    <span class="time">4d ago</span>
+                </li>
+            </ul>
+        </div>
 
-            <!-- Stats Section -->
-            <div class="stats-section">
-                <h2>Your Activity</h2>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-number" id="viewsCount">0</div>
-                        <div class="stat-label">Profile Views</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="interviews">0</div>
-                        <div class="stat-label">Interviews</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="saved">0</div>
-                        <div class="stat-label">Saved Jobs</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number" id="messages">0</div>
-                        <div class="stat-label">Messages</div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
+        <!-- subtle footer note -->
+        <div style="font-size:0.8rem; color:#aaa; margin-top:1rem; border-top:1px solid #ececec; padding-top:1.2rem; display:flex; justify-content:space-between;">
+            <span>© 2026 jobboard · monochrome</span>
+            <span><i class="fas fa-circle" style="font-size:0.4rem; vertical-align:middle; color:#888;"></i> all good</span>
+        </div>
+    </main>
+</div>
 
-    <script>
-        const API_URL = 'http://localhost:8000/api';
+<!-- JavaScript (minimal, keeps the monochrome spirit) -->
+<script>
+    (function() {
+        // --- mock data (simulate user from localStorage) ---
+        const defaultUser = {
+            name: 'John Doe',
+            role: 'candidate',
+            avatar: 'J'
+        };
 
-        // Check authentication
-        function checkAuth() {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                window.location.href = '/auth/login';
-                return false;
-            }
-            return token;
+        // try to read from localStorage, else use default
+        let storedUser = null;
+        try {
+            const raw = localStorage.getItem('user');
+            if (raw) storedUser = JSON.parse(raw);
+        } catch (_) { /* ignore */ }
+
+        const user = storedUser || defaultUser;
+
+        // display user
+        document.getElementById('userNameDisplay').textContent = user.name || 'John Doe';
+        document.getElementById('userRoleDisplay').textContent = (user.role || 'candidate').charAt(0).toUpperCase() + (user.role || 'candidate').slice(1);
+        const avatarEl = document.getElementById('avatarDisplay');
+        if (user.name) {
+            avatarEl.textContent = user.name.charAt(0).toUpperCase();
         }
 
-        // Load user data
-        function loadUserData() {
-            const user = JSON.parse(localStorage.getItem('user'));
-            if (user) {
-                document.getElementById('userName').textContent = user.name;
-                document.getElementById('userRole').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
-                document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
-                document.getElementById('welcomeMessage').textContent = `Welcome, ${user.name}!`;
+        // --- dashboard numbers (static mock, but can be dynamic) ---
+        // you can replace these with real API data later
+        document.getElementById('activeJobs').textContent = '12';
+        document.getElementById('totalApplications').textContent = '3';
+        document.getElementById('totalCompanies').textContent = '25';
+        document.getElementById('viewsCount').textContent = '142';
+        document.getElementById('interviews').textContent = '7';
+        document.getElementById('saved').textContent = '18';
+        document.getElementById('messages').textContent = '9';
 
-                // Set dashboard content based on role
-                loadRoleDashboard(user.role);
-            }
-        }
+        // --- logout handler ---
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            // clear local storage and redirect
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            // if you have a login page:
+            // window.location.href = '/auth/login';
+            alert('Logged out (demo) — redirect to login.');
+            // for demo we just reload and reset to default user
+            localStorage.removeItem('user');
+            window.location.reload();
+        });
 
-        // Load role-specific dashboard
-        function loadRoleDashboard(role) {
-            if (role === 'candidate') {
-                // Show candidate-specific content
-                document.getElementById('activeJobs').textContent = '12';
-                document.getElementById('totalApplications').textContent = '3';
-                document.getElementById('totalCompanies').textContent = '25';
-            } else if (role === 'employer') {
-                // Show employer-specific content
-                document.getElementById('activeJobs').textContent = 'Posted';
-                document.getElementById('totalApplications').textContent = 'Received';
-                document.getElementById('totalCompanies').textContent = 'Your Company';
-            } else if (role === 'admin') {
-                // Show admin-specific content
-                document.getElementById('activeJobs').textContent = 'Manage';
-                document.getElementById('totalApplications').textContent = 'Review';
-                document.getElementById('totalCompanies').textContent = 'Verify';
-            }
-        }
-
-        // Logout function
-        function logout() {
-            const token = checkAuth();
-            if (!token) return;
-
-            fetch(`${API_URL}/auth/logout`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Accept': 'application/json'
-                }
-            }).then(() => {
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-                window.location.href = '/auth/login';
-            }).catch(error => {
-                console.error('Logout error:', error);
-                // Clear storage anyway
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-                window.location.href = '/auth/login';
+        // --- navigation links (demo) ---
+        document.querySelectorAll('.sidebar-nav a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                // remove active from all, add to current
+                document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+                this.classList.add('active');
+                // simple feedback
+                const label = this.textContent.trim();
+                alert(`Navigation: ${label} (coming soon)`);
             });
-        }
-
-        // Initialize
-        window.addEventListener('load', () => {
-            if (checkAuth()) {
-                loadUserData();
-            }
         });
 
-        // Handle navigation
-        document.getElementById('navLink_jobs')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            alert('Jobs page - Coming soon!');
+        // action links (cards)
+        document.querySelectorAll('.action-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('Action: ' + this.textContent.trim());
+            });
         });
 
-        document.getElementById('navLink_applications')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            alert('Applications page - Coming soon!');
-        });
+        // 'Browse jobs' / 'View all' etc are handled above via .action-link
 
-        document.getElementById('navLink_companies')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            alert('Companies page - Coming soon!');
-        });
-
-        document.getElementById('navLink_profile')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            alert('Profile page - Coming soon!');
-        });
-
-        document.getElementById('navLink_settings')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            alert('Settings page - Coming soon!');
-        });
-    </script>
+        console.log('Monochrome job board ready.');
+    })();
+</script>
 </body>
 </html>
