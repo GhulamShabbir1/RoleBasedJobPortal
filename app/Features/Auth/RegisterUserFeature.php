@@ -24,12 +24,10 @@ class RegisterUserFeature
             // Create user via repository
             $user = $this->authRepository->createUser($dto->toArray());
 
-            // Generate JWT token for newly registered user
-            $token = auth()->login($user);
-
+            // Do NOT auto-login on signup.
+            // Just create the user; the client will redirect to the login page.
             return [
                 'user' => $user,
-                'token' => $token,
             ];
         } catch (Exception $e) {
             throw new Exception('User registration failed: ' . $e->getMessage());

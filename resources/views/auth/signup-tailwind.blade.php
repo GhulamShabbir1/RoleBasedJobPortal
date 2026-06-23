@@ -146,23 +146,20 @@
             });
 
             const data = await response.json();
-            const token = data?.data?.token || data?.token || data?.access_token;
             const user = data?.data?.user || data?.user;
 
             if (!response.ok) {
                 throw new Error(data.message || 'Registration failed');
             }
 
-            if (token) {
-                localStorage.setItem('token', token);
-            }
-            if (user) {
-                localStorage.setItem('user', JSON.stringify(user));
-            }
+            // Clear any existing auth artifacts to prevent auto-login redirect.
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
 
             btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Account Created';
-            const role = user?.role || document.querySelector('input[name="role"]:checked')?.value || 'candidate';
-            window.location.href = `/dashboard/${role}`;
+
+            // Redirect to login page (user must login manually)
+            window.location.href = '/auth/login';
         } catch (error) {
             alert(error.message);
             btn.innerHTML = originalText;

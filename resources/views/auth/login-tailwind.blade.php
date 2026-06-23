@@ -188,4 +188,3 @@
     });
 </script>
 @endpush
-@endsection

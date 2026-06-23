@@ -2,104 +2,166 @@
 
 use Illuminate\Support\Facades\Route;
 
+/*
+|--------------------------------------------------------------------------
+| Web Routes — Recruitment & Job Portal
+|--------------------------------------------------------------------------
+| All routes serve Blade views. Authentication & role enforcement is handled
+| client-side via JWT stored in localStorage and checked in layouts/app.blade.php.
+| API routes (resources/data) are in routes/api.php.
+|--------------------------------------------------------------------------
+*/
+
+// ──────────────────────────────────────────────
+// PUBLIC
+// ──────────────────────────────────────────────
+
+// Landing / home page
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
-// Auth Routes
-Route::prefix('auth')->group(function () {
+// ──────────────────────────────────────────────
+// AUTH PAGES
+// ──────────────────────────────────────────────
+
+Route::prefix('auth')->name('auth.')->group(function () {
+
+    // Login page
     Route::get('/login', function () {
         return view('auth.login-tailwind');
-    });
+    })->name('login');
 
+    // Register / Sign-up page
     Route::get('/signup', function () {
         return view('auth.signup-tailwind');
-    });
+    })->name('signup');
 
+    // Forgot password page
     Route::get('/forgot-password', function () {
         return view('auth.forgot-password');
-    });
+    })->name('forgot-password');
 });
 
-// Dashboard (role-based)
+// ──────────────────────────────────────────────
+// DASHBOARD — role-based redirect (handled by JS in layouts/app.blade.php)
+// ──────────────────────────────────────────────
+
+// Generic /dashboard: JS in the page reads role from localStorage and redirects
 Route::get('/dashboard', function () {
-    $role = null;
-
-    // Server-side role detection (only works if using Laravel auth session).
-    // This project also stores JWT user data in localStorage for API calls.
-    // If no authenticated Laravel user exists, we default to candidate.
+    // Server-side role detection (works when using Laravel session auth)
     $laravelUser = auth()->user();
-    if ($laravelUser && isset($laravelUser->role)) {
-        $role = $laravelUser->role;
-    }
+    $role = $laravelUser?->role ?? null;
 
-    $blade = 'dashboard.candidate-dashboard';
-    if ($role === 'admin') {
-        $blade = 'dashboard.admin-dashboard';
-    } elseif ($role === 'employer') {
-        $blade = 'dashboard.employer-dashboard';
-    }
+    return match($role) {
+        'admin'    => redirect()->route('dashboard.admin'),
+        'employer' => redirect()->route('dashboard.employer'),
+        default    => redirect()->route('dashboard.candidate'),
+    };
+})->name('dashboard');
 
-    return view($blade);
-
-});
-
+// Role-specific dashboards
 Route::get('/dashboard/admin', function () {
     return view('dashboard.admin-dashboard');
-});
+})->name('dashboard.admin');
 
 Route::get('/dashboard/employer', function () {
     return view('dashboard.employer-dashboard');
-});
+})->name('dashboard.employer');
 
 Route::get('/dashboard/candidate', function () {
     return view('dashboard.candidate-dashboard');
-});
+})->name('dashboard.candidate');
 
+// ──────────────────────────────────────────────
+// JOBS
+// ──────────────────────────────────────────────
 
-// Jobs
+// Public job listing with search + advanced filters
 Route::get('/jobs', function () {
     return view('jobs.index');
-});
+})->name('jobs.index');
+
+// Post a new job (employer only — enforced in JS/layout)
 Route::get('/jobs/create', function () {
     return view('jobs.create');
-});
+})->name('jobs.create');
+
+// Single job detail + apply button
 Route::get('/jobs/{id}', function ($id) {
     return view('jobs.show', compact('id'));
-});
+})->name('jobs.show')->where('id', '[0-9]+');
 
-// Applications
+// ──────────────────────────────────────────────
+// APPLICATIONS
+// ──────────────────────────────────────────────
+
+// Smart redirect — JS detects role and redirects to the correct sub-route
 Route::get('/applications', function () {
     return view('applications.index');
-});
+})->name('applications.index');
 
-// Companies
+// Candidate: track own application statuses (Pending / Reviewed / Rejected)
+Route::get('/applications/mine', function () {
+    return view('applications.my-applications');
+})->name('applications.mine');
+
+// Employer + Admin: review incoming applications for their jobs
+Route::get('/applications/review', function () {
+    return view('dashboard.review-applications');
+})->name('applications.review');
+
+// ──────────────────────────────────────────────
+// COMPANIES
+// ──────────────────────────────────────────────
+
+// Public company directory
 Route::get('/companies', function () {
     return view('companies.index');
-});
+})->name('companies.index');
+
+// Employer: register / edit their company (logo + certificate upload)
+// NOTE: must come BEFORE /{id} to avoid being captured by the wildcard
 Route::get('/companies/create', function () {
-    return view('companies.create');
-});
+    return view('companies.register');
+})->name('companies.create');
+
+// Admin: pending company approvals queue
+Route::get('/companies/pending', function () {
+    return view('companies.pending-review');
+})->name('companies.pending');
+
+// Single company profile
 Route::get('/companies/{id}', function ($id) {
     return view('companies.show', compact('id'));
-});
+})->name('companies.show')->where('id', '[0-9]+');
 
-// Profile
+// ──────────────────────────────────────────────
+// PROFILE & SETTINGS
+// ──────────────────────────────────────────────
+
+// User profile — shows name, email, role; allows password change
 Route::get('/profile', function () {
-    return view('dashboard.dashboard');
-});
+    return view('profile.index');
+})->name('profile');
 
-// Settings
+// Account settings
 Route::get('/settings', function () {
-    return view('dashboard.dashboard');
-});
+    return view('settings.index');
+})->name('settings');
 
-// Admin users
+// ──────────────────────────────────────────────
+// ADMIN — USER MANAGEMENT
+// ──────────────────────────────────────────────
+
 Route::get('/users', function () {
     return view('users.manage');
-});
+})->name('users.manage');
 
-// Fallback
-Route::get('/{any}', function () {
+// ──────────────────────────────────────────────
+// FALLBACK — must be the very last route
+// ──────────────────────────────────────────────
+
+Route::fallback(function () {
     return view('welcome');
-})->where('any', '.*');
+});
