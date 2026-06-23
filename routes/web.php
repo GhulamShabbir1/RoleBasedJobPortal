@@ -9,11 +9,11 @@ Route::get('/', function () {
 // Auth Routes
 Route::prefix('auth')->group(function () {
     Route::get('/login', function () {
-        return view('auth.login');
+        return view('auth.login-tailwind');
     });
 
     Route::get('/signup', function () {
-        return view('auth.signup');
+        return view('auth.signup-tailwind');
     });
 
     Route::get('/forgot-password', function () {
@@ -21,14 +21,51 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-// Dashboard
+// Dashboard (role-based)
 Route::get('/dashboard', function () {
-    return view('dashboard.dashboard');
+    $role = null;
+
+    // Server-side role detection (only works if using Laravel auth session).
+    // This project also stores JWT user data in localStorage for API calls.
+    // If no authenticated Laravel user exists, we default to candidate.
+    $laravelUser = auth()->user();
+    if ($laravelUser && isset($laravelUser->role)) {
+        $role = $laravelUser->role;
+    }
+
+    $blade = 'dashboard.candidate-dashboard';
+    if ($role === 'admin') {
+        $blade = 'dashboard.admin-dashboard';
+    } elseif ($role === 'employer') {
+        $blade = 'dashboard.employer-dashboard';
+    }
+
+    return view($blade);
+
 });
+
+Route::get('/dashboard/admin', function () {
+    return view('dashboard.admin-dashboard');
+});
+
+Route::get('/dashboard/employer', function () {
+    return view('dashboard.employer-dashboard');
+});
+
+Route::get('/dashboard/candidate', function () {
+    return view('dashboard.candidate-dashboard');
+});
+
 
 // Jobs
 Route::get('/jobs', function () {
     return view('jobs.index');
+});
+Route::get('/jobs/create', function () {
+    return view('jobs.create');
+});
+Route::get('/jobs/{id}', function ($id) {
+    return view('jobs.show', compact('id'));
 });
 
 // Applications
@@ -40,6 +77,12 @@ Route::get('/applications', function () {
 Route::get('/companies', function () {
     return view('companies.index');
 });
+Route::get('/companies/create', function () {
+    return view('companies.create');
+});
+Route::get('/companies/{id}', function ($id) {
+    return view('companies.show', compact('id'));
+});
 
 // Profile
 Route::get('/profile', function () {
@@ -49,6 +92,11 @@ Route::get('/profile', function () {
 // Settings
 Route::get('/settings', function () {
     return view('dashboard.dashboard');
+});
+
+// Admin users
+Route::get('/users', function () {
+    return view('users.manage');
 });
 
 // Fallback

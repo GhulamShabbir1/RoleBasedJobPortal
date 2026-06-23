@@ -3,6 +3,7 @@
 namespace App\Repositories\Interfaces;
 
 use App\Models\Job;
+use Illuminate\Support\Collection;
 
 interface JobRepositoryInterface
 {
@@ -75,4 +76,9 @@ interface JobRepositoryInterface
      * Get jobs by search query
      */
     public function searchJobs(string $query): Collection;
+
+    /**
+     * Filter and paginate jobs
+     */
+    public function filterJobs(array $filters, int $page, int $perPage): \Illuminate\Contracts\Pagination\LengthAwarePaginator;
 }

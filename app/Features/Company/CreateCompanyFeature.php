@@ -42,8 +42,36 @@ class CreateCompanyFeature
             // Create company via repository
             $company = $this->companyRepository->create($data);
 
+            // Create directory structure
+            $storagePath = "companies/{$company->id}";
+            \Illuminate\Support\Facades\Storage::disk('public')->makeDirectory($storagePath);
+
+            // Store logo
+            if ($dto->logo) {
+                $logoPath = $dto->logo->storeAs(
+                    $storagePath,
+                    'logo_' . time() . '.' . $dto->logo->getClientOriginalExtension(),
+                    'public'
+                );
+                $company->update(['logo' => $logoPath]);
+            }
+
+            // Store certificate
+            if ($dto->certificate) {
+                $certPath = $dto->certificate->storeAs(
+                    $storagePath,
+                    'certificate_' . time() . '.' . $dto->certificate->getClientOriginalExtension(),
+                    'public'
+                );
+                $company->update(['certificate' => $certPath]);
+            }
+
             return $company;
         } catch (Exception $e) {
+            // Clean up directory if creation failed and we somehow got here
+            if (isset($company)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->deleteDirectory("companies/{$company->id}");
+            }
             throw $e;
         }
     }

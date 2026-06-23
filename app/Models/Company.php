@@ -21,7 +21,7 @@ class Company extends Model
         'city',
         'state',
         'country',
-        'certification',
+        'certificate',
         'status',
         'approved_by',
     ];

@@ -23,12 +23,14 @@ class FiltreJobRequest extends FormRequest
     public function rules(): array
     {
         return [
-        'city' => 'nullable|string|max:100',
-        'job_type' => 'nullable|in:full_time,part_time,contract,temporary,internship,other',
-        'category_id' => 'nullable|exists:categories,id',
-        'salary_min' => 'nullable|numeric|min:0',
-        'salary_max' => 'nullable|numeric|min:0',
-        'search' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:100',
+            'job_type' => 'nullable|in:full_time,part_time,contract,temporary,internship,other',
+            'category_id' => 'nullable|exists:categories,id',
+            'min_salary' => 'nullable|numeric|min:0',
+            'max_salary' => 'nullable|numeric|min:0',
+            'search' => 'nullable|string|max:255',
+            'page' => 'nullable|integer|min:1|max:10000',
+            'per_page' => 'nullable|integer|min:1|max:100',
         ];
     }
 }

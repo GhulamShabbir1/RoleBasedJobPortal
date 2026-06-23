@@ -130,4 +130,36 @@ class JobRepository implements JobRepositoryInterface
             ->orWhere('description', 'like', "%$query%")
             ->get();
     }
+
+    /**
+     * Filter and paginate jobs
+     */
+    public function filterJobs(array $filters, int $page, int $perPage): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    {
+        $query = Job::query();
+
+        if (!empty($filters['search'])) {
+            $query->where(function($q) use ($filters) {
+                $q->where('title', 'like', '%' . $filters['search'] . '%')
+                  ->orWhere('description', 'like', '%' . $filters['search'] . '%');
+            });
+        }
+        if (!empty($filters['category_id'])) {
+            $query->where('category_id', $filters['category_id']);
+        }
+        if (!empty($filters['job_type'])) {
+            $query->where('job_type', $filters['job_type']);
+        }
+        if (!empty($filters['city'])) {
+            $query->where('city', $filters['city']);
+        }
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+        if (isset($filters['min_salary']) && isset($filters['max_salary'])) {
+            $query->whereBetween('salary', [$filters['min_salary'], $filters['max_salary']]);
+        }
+
+        return $query->paginate($perPage, ['*'], 'page', $page);
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\DTOs\Company;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 
 /**
  * CreateCompanyDTO
@@ -22,7 +23,9 @@ class CreateCompanyDTO
         public readonly ?string $address = null,
         public readonly ?string $city = null,
         public readonly ?string $state = null,
-        public readonly ?string $country = null
+        public readonly ?string $country = null,
+        public readonly ?UploadedFile $logo = null,
+        public readonly ?UploadedFile $certificate = null
     ) {
     }
 
@@ -43,7 +46,9 @@ class CreateCompanyDTO
             address: $request->validated('address'),
             city: $request->validated('city'),
             state: $request->validated('state'),
-            country: $request->validated('country')
+            country: $request->validated('country'),
+            logo: $request->file('logo'),
+            certificate: $request->file('certificate')
         );
     }
 

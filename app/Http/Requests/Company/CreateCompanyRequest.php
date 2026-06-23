@@ -36,6 +36,8 @@ class CreateCompanyRequest extends FormRequest
             'city' => 'nullable|string|max:100',
             'state' => 'nullable|string|max:100',
             'country' => 'nullable|string|max:100',
+            'logo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'certificate' => 'required|file|mimes:pdf,jpeg,png,jpg|max:5120',
         ];
     }
 
@@ -52,6 +54,10 @@ class CreateCompanyRequest extends FormRequest
             'email.unique' => 'Company email already exists',
             'website.url' => 'Website must be a valid URL',
             'phone.max' => 'Phone number cannot exceed 20 characters',
+            'logo.required' => 'Company logo is required for registration',
+            'logo.image' => 'Company logo must be an image',
+            'certificate.required' => 'Company registration certificate is required',
+            'certificate.file' => 'Certificate must be a valid file',
         ];
     }
 
