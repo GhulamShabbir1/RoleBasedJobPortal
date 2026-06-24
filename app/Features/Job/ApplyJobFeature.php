@@ -61,15 +61,23 @@ class ApplyJobFeature
                 throw new Exception('You have already applied to this job', 409);
             }
 
-            // 3. Check if company is approved
-            if ($job->company && $job->company->status !== 'approved') {
+            // 3. Check if job is open
+            if (!isset($job->status) || $job->status !== 'open') {
+                throw new Exception('This job is not open for applications', 403);
+            }
+
+            // Ensure company relation is loaded for status check
+            $job->loadMissing('company');
+
+            // 4. Check if company is approved
+            if (!$job->company || $job->company->status !== 'approved') {
                 throw new Exception(
                     'This job is no longer available (company not approved)',
                     403
                 );
             }
 
-            // 4. Validate resume file
+            // 5. Validate resume file
             if (!isset($dto->resume) || !$dto->resume) {
                 throw new Exception('Resume file is required', 422);
             }

@@ -359,31 +359,76 @@
             document.getElementById('globalAvatarDisplay').textContent = currentUser.name.charAt(0).toUpperCase();
         }
 
-        // Render Sidebar
+        // Render Sidebar (with employer gating based on company status)
         const nav = document.getElementById('sidebarNav');
         const role = currentUser.role || 'candidate';
         const currentPath = window.location.pathname;
 
+        let myCompanyStatus = 'none';
+        async function loadMyCompanyStatus() {
+            if (role !== 'employer') return;
+            try {
+                const response = await fetch(`${API_URL}/employer/my-company-status`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Accept': 'application/json',
+                    },
+                });
+                const data = await response.json();
+                if (response.ok && data.success && data.data) {
+                    myCompanyStatus = (data.data.status || 'none').toLowerCase();
+                }
+            } catch (e) {
+                // If check fails, keep default (none) to be safe
+                console.warn('Failed to load company status', e);
+            }
+        }
+
         const links = [
             { href: '/dashboard', icon: 'fa-chart-pie', text: 'Dashboard', roles: ['admin', 'employer', 'candidate'] },
             { href: '/jobs', icon: 'fa-search', text: 'Browse Jobs', roles: ['candidate', 'admin'] },
-            { href: '/jobs/create', icon: 'fa-plus-circle', text: 'Post a Job', roles: ['employer'] },
+
+            // Employer-only: hide until company is approved
+            { href: '/jobs/create', icon: 'fa-plus-circle', text: 'Post a Job', roles: ['employer'], gate: 'approved' },
             { href: '/applications', icon: 'fa-file-alt', text: 'Applications', roles: ['admin', 'employer', 'candidate'] },
             { href: '/companies', icon: 'fa-building', text: 'Companies', roles: ['admin', 'candidate'] },
+
+            // Employer: always allow company onboarding page
             { href: '/companies/create', icon: 'fa-briefcase', text: 'My Company', roles: ['employer'] },
+
             { href: '/users', icon: 'fa-users-cog', text: 'Manage Users', roles: ['admin'] },
             { href: '/profile', icon: 'fa-user', text: 'Profile', roles: ['admin', 'employer', 'candidate'] },
         ];
 
-        nav.innerHTML = links
-            .filter(link => link.roles.includes(role))
-            .map(link => `
-                <a href="${link.href}" class="${currentPath === link.href ? 'active' : ''}">
-                    <i class="fas ${link.icon}"></i> ${link.text}
-                </a>
-            `).join('');
+        async function renderNav() {
+            await loadMyCompanyStatus();
+
+            nav.innerHTML = links
+                .filter(link => link.roles.includes(role))
+                .filter(link => {
+                    if (link.gate !== 'approved') return true;
+                    // company statuses: 'approved' | 'pending' | 'rejected' | 'none'
+                    return myCompanyStatus === 'approved';
+                })
+                .map(link => `
+                    <a href="${link.href}" class="${currentPath === link.href ? 'active' : ''}">
+                        <i class="fas ${link.icon}"></i> ${link.text}
+                    </a>
+                `).join('');
+
+            // If employer tries to access /jobs/create while pending, show a banner
+            if (role === 'employer' && myCompanyStatus !== 'approved' && window.location.pathname === '/jobs/create') {
+                const banner = document.createElement('div');
+                banner.style.cssText = 'margin-bottom:16px;padding:14px 16px;background:#fff3cd;border:1px solid #ffeeba;border-radius:12px;color:#664d03;';
+                banner.innerHTML = `<strong>Company approval required.</strong> Your company is <b>${myCompanyStatus}</b>. You can’t post jobs until admin approves your company.`;
+                document.body.prepend(banner);
+            }
+        }
+
+        renderNav();
 
         // Logout
+
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             try {
                 await fetch(`${API_URL}/auth/logout`, {

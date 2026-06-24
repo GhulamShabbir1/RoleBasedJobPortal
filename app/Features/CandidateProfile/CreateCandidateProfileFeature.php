@@ -24,10 +24,24 @@ class CreateCandidateProfileFeature
     public function handle(CreateCandidateProfileDTO $dto): CandidateProfile
     {
         try {
+            $userId = auth()->id();
+            if (!$userId) {
+                throw new Exception('Unauthorized', 401);
+            }
+
+            // Candidate profile single-instance rule: only one profile per candidate user
+            $existing = $this->candidateProfileRepository->findByUserId((string) $userId);
+            if ($existing) {
+                throw new Exception('Candidate profile already exists', 409);
+            }
+
             $data = $dto->toArray();
+            $data['user_id'] = $userId;
+
             return $this->candidateProfileRepository->createProfile($data);
         } catch (Exception $e) {
             throw $e;
         }
     }
+
 }

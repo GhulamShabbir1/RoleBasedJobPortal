@@ -96,8 +96,9 @@ Route::middleware('jwt')->group(function () {
             Route::post('/{id}/apply', [JobController::class, 'apply']);
         });
 
-        // Apply for job
-        Route::post('/applications', [ApplicationController::class, 'store']);
+        // Apply for job (spec: candidate applies via job-based endpoint)
+        // Note: POST /applications is intentionally disabled for candidates to avoid
+        // inconsistent payload/schema with ApplyApplicationFeature.
 
         // View own applications
         Route::get('/applications', [ApplicationController::class, 'index']);
@@ -109,6 +110,9 @@ Route::middleware('jwt')->group(function () {
         // Company management
         Route::apiResource('companies', CompanyController::class)->only(['store', 'update', 'destroy']);
 
+        // Employer: get own company status (for UI gating)
+        Route::get('/employer/my-company-status', [\App\Http\Controllers\CompanyStatusController::class, 'myCompanyStatus']);
+
         // Job management
         Route::prefix('jobs')->group(function () {
             Route::post('/', [JobController::class, 'store']);
@@ -117,6 +121,7 @@ Route::middleware('jwt')->group(function () {
             Route::delete('/{id}', [JobController::class, 'destroy']);
         });
     });
+
 
     // Admin routes
     Route::middleware('role:admin')->group(function () {

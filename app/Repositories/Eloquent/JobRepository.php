@@ -136,7 +136,12 @@ class JobRepository implements JobRepositoryInterface
      */
     public function filterJobs(array $filters, int $page, int $perPage): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
-        $query = Job::query();
+        // Candidate browse must always see: open jobs from approved companies.
+        $query = Job::query()
+            ->where('status', 'open')
+            ->whereHas('company', function ($q) {
+                $q->where('status', 'approved');
+            });
 
         if (!empty($filters['search'])) {
             $query->where(function($q) use ($filters) {
@@ -153,13 +158,14 @@ class JobRepository implements JobRepositoryInterface
         if (!empty($filters['city'])) {
             $query->where('city', $filters['city']);
         }
-        if (!empty($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
+
+        // NOTE: we ignore filters['status'] for candidate browsing safety.
+
         if (isset($filters['min_salary']) && isset($filters['max_salary'])) {
             $query->whereBetween('salary', [$filters['min_salary'], $filters['max_salary']]);
         }
 
         return $query->paginate($perPage, ['*'], 'page', $page);
     }
+
 }
