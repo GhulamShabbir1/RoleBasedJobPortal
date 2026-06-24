@@ -43,6 +43,11 @@ Route::prefix('auth')->name('auth.')->group(function () {
     })->name('forgot-password');
 });
 
+// Reset password page
+Route::get('/reset-password', function () {
+    return view('auth.reset-password');
+})->name('password.reset');
+
 // ──────────────────────────────────────────────
 // DASHBOARD — role-based redirect (handled by JS in layouts/app.blade.php)
 // ──────────────────────────────────────────────
@@ -50,6 +55,7 @@ Route::prefix('auth')->name('auth.')->group(function () {
 // Generic /dashboard: JS in the page reads role from localStorage and redirects
 Route::get('/dashboard', function () {
     // Server-side role detection (works when using Laravel session auth)
+    /** @var \App\Models\User|null $laravelUser */
     $laravelUser = auth()->user();
     $role = $laravelUser?->role ?? null;
 
@@ -91,6 +97,11 @@ Route::get('/jobs/create', function () {
 Route::get('/jobs/{id}', function ($id) {
     return view('jobs.show', compact('id'));
 })->name('jobs.show')->where('id', '[0-9]+');
+
+// Admin: manage jobs
+Route::get('/admin/jobs', function () {
+    return view('jobs.manage');
+})->name('admin.jobs.manage');
 
 // ──────────────────────────────────────────────
 // APPLICATIONS
@@ -137,8 +148,42 @@ Route::get('/companies/{id}', function ($id) {
 })->name('companies.show')->where('id', '[0-9]+');
 
 // ──────────────────────────────────────────────
-// PROFILE & SETTINGS
+// CATEGORIES
 // ──────────────────────────────────────────────
+
+// Public categories list
+Route::get('/categories', function () {
+    return view('categories.index');
+})->name('categories.index');
+
+// Admin: manage categories
+Route::get('/admin/categories', function () {
+    return view('categories.manage');
+})->name('admin.categories.manage');
+
+// Admin: create category
+Route::get('/categories/create', function () {
+    return view('categories.create');
+})->name('categories.create');
+
+// Admin: edit category
+Route::get('/categories/{id}/edit', function ($id) {
+    return view('categories.edit', compact('id'));
+})->name('categories.edit')->where('id', '[0-9]+');
+
+// ──────────────────────────────────────────────
+// CANDIDATE PROFILES
+// ──────────────────────────────────────────────
+
+// Candidate: create profile
+Route::get('/candidate/profile/create', function () {
+    return view('candidate-profiles.create');
+})->name('candidate.profile.create');
+
+// Candidate: edit profile
+Route::get('/candidate/profile/edit', function () {
+    return view('candidate-profiles.edit');
+})->name('candidate.profile.edit');
 
 // User profile — shows name, email, role; allows password change
 Route::get('/profile', function () {

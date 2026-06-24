@@ -19,13 +19,13 @@ class Job extends Model
         'job_type',
         'min_salary',
         'max_salary',
-        'dead_line',
+        'deadline',
         'vacancies',
         'status',
     ];
 
     protected $casts = [
-        'dead_line' => 'datetime',
+        'deadline' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -35,7 +35,7 @@ class Job extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     /**

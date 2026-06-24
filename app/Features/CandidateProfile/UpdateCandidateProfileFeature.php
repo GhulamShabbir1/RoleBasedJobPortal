@@ -30,6 +30,11 @@ class UpdateCandidateProfileFeature
                 throw new Exception('Candidate profile not found', 404);
             }
 
+            $user = auth()->user();
+            if ($profile->user_id !== $user->id) {
+                throw new \Illuminate\Auth\Access\AuthorizationException('You do not own this profile');
+            }
+
             $data = $dto->toArray();
 
             if (!empty($data)) {

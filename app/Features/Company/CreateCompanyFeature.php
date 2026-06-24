@@ -28,6 +28,14 @@ class CreateCompanyFeature
     public function handle(CreateCompanyDTO $dto): Company
     {
         try {
+            $userId = auth()->id();
+            
+            // One company per employer rule
+            $existing = $this->companyRepository->getByUserId($userId);
+            if ($existing) {
+                throw new Exception('You already have a registered company.');
+            }
+            
             // Check if company with same email already exists
             $existingCompany = $this->companyRepository->findByEmail($dto->email);
             if ($existingCompany) {
@@ -37,32 +45,20 @@ class CreateCompanyFeature
             // Create company data array with pending status
             $data = $dto->toArray();
             $data['status'] = 'pending';
-            $data['user_id'] = auth()->id();
+            $data['user_id'] = $userId;
 
             // Create company via repository
             $company = $this->companyRepository->create($data);
 
-            // Create directory structure
-            $storagePath = "companies/{$company->id}";
-            \Illuminate\Support\Facades\Storage::disk('public')->makeDirectory($storagePath);
-
             // Store logo
             if ($dto->logo) {
-                $logoPath = $dto->logo->storeAs(
-                    $storagePath,
-                    'logo_' . time() . '.' . $dto->logo->getClientOriginalExtension(),
-                    'public'
-                );
+                $logoPath = $dto->logo->store('companies/logos', 'public');
                 $company->update(['logo' => $logoPath]);
             }
 
             // Store certificate
             if ($dto->certificate) {
-                $certPath = $dto->certificate->storeAs(
-                    $storagePath,
-                    'certificate_' . time() . '.' . $dto->certificate->getClientOriginalExtension(),
-                    'public'
-                );
+                $certPath = $dto->certificate->store('companies/certificates', 'public');
                 $company->update(['certificate' => $certPath]);
             }
 

@@ -28,7 +28,9 @@ class FiltreJobFeature
     public function handle(FiltreJobDTO $dto): LengthAwarePaginator
     {
         try {
-            return $this->jobRepository->filterJobs($dto->toArray(), $dto->page, $dto->per_page);
+            $user = auth()->user();
+            $role = $user?->role;
+            return $this->jobRepository->filterJobs($dto->toArray(), $dto->page, $dto->per_page, $role);
         } catch (Exception $e) {
             throw $e;
         }

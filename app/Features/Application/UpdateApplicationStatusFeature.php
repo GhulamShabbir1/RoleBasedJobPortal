@@ -29,9 +29,22 @@ class UpdateApplicationStatusFeature
                 throw new Exception('Application not found');
             }
 
-            return $this->applicationRepository->updateApplication($applicationId, [
+            $user = auth()->user();
+            // Check ownership (admin or job owner)
+            $application->load('job');
+            if ($user->role !== 'admin' && $application->job->user_id !== $user->id) {
+                throw new \Illuminate\Auth\Access\AuthorizationException('You do not own this application');
+            }
+
+            // Validate status is in allowed list
+            if (!in_array($dto->status, ['reviewed', 'accepted', 'rejected'])) {
+                throw new Exception('Invalid status');
+            }
+
+            $this->applicationRepository->updateApplication((int)$applicationId, [
                 'status' => $dto->status,
             ]);
+            return true;
         } catch (Exception $e) {
             throw $e;
         }

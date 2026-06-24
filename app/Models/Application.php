@@ -11,7 +11,6 @@ class Application extends Model
 
     protected $fillable = [
         'job_id',
-        'user_id',
         'candidate_id',
         'status',
         'cover_letter',
@@ -34,7 +33,7 @@ class Application extends Model
     }
 
     /**
-     * Get the candidate who applied (using candidate_id or user_id)
+     * Get the candidate who applied
      */
     public function candidate()
     {
@@ -42,18 +41,10 @@ class Application extends Model
     }
 
     /**
-     * Get the candidate via user_id relationship
-     */
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    /**
      * Get the employer through the job
      */
     public function employer()
     {
-        return $this->hasOneThrough(User::class, Job::class, 'id', 'id', 'job_id', 'user_id');
+        return $this->hasOneThrough(User::class, Job::class, 'id', 'id', 'job_id', 'created_by');
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Job;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -24,7 +24,7 @@ class FiltreJobRequest extends FormRequest
     {
         return [
             'city' => 'nullable|string|max:100',
-            'job_type' => 'nullable|in:full_time,part_time,contract,temporary,internship,other',
+            'job_type' => 'nullable|in:full_time,part_time,remote,contract',
             'category_id' => 'nullable|exists:categories,id',
             'min_salary' => 'nullable|numeric|min:0',
             'max_salary' => 'nullable|numeric|min:0',

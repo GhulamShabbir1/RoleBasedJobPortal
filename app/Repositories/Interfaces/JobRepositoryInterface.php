@@ -80,5 +80,5 @@ interface JobRepositoryInterface
     /**
      * Filter and paginate jobs
      */
-    public function filterJobs(array $filters, int $page, int $perPage): \Illuminate\Contracts\Pagination\LengthAwarePaginator;
+    public function filterJobs(array $filters, int $page, int $perPage, ?string $role = null): \Illuminate\Contracts\Pagination\LengthAwarePaginator;
 }

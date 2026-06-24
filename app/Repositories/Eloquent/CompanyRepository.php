@@ -111,6 +111,17 @@ class CompanyRepository implements CompanyRepositoryInterface
     }
 
     /**
+     * Find company by user ID
+     *
+     * @param int $userId User ID
+     * @return Company|null
+     */
+    public function getByUserId(int $userId): ?Company
+    {
+        return Company::where('user_id', $userId)->first();
+    }
+
+    /**
      * Update company status
      *
      * @param Company $company Company instance

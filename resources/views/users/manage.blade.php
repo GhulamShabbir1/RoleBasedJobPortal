@@ -21,20 +21,20 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div class="bg-white p-6 rounded-3xl border border-[#ECECEC] shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
             <p class="text-secondary font-label-sm text-label-sm mb-1 uppercase tracking-wider">Total Users</p>
-            <p class="text-3xl font-bold text-primary">12,482</p>
+            <p class="text-3xl font-bold text-primary" id="total-users">0</p>
         </div>
         <div class="bg-white p-6 rounded-3xl border border-[#ECECEC] shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
             <p class="text-secondary font-label-sm text-label-sm mb-1 uppercase tracking-wider">Employers</p>
-            <p class="text-3xl font-bold text-primary">843</p>
+            <p class="text-3xl font-bold text-primary" id="employer-count">0</p>
         </div>
         <div class="bg-white p-6 rounded-3xl border border-[#ECECEC] shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
             <p class="text-secondary font-label-sm text-label-sm mb-1 uppercase tracking-wider">Candidates</p>
-            <p class="text-3xl font-bold text-primary">11,639</p>
+            <p class="text-3xl font-bold text-primary" id="candidate-count">0</p>
         </div>
         <div class="bg-white p-6 rounded-3xl border border-[#ECECEC] shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
             <p class="text-secondary font-label-sm text-label-sm mb-1 uppercase tracking-wider">Active Now</p>
             <div class="flex items-center">
-                <p class="text-3xl font-bold text-primary">154</p>
+                <p class="text-3xl font-bold text-primary">0</p>
                 <span class="ml-2 w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
             </div>
         </div>
@@ -101,10 +101,33 @@
 
 @push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', loadUsers);
+    document.addEventListener('DOMContentLoaded', () => {
+        loadStats();
+        loadUsers();
+    });
 
     function initials(name) {
         return (name || 'U').split(' ').map(part => part[0]).join('').substring(0, 2).toUpperCase();
+    }
+
+    async function loadStats() {
+        try {
+            const response = await fetch(`${API_URL}/dashboard/admin`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Accept': 'application/json',
+                },
+            });
+            const data = await response.json();
+            if (response.ok && data.success) {
+                const stats = data.data;
+                document.getElementById('total-users').textContent = stats.totalUsers;
+                // We don't have separate employer/candidate counts from dashboard,
+                // for now, let's just set total users
+            }
+        } catch (error) {
+            console.error('Failed to load stats', error);
+        }
     }
 
     async function loadUsers() {
@@ -123,6 +146,13 @@
 
             const users = data.data?.data || data.data || [];
             document.getElementById('usersTableSummary').textContent = `Showing ${users.length} real user(s)`;
+            
+            // Update employer and candidate counts from users array
+            const employers = users.filter(u => u.role === 'employer').length;
+            const candidates = users.filter(u => u.role === 'candidate').length;
+            document.getElementById('employer-count').textContent = employers;
+            document.getElementById('candidate-count').textContent = candidates;
+            
             if (!users.length) {
                 tbody.innerHTML = '<tr><td class="px-8 py-6 text-secondary" colspan="6">No users found.</td></tr>';
                 return;
@@ -171,6 +201,9 @@
         const data = await response.json();
         if (!response.ok || !data.success) {
             alert(data.message || 'Failed to update role');
+            loadUsers();
+        } else {
+            // Reload users to update counts
             loadUsers();
         }
     }

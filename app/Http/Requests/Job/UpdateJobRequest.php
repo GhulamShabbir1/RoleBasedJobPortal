@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Job;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -23,15 +23,15 @@ class UpdateJobRequest extends FormRequest
     public function rules(): array
     {
         return [
-        'title' => 'required|string|max:255',
-        'description' => 'required|string|max:10000',
-        'category_id' => 'required|exists:categories,id',
-        'job_type' => 'required|in:full_time,part_time,contract,temporary,internship,other',
-        'city' => 'required|string|max:100',
+        'title' => 'nullable|string|max:255',
+        'description' => 'nullable|string|max:10000',
+        'category_id' => 'nullable|exists:categories,id',
+        'job_type' => 'nullable|in:full_time,part_time,remote,contract',
+        'city' => 'nullable|string|max:100',
         'min_salary' => 'nullable|numeric|min:0',
         'max_salary' => 'nullable|numeric|min:0',
-        'vacancies' => 'required|integer|min:1',
-        'status' => 'in:open,closed,draft',
+        'vacancies' => 'nullable|integer|min:1',
+        'status' => 'nullable|in:open,closed,draft',
         'deadline' => 'nullable|date',
         ];
     }

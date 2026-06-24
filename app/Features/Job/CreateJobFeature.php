@@ -9,11 +9,6 @@ use App\Repositories\Interfaces\JobRepositoryInterface;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
-/**
- * CreateJobFeature
- * Business logic for creating a new job
- * Includes company approval check
- */
 class CreateJobFeature
 {
     public function __construct(
@@ -21,20 +16,12 @@ class CreateJobFeature
     ) {
     }
 
-    /**
-     * Create a new job with pending status
-     * Verifies company is approved before job creation
-     *
-     * @param CreateJobDTO $dto Job creation data
-     * @return Job
-     * @throws Exception
-     */
     public function handle(CreateJobDTO $dto): Job
     {
         try {
-            $userId = auth()->id();
+            $user = auth()->user();
+            $userId = $user->id;
 
-            // 1. Find user's company
             $company = Company::where('user_id', $userId)->first();
 
             if (!$company) {
@@ -45,7 +32,6 @@ class CreateJobFeature
                 throw new Exception('You must create a company first before posting jobs', 403);
             }
 
-            // 2. Check if company is approved
             if ($company->status !== 'approved') {
                 Log::warning('Job creation attempted with unapproved company', [
                     'user_id' => $userId,
@@ -60,13 +46,11 @@ class CreateJobFeature
                 );
             }
 
-            // 3. Create job data array with pending status
             $data = $dto->toArray();
-            $data['status'] = 'pending';
+            $data['status'] = 'open';
             $data['user_id'] = $userId;
             $data['company_id'] = $company->id;
 
-            // 4. Create job via repository
             $job = $this->jobRepository->createJob($data);
 
             Log::info('Job created successfully', [

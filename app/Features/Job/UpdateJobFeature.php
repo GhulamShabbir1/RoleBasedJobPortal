@@ -35,6 +35,11 @@ class UpdateJobFeature
                 throw new Exception('Job not found');
             }
 
+            $user = auth()->user();
+            if ($user->role !== 'admin' && $job->user_id !== $user->id) {
+                throw new Exception('Unauthorized', 403);
+            }
+
             // Update job
             $data = $dto->toArray();
             $this->jobRepository->updateJob($id, $data);

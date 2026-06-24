@@ -16,7 +16,7 @@ use App\Http\Controllers\CandidateProfileController;
 */
 
 // Public routes (no authentication required)
-Route::prefix('auth')->group(function () {
+Route::prefix('auth')->middleware('throttle:auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
@@ -55,23 +55,12 @@ Route::middleware('jwt')->group(function () {
     // User profile
     Route::get('/profile', [UserController::class, 'profile']);
 
-    // Admin User Management
-    Route::middleware('role:admin')->group(function () {
-        Route::prefix('users')->group(function () {
-            Route::get('/', [UserController::class, 'index']);
-            Route::get('/search', [UserController::class, 'filter']);
-            Route::get('/{id}', [UserController::class, 'show']);
-            Route::put('/{id}', [UserController::class, 'update']);
-            Route::put('/{id}/role', [UserController::class, 'updateRole']);
-            Route::delete('/{id}', [UserController::class, 'destroy']);
-        });
-
-        // Admin Category Management
-        Route::prefix('categories')->group(function () {
-            Route::post('/', [CategoryController::class, 'store']);
-            Route::put('/{id}', [CategoryController::class, 'update']);
-            Route::delete('/{id}', [CategoryController::class, 'destroy']);
-        });
+    // Protected candidate profile routes
+    Route::prefix('candidate-profiles')->middleware('role:candidate')->group(function () {
+        Route::get('/me', [CandidateProfileController::class, 'me']);
+        Route::post('/', [CandidateProfileController::class, 'store']);
+        Route::put('/{id}', [CandidateProfileController::class, 'update']);
+        Route::delete('/{id}', [CandidateProfileController::class, 'destroy']);
     });
 
     // Company routes (all authenticated users)
@@ -93,7 +82,8 @@ Route::middleware('jwt')->group(function () {
         Route::prefix('jobs')->group(function () {
             Route::get('/', [JobController::class, 'index']);
             Route::get('/{id}', [JobController::class, 'show']);
-            Route::post('/{id}/apply', [JobController::class, 'apply']);
+            Route::post('/{id}/apply', [JobController::class, 'apply'])
+                ->middleware('throttle:uploads');
         });
 
         // Apply for job (spec: candidate applies via job-based endpoint)
@@ -103,12 +93,14 @@ Route::middleware('jwt')->group(function () {
         // View own applications
         Route::get('/applications', [ApplicationController::class, 'index']);
         Route::get('/applications/{id}', [ApplicationController::class, 'show']);
+        Route::get('/applications/{id}/download', [ApplicationController::class, 'downloadResume']);
     });
 
     // Employer routes
     Route::middleware('role:employer')->group(function () {
         // Company management
-        Route::apiResource('companies', CompanyController::class)->only(['store', 'update', 'destroy']);
+        Route::apiResource('companies', CompanyController::class)->only(['store', 'update', 'destroy'])
+            ->middleware('throttle:uploads');
 
         // Employer: get own company status (for UI gating)
         Route::get('/employer/my-company-status', [\App\Http\Controllers\CompanyStatusController::class, 'myCompanyStatus']);
@@ -119,9 +111,13 @@ Route::middleware('jwt')->group(function () {
             Route::get('/', [JobController::class, 'index']);
             Route::put('/{id}', [JobController::class, 'update']);
             Route::delete('/{id}', [JobController::class, 'destroy']);
+            Route::post('/{id}/close', [JobController::class, 'close']);
         });
-    });
 
+        // Application review
+        Route::put('/applications/{id}/review', [ApplicationController::class, 'review']);
+        Route::get('/applications/{id}/download', [ApplicationController::class, 'downloadResume']);
+    });
 
     // Admin routes
     Route::middleware('role:admin')->group(function () {
@@ -134,6 +130,21 @@ Route::middleware('jwt')->group(function () {
         // Applications management
         Route::put('/applications/{id}', [ApplicationController::class, 'update']);
         Route::delete('/applications/{id}', [ApplicationController::class, 'destroy']);
+        Route::get('/applications/{id}/download', [ApplicationController::class, 'downloadResume']);
+        
+        // Admin can close any job
+        Route::prefix('jobs')->group(function () {
+            Route::get('/', [JobController::class, 'adminIndex']);
+            Route::post('/{id}/close', [JobController::class, 'close']);
+            Route::delete('/{id}', [JobController::class, 'adminDestroy']);
+        });
+    });
+
+    // Dashboard stats for all roles
+    Route::prefix('dashboard')->group(function () {
+        Route::get('/admin', [\App\Http\Controllers\DashboardController::class, 'adminStats'])->middleware('role:admin');
+        Route::get('/employer', [\App\Http\Controllers\DashboardController::class, 'employerStats'])->middleware('role:employer');
+        Route::get('/candidate', [\App\Http\Controllers\DashboardController::class, 'candidateStats'])->middleware('role:candidate');
     });
 });
 

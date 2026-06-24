@@ -26,28 +26,28 @@ class RegisterRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            'role' => 'in:admin,employer,candidate'
+            'role' => 'in:employer,candidate'
         ];
     }
+
     public function messages()
-{
-    return [
-        'name.required' => 'Name is required',
-        'email.required' => 'Email is required',
-        'email.unique' => 'Email already exists',
-        'password.required' => 'Password is required',
-        'role.in' => 'Role must be admin, employer, or candidate'
-    ];
-}
+    {
+        return [
+            'name.required' => 'Name is required',
+            'email.required' => 'Email is required',
+            'email.unique' => 'Email already exists',
+            'password.required' => 'Password is required',
+            'role.in' => 'Role must be employer or candidate' // Admin accounts are created directly in DB or via seeder only
+        ];
+    }
 
-public function attributes()
-{
-    return [
-        'name' => 'Name',
-        'email' => 'Email',
-        'password' => 'Password',
-        'role' => 'Role'
-    ];
-}
-
+    public function attributes()
+    {
+        return [
+            'name' => 'Name',
+            'email' => 'Email',
+            'password' => 'Password',
+            'role' => 'Role'
+        ];
+    }
 }

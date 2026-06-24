@@ -5,22 +5,31 @@ namespace App\Http\Controllers;
 use App\DTOs\Job\ApplyJobDTO;
 use App\DTOs\Job\CreateJobDTO;
 use App\DTOs\Job\FiltreJobDTO;
+use App\DTOs\Job\JobDTO;
 use App\DTOs\Job\UpdateJobDTO;
 use App\Features\Job\ApplyJobFeature;
+use App\Features\Job\CloseJobFeature;
 use App\Features\Job\CreateJobFeature;
+use App\Features\Job\DeleteJobFeature;
 use App\Features\Job\FiltreJobFeature;
+use App\Features\Job\GetJobFeature;
 use App\Features\Job\UpdateJobFeature;
 use App\Http\Requests\ApplyJobRequest;
-use App\Http\Requests\CreateJobRequest;
-use App\Http\Requests\FiltreJobRequest;
-use App\Http\Requests\UpdateJobRequest;
+use App\Http\Requests\Job\CreateJobRequest;
+use App\Http\Requests\Job\FiltreJobRequest;
+use App\Http\Requests\Job\UpdateJobRequest;
 use App\Repositories\Interfaces\JobRepositoryInterface;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Exception;
 
 class JobController extends Controller
 {
     public function __construct(
-        private readonly JobRepositoryInterface $jobRepository
+        private readonly JobRepositoryInterface $jobRepository,
+        private readonly GetJobFeature $getJobFeature,
+        private readonly DeleteJobFeature $deleteJobFeature,
+        private readonly CloseJobFeature $closeJobFeature
     ) {
     }
 
@@ -77,19 +86,17 @@ class JobController extends Controller
     public function show(int $id): JsonResponse
     {
         try {
-            $job = $this->jobRepository->findById((string)$id);
-
-            if (!$job) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Job not found',
-                ], 404);
-            }
+            $job = $this->getJobFeature->handle((string)$id);
 
             return response()->json([
                 'success' => true,
-                'data' => $job,
+                'data' => $job->toArray(),
             ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -129,24 +136,17 @@ class JobController extends Controller
     public function destroy(int $id): JsonResponse
     {
         try {
-            $result = $this->jobRepository->deleteJob((string)$id);
-
-            if (!$result) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Job not found',
-                ], 404);
-            }
+            $this->deleteJobFeature->handle($id);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Job deleted successfully',
             ], 200);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ], 500);
+            ], $e->getCode() ?? 500);
         }
     }
 
@@ -172,5 +172,54 @@ class JobController extends Controller
                 'message' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Close a job
+     */
+    public function close(int $id): JsonResponse
+    {
+        try {
+            $job = $this->closeJobFeature->handle((string)$id);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Job closed successfully',
+                'data' => $job,
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Admin: get all jobs
+     */
+    public function adminIndex(): JsonResponse
+    {
+        try {
+            $jobs = $this->jobRepository->getAllJobs();
+
+            return response()->json([
+                'success' => true,
+                'data' => $jobs,
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Admin: delete any job
+     */
+    public function adminDestroy(int $id): JsonResponse
+    {
+        return $this->destroy($id);
     }
 }

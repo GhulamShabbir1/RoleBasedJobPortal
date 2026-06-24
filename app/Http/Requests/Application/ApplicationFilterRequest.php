@@ -23,7 +23,7 @@ class ApplicationFilterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => 'nullable|in:pending,accepted,rejected',
+            'status' => 'nullable|in:pending,reviewed,accepted,rejected',
             'job_id' => 'nullable|exists:jobs,id',
             'user_id' => 'nullable|exists:users,id',
             'company_id' => 'nullable|exists:companies,id',

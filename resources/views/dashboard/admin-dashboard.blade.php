@@ -400,17 +400,29 @@
 
     async function loadAdminDashboardData() {
         try {
-            const [companies, users, jobs] = await Promise.all([
-                adminApiGet('/companies').catch(() => []),
-                adminApiGet('/users').catch(() => []),
-                adminApiGet('/jobs', false).catch(() => []),
-            ]);
+            const statsResponse = await fetch(`${API_URL}/dashboard/admin`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Accept': 'application/json'
+                }
+            });
+            const statsData = await statsResponse.json();
+            const stats = statsData.data;
 
-            const stats = document.querySelectorAll('.premium-card h3.font-display');
-            if (stats[0]) stats[0].textContent = companies.filter(company => company.status === 'pending').length;
-            if (stats[1]) stats[1].textContent = users.length;
-            if (stats[2]) stats[2].textContent = jobs.length;
+            // Update the stat cards with IDs we'll add
+            const statCards = document.querySelectorAll('.premium-card');
+            if (statCards[0]) { // Pending Companies
+                statCards[0].querySelector('h3').textContent = stats.pendingCompanies;
+            }
+            if (statCards[1]) { // Total Users
+                statCards[1].querySelector('h3').textContent = stats.totalUsers;
+            }
+            if (statCards[2]) { // Total Jobs
+                statCards[2].querySelector('h3').textContent = stats.totalJobs;
+            }
 
+            // Keep the pending companies table
+            const companies = await adminApiGet('/companies').catch(() => []);
             const pendingCompanies = companies.filter(company => company.status === 'pending');
             const tbody = document.querySelector('tbody.divide-y');
             if (tbody) {

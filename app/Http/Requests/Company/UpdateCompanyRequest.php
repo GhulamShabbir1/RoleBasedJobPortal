@@ -39,6 +39,8 @@ class UpdateCompanyRequest extends FormRequest
             'city' => 'nullable|string|max:100',
             'state' => 'nullable|string|max:100',
             'country' => 'nullable|string|max:100',
+            'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'registration_certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ];
     }
 

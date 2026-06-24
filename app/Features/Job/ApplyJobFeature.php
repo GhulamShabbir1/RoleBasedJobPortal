@@ -40,6 +40,8 @@ class ApplyJobFeature
     {
         try {
             $jobId = $dto->job_id;
+            $user = auth()->user();
+            $userId = $user->id;
 
             // 1. Check if job exists
             $job = $this->jobRepository->findById($jobId);
@@ -49,12 +51,12 @@ class ApplyJobFeature
 
             // 2. Check if candidate already applied (Duplicate Prevention)
             $existing = Application::where('job_id', $jobId)
-                                   ->where('candidate_id', auth()->id())
+                                   ->where('candidate_id', $userId)
                                    ->exists();
 
             if ($existing) {
                 Log::warning('Duplicate application attempt', [
-                    'candidate_id' => auth()->id(),
+                    'candidate_id' => $userId,
                     'job_id' => $jobId,
                     'timestamp' => now()
                 ]);
@@ -91,7 +93,7 @@ class ApplyJobFeature
             $data = $dto->toArray();
             $data['status'] = 'pending';
             $data['job_id'] = $jobId;
-            $data['candidate_id'] = auth()->id();
+            $data['candidate_id'] = $userId;
             $data['resume_path'] = $resumePath;
             $data['applied_at'] = now();
 
@@ -99,7 +101,7 @@ class ApplyJobFeature
 
             Log::info('Application created successfully', [
                 'application_id' => $application->id,
-                'candidate_id' => auth()->id(),
+                'candidate_id' => $userId,
                 'job_id' => $jobId
             ]);
 

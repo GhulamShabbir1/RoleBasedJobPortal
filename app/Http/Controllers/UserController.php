@@ -8,6 +8,7 @@ use App\DTOs\User\UpdateUserRoleDTO;
 use App\DTOs\User\UserFilterDTO;
 use App\Features\User\DeleteUserFeature;
 use App\Features\User\FilterUsersFeature;
+use App\Features\User\GetMyProfileFeature;
 use App\Features\User\GetUserFeature;
 use App\Features\User\GetUsersFeature;
 use App\Features\User\UpdateUserFeature;
@@ -19,6 +20,11 @@ use Illuminate\Http\JsonResponse;
 
 class UserController extends Controller
 {
+    public function __construct(
+        private readonly GetMyProfileFeature $getMyProfileFeature
+    ) {
+    }
+
     /**
      * Get all users (admin only)
      */
@@ -153,6 +159,27 @@ class UserController extends Controller
                 'success' => false,
                 'message' => $e->getMessage(),
             ], $e->getCode() ?? 500);
+        }
+    }
+
+    /**
+     * Get current user profile
+     */
+    public function profile(): JsonResponse
+    {
+        try {
+            $user = $this->getMyProfileFeature->handle();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile retrieved successfully',
+                'data' => $user,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
         }
     }
 }

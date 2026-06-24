@@ -63,6 +63,14 @@ interface CompanyRepositoryInterface
     public function findByEmail(string $email): ?Company;
 
     /**
+     * Find company by user ID
+     *
+     * @param int $userId User ID
+     * @return Company|null
+     */
+    public function getByUserId(int $userId): ?Company;
+
+    /**
      * Update company status
      *
      * @param Company $company Company instance

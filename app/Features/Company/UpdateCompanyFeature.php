@@ -36,6 +36,11 @@ class UpdateCompanyFeature
                 throw new Exception('Company not found');
             }
 
+            // Ownership check
+            if (auth()->id() !== $company->user_id && auth()->user()->role !== 'admin') {
+                throw new \Illuminate\Auth\Access\AuthorizationException('You do not own this company.');
+            }
+
             // Check if email is being changed and if it's unique
             if ($dto->email && $dto->email !== $company->email) {
                 $existingCompany = $this->companyRepository->findByEmail($dto->email);

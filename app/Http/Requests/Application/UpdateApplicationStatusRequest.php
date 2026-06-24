@@ -23,7 +23,7 @@ class UpdateApplicationStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => 'required|in:pending,accepted,rejected',
+            'status' => 'required|in:reviewed,accepted,rejected',
         ];
     }
 
@@ -31,7 +31,7 @@ class UpdateApplicationStatusRequest extends FormRequest
     {
         return [
             'status.required' => 'Status is required',
-            'status.in' => 'Status must be pending, accepted, or rejected',
+            'status.in' => 'Status must be reviewed, accepted, or rejected',
         ];
     }
 }

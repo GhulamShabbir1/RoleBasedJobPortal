@@ -94,7 +94,9 @@ class JobRepository implements JobRepositoryInterface
      */
     public function getJobsBySalaryRange(int $minSalary, int $maxSalary): Collection
     {
-        return Job::whereBetween('salary', [$minSalary, $maxSalary])->get();
+        return Job::where('min_salary', '>=', $minSalary)
+            ->where('max_salary', '<=', $maxSalary)
+            ->get();
     }
 
     /**
@@ -134,19 +136,23 @@ class JobRepository implements JobRepositoryInterface
     /**
      * Filter and paginate jobs
      */
-    public function filterJobs(array $filters, int $page, int $perPage): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    public function filterJobs(array $filters, int $page, int $perPage, ?string $role = null): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
-        // Candidate browse must always see: open jobs from approved companies.
         $query = Job::query()
-            ->where('status', 'open')
-            ->whereHas('company', function ($q) {
-                $q->where('status', 'approved');
-            });
+            ->select('jobs.*', 'companies.name as company_name')
+            ->join('companies', 'companies.id', '=', 'jobs.company_id');
+
+        // Apply role-based filters
+        if (!in_array($role, ['admin', 'employer'])) {
+            $query->where('jobs.status', 'open')
+                  ->where('companies.status', 'approved');
+        }
 
         if (!empty($filters['search'])) {
             $query->where(function($q) use ($filters) {
-                $q->where('title', 'like', '%' . $filters['search'] . '%')
-                  ->orWhere('description', 'like', '%' . $filters['search'] . '%');
+                $q->where('jobs.title', 'like', '%' . $filters['search'] . '%')
+                  ->orWhere('jobs.description', 'like', '%' . $filters['search'] . '%')
+                  ->orWhere('companies.name', 'like', '%' . $filters['search'] . '%');
             });
         }
         if (!empty($filters['category_id'])) {
@@ -159,13 +165,13 @@ class JobRepository implements JobRepositoryInterface
             $query->where('city', $filters['city']);
         }
 
-        // NOTE: we ignore filters['status'] for candidate browsing safety.
-
-        if (isset($filters['min_salary']) && isset($filters['max_salary'])) {
-            $query->whereBetween('salary', [$filters['min_salary'], $filters['max_salary']]);
+        if (isset($filters['min_salary']) && is_numeric($filters['min_salary'])) {
+            $query->where('max_salary', '>=', $filters['min_salary']);
+        }
+        if (isset($filters['max_salary']) && is_numeric($filters['max_salary'])) {
+            $query->where('min_salary', '<=', $filters['max_salary']);
         }
 
         return $query->paginate($perPage, ['*'], 'page', $page);
     }
-
 }

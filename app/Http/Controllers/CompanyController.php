@@ -3,18 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\DTOs\Company\ApproveCompanyDTO;
+use App\DTOs\Company\CompanyFilterDTO;
 use App\DTOs\Company\CreateCompanyDTO;
 use App\DTOs\Company\RejectCompanyDTO;
 use App\DTOs\Company\UpdateCompanyDTO;
 use App\Features\Company\ApproveCompanyFeature;
 use App\Features\Company\CreateCompanyFeature;
 use App\Features\Company\DeleteCompanyFeature;
+use App\Features\Company\FilterCompaniesFeature;
 use App\Features\Company\GetCompanyFeature;
-use App\Features\Company\ListCompaniesFeature;
 use App\Features\Company\RejectCompanyFeature;
 use App\Features\Company\UpdateCompanyFeature;
 use App\Http\Requests\Company\ApproveCompanyRequest;
 use App\Http\Requests\Company\CreateCompanyRequest;
+use App\Http\Requests\Company\ListCompaniesRequest;
 use App\Http\Requests\Company\RejectCompanyRequest;
 use App\Http\Requests\Company\UpdateCompanyRequest;
 use Illuminate\Http\JsonResponse;
@@ -53,11 +55,11 @@ class CompanyController extends Controller
     /**
      * List all companies
      */
-    public function index(ListCompaniesFeature $feature): JsonResponse
+    public function index(ListCompaniesRequest $request, FilterCompaniesFeature $feature): JsonResponse
     {
         try {
-            $filters = request()->only(['status', 'search', 'city', 'country', 'per_page']);
-            $result = $feature->handle($filters);
+            $dto = CompanyFilterDTO::fromRequest($request);
+            $result = $feature->handle($dto);
 
             return response()->json([
                 'success' => true,

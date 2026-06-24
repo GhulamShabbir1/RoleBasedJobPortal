@@ -33,6 +33,11 @@ class DeleteCompanyFeature
                 throw new Exception('Company not found');
             }
 
+            // Ownership check
+            if (auth()->id() !== $company->user_id && auth()->user()->role !== 'admin') {
+                throw new \Illuminate\Auth\Access\AuthorizationException('You do not own this company.');
+            }
+
             // Delete company via repository
             return $this->companyRepository->delete($company);
         } catch (Exception $e) {

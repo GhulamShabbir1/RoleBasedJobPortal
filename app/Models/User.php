@@ -82,7 +82,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function jobs()
     {
-        return $this->hasMany(Job::class, 'user_id');
+        return $this->hasMany(Job::class, 'created_by');
     }
 
     /**

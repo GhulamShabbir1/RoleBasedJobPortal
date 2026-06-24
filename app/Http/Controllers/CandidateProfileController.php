@@ -109,6 +109,29 @@ class CandidateProfileController extends Controller
     }
 
     /**
+     * Get current user's candidate profile
+     */
+    public function me(): JsonResponse
+    {
+        try {
+            $profile = (new \App\Features\CandidateProfile\GetMyCandidateProfileFeature(
+                app(\App\Repositories\Interfaces\CandidateProfileRepositoryInterface::class)
+            ))->handle();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile retrieved successfully',
+                'data' => $profile,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], $e->getCode() ?? 500);
+        }
+    }
+
+    /**
      * Update candidate profile (candidate only)
      */
     public function update(

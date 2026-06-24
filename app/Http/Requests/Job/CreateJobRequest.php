@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Job;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -26,7 +26,7 @@ class CreateJobRequest extends FormRequest
             'title' => 'required|string|max:255',
             'description' => 'required|string|max:10000',
             'category_id' => 'required|exists:categories,id',
-            'job_type' => 'required|in:full_time,part_time,contract,temporary,internship,other',
+            'job_type' => 'required|in:full_time,part_time,remote,contract',
             'city' => 'required|string|max:100',
             'min_salary' => 'nullable|numeric|min:0',
             'max_salary' => 'nullable|numeric|min:0',

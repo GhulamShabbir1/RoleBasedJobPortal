@@ -336,21 +336,17 @@
                 <div class="job-meta">
                     <div class="job-meta-item">
                         <i class="fas fa-map-marker-alt"></i>
-                        ${job.location || job.city || 'Remote'}
+                        ${job.city || 'Remote'}
                     </div>
                     <div class="job-meta-item">
                         <i class="fas fa-briefcase"></i>
                         ${job.job_type || 'Full-time'}
                     </div>
-                    <div class="job-meta-item">
-                        <i class="fas fa-graduation-cap"></i>
-                        ${job.experience_level || 'Mid-level'}
-                    </div>
                 </div>
 
                 <div class="job-footer">
                     <div class="job-salary">
-                        $${job.salary_min || 'TBD'} - $${job.salary_max || 'TBD'}
+                        $${job.min_salary || 'TBD'} - $${job.max_salary || 'TBD'}
                     </div>
                     <a href="/jobs/${job.id}" class="btn-apply">
                         View Details <i class="fas fa-arrow-right" style="margin-left:0.4rem;"></i>
@@ -379,9 +375,9 @@
 
         const filtered = allJobs.filter(job => {
             const titleMatch = (job.title || '').toLowerCase().includes(search);
-            const locationMatch = (job.location || job.city || '').toLowerCase().includes(location);
+            const locationMatch = (job.city || '').toLowerCase().includes(location);
             const typeMatch = !jobType || (job.job_type || '').toLowerCase().includes(jobType);
-            const salaryMatch = (job.salary_min || 0) >= salaryMin;
+            const salaryMatch = (job.min_salary || 0) >= salaryMin;
 
             return titleMatch && locationMatch && typeMatch && salaryMatch;
         });
