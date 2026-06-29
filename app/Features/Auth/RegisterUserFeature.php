@@ -24,8 +24,6 @@ class RegisterUserFeature
             // Create user via repository
             $user = $this->authRepository->createUser($dto->toArray());
 
-            // Do NOT auto-login on signup.
-            // Just create the user; the client will redirect to the login page.
             return [
                 'user' => $user,
             ];

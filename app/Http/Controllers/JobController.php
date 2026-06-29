@@ -53,7 +53,7 @@ class JobController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ], 500);
+            ], $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500);
         }
     }
 
@@ -76,7 +76,7 @@ class JobController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ], 500);
+            ], $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500);
         }
     }
 
@@ -101,7 +101,7 @@ class JobController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ], 500);
+            ], $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500);
         }
     }
 
@@ -126,7 +126,7 @@ class JobController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ], 500);
+            ], $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500);
         }
     }
 
@@ -146,7 +146,7 @@ class JobController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ], $e->getCode() ?? 500);
+            ], $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500);
         }
     }
 
@@ -170,7 +170,7 @@ class JobController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ], 500);
+            ], $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500);
         }
     }
 
@@ -191,7 +191,7 @@ class JobController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ], 500);
+            ], $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500);
         }
     }
 
@@ -207,11 +207,31 @@ class JobController extends Controller
                 'success' => true,
                 'data' => $jobs,
             ], 200);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ], 500);
+            ], $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500);
+        }
+    }
+
+    /**
+     * Employer: get all my jobs
+     */
+    public function employerIndex(): JsonResponse
+    {
+        try {
+            $jobs = $this->jobRepository->getJobsByUserId(auth()->id());
+
+            return response()->json([
+                'success' => true,
+                'data' => $jobs,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500);
         }
     }
 

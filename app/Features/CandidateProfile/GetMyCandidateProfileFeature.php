@@ -16,10 +16,17 @@ class GetMyCandidateProfileFeature
     public function handle(): CandidateProfile
     {
         $user = auth()->user();
-        $profile = $this->candidateProfileRepository->findByUserId((string)$user->id);
-        if (!$profile) {
-            throw new Exception('Profile not found', 404);
+        $userId = $user?->id;
+
+        if (!$userId) {
+            throw new Exception('Unauthenticated', 401);
         }
+
+        $profile = $this->candidateProfileRepository->findByUserId((string) $userId);
+        if (!$profile) {
+            throw new Exception('Candidate profile not found', 404);
+        }
+
         return $profile;
     }
 }

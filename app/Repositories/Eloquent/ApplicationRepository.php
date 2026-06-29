@@ -8,6 +8,11 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ApplicationRepository implements ApplicationRepositoryInterface
 {
+    public function findById(string $id): ?Application
+    {
+        return Application::find($id);
+    }
+
     public function getApplicationById(int $id): ?Application
     {
         return Application::find($id);

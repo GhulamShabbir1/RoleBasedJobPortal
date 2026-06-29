@@ -27,10 +27,13 @@ class ApplicationFactory extends Factory
             'status' => fake()->randomElement([
                 'pending',
                 'reviewed',
-                'shortlisted',
-                'rejected',
-                'hired'
+                'accepted',
+                'rejected'
             ]),
+
+            // NOTE: If DB column 'status' is an enum with restricted values,
+            // seed must match exactly those values.
+            // (This factory keeps same values; mismatch warnings indicate DB enum mismatch.)
 
             'cover_letter' => fake()->paragraph(),
 

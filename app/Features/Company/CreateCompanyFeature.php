@@ -33,13 +33,13 @@ class CreateCompanyFeature
             // One company per employer rule
             $existing = $this->companyRepository->getByUserId($userId);
             if ($existing) {
-                throw new Exception('You already have a registered company.');
+                throw new Exception('You already have a registered company.', 400);
             }
             
             // Check if company with same email already exists
             $existingCompany = $this->companyRepository->findByEmail($dto->email);
             if ($existingCompany) {
-                throw new Exception('Company with this email already exists');
+                throw new Exception('Company with this email already exists', 400);
             }
 
             // Create company data array with pending status

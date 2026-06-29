@@ -19,15 +19,15 @@ class JobFactory extends Factory
     {
         return [
             'title' => fake()->jobTitle,
-            'company_id' => \App\Models\Company::inRandomOrder()->first()->id,
-            'category_id' => \App\Models\Category::inRandomOrder()->first()->id,
-            'created_by' => \App\Models\User::inRandomOrder()->first()->id,
+            'company_id' => \App\Models\Company::factory(),
+            'category_id' => \App\Models\Category::factory(),
+            'user_id' => \App\Models\User::factory(),
             'description' => fake()->paragraph(5),
             'city' => fake()->city,
-            'job_type' => fake()->randomElement(['full_time', 'part_time', 'contract', 'internship']),
+            'job_type' => fake()->randomElement(['full_time', 'part_time', 'remote', 'contract']),
             'min_salary' => fake()->numberBetween(10000, 50000),
             'max_salary' => fake()->numberBetween(50000, 100000),
-            'dead_line' => fake()->date,
+            'deadline' => fake()->date,
             'vacancies' => fake()->numberBetween(1, 10),
             'status' => fake()->randomElement(['draft', 'open', 'closed']),
         ];

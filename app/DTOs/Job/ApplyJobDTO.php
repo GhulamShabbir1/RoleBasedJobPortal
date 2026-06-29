@@ -8,7 +8,7 @@ class ApplyJobDTO
 {
     public function __construct(
         public readonly string $job_id,
-        public readonly string $resume,
+        public readonly mixed $resume,
         public readonly ?string $cover_letter = null,
     ) {
     }

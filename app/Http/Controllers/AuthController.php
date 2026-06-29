@@ -6,6 +6,7 @@ use App\DTOs\Auth\ForgotPasswordDTO;
 use App\DTOs\Auth\LoginUserDTO;
 use App\DTOs\Auth\RegisterUserDTO;
 use App\DTOs\Auth\ResetPasswordDTO;
+use App\Features\Auth\ChangePasswordFeature;
 use App\Features\Auth\ForgotPasswordFeature;
 use App\Features\Auth\GetAuthenticatedUserFeature;
 use App\Features\Auth\LoginUserFeature;
@@ -13,6 +14,7 @@ use App\Features\Auth\LogoutUserFeature;
 use App\Features\Auth\RefreshTokenFeature;
 use App\Features\Auth\RegisterUserFeature;
 use App\Features\Auth\ResetPasswordFeature;
+use App\Http\Requests\Auth\ChangePasswordRequest;
 use App\Http\Requests\Auth\ForgetRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
@@ -174,6 +176,29 @@ class AuthController extends Controller
                 'success' => false,
                 'message' => $e->getMessage(),
             ], 500);
+        }
+    }
+
+    /**
+     * Change password
+     */
+    public function changePassword(
+        ChangePasswordRequest $request,
+        ChangePasswordFeature $feature
+    ): JsonResponse {
+        try {
+            $dto = \App\DTOs\Auth\ChangePasswordDTO::fromRequest($request);
+            $feature->handle($dto->currentPassword, $dto->newPassword);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Password changed successfully',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 400);
         }
     }
 }

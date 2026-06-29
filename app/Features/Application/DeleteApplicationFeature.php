@@ -24,7 +24,15 @@ class DeleteApplicationFeature
         try {
             $application = $this->applicationRepository->findById($applicationId);
             if (!$application) {
-                throw new Exception('Application not found');
+                throw new Exception('Application not found', 404);
+            }
+
+            $user = auth()->user();
+
+            // Authorization: only admin or the job owner (employer) can delete
+            $application->load('job');
+            if ($user->role !== 'admin' && $application->job->user_id !== $user->id) {
+                throw new \Illuminate\Auth\Access\AuthorizationException('You do not have permission to delete this application', 403);
             }
 
             return $this->applicationRepository->deleteApplication($applicationId);

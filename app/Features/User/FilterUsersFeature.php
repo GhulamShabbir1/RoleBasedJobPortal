@@ -5,7 +5,7 @@ namespace App\Features\User;
 use App\DTOs\User\UserFilterDTO;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Exception;
-use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class FilterUsersFeature
 {
@@ -18,10 +18,10 @@ class FilterUsersFeature
      * Filter users by role, search, and pagination
      *
      * @param UserFilterDTO $dto Filter criteria
-     * @return Paginator
+     * @return LengthAwarePaginator
      * @throws Exception
      */
-    public function handle(UserFilterDTO $dto): Paginator
+    public function handle(UserFilterDTO $dto): LengthAwarePaginator
     {
         try {
             return $this->userRepository->filterUsers(

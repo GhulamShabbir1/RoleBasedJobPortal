@@ -156,20 +156,20 @@ class JobRepository implements JobRepositoryInterface
             });
         }
         if (!empty($filters['category_id'])) {
-            $query->where('category_id', $filters['category_id']);
+            $query->where('jobs.category_id', $filters['category_id']);
         }
         if (!empty($filters['job_type'])) {
-            $query->where('job_type', $filters['job_type']);
+            $query->where('jobs.job_type', $filters['job_type']);
         }
         if (!empty($filters['city'])) {
-            $query->where('city', $filters['city']);
+            $query->where('jobs.city', $filters['city']);
         }
 
         if (isset($filters['min_salary']) && is_numeric($filters['min_salary'])) {
-            $query->where('max_salary', '>=', $filters['min_salary']);
+            $query->where('jobs.max_salary', '>=', $filters['min_salary']);
         }
         if (isset($filters['max_salary']) && is_numeric($filters['max_salary'])) {
-            $query->where('min_salary', '<=', $filters['max_salary']);
+            $query->where('jobs.min_salary', '<=', $filters['max_salary']);
         }
 
         return $query->paginate($perPage, ['*'], 'page', $page);

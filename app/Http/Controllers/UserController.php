@@ -55,12 +55,20 @@ class UserController extends Controller
     ): JsonResponse {
         try {
             $dto = UserFilterDTO::fromRequest($request);
-            $users = $feature->handle($dto);
+            $paginated = $feature->handle($dto);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Users filtered successfully',
-                'data' => $users,
+                'data' => $paginated->items(),
+                'pagination' => [
+                    'total' => $paginated->total(),
+                    'per_page' => $paginated->perPage(),
+                    'current_page' => $paginated->currentPage(),
+                    'last_page' => $paginated->lastPage(),
+                    'from' => $paginated->firstItem(),
+                    'to' => $paginated->lastItem(),
+                ],
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

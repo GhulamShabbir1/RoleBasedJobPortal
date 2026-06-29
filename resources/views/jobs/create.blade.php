@@ -1,220 +1,540 @@
 @extends('layouts.app')
 
-@section('title', 'Post a Job · jobboard')
-@section('page_title', 'Post a Job')
+@section('title', 'Post a Job - JobHub')
 
 @section('content')
-<main class="ml-[280px] flex-1 md:ml-[280px] bg-[#FAFAFA] min-h-screen">
-    <!-- Form Content -->
-    <div class="max-w-[1000px] mx-auto p-margin_desktop pb-24">
-        <div class="bg-white rounded-[24px] p-8 md:p-12 card-shadow border border-[#ECECEC]">
-            <div class="mb-10">
-                <h2 class="font-headline-md text-headline-md text-primary mb-2">Job Details</h2>
-                <p class="font-body-md text-body-md text-secondary">Fill out the information below to create a new job listing for candidates.</p>
-            </div>
+<div class="min-h-screen bg-white">
+    <div class="flex gap-0">
+        <!-- Sidebar - Determine role dynamically -->
+        @php
+            $userRole = auth()->user()?->role ?? 'employer';
+        @endphp
 
-            <form class="space-y-8" method="POST" action="#" id="postJobForm" enctype="multipart/form-data">
-                @csrf
+        @if($userRole === 'admin')
+            @include('components.admin-sidebar')
+        @else
+            @include('components.employer-sidebar')
+        @endif
 
-                <!-- Top Row: Approved Companies & Title -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="space-y-2">
-                        <label class="font-label-sm text-label-sm uppercase tracking-widest text-secondary block" for="category_id">Category</label>
-                        <select class="form-input w-full p-4 rounded-xl border border-[#ECECEC] bg-white text-body-md" id="category_id" name="category_id" required>
-                            <option value="">Loading categories...</option>
-                        </select>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="font-label-sm text-label-sm uppercase tracking-widest text-secondary block" for="title">Job Title</label>
-                        <input class="form-input w-full p-4 rounded-xl border border-[#ECECEC] bg-white text-body-md" id="title" name="title" placeholder="e.g. Senior Product Designer" type="text" />
-                    </div>
-                </div>
-
-                <!-- Description -->
-                <div class="space-y-2">
-                    <label class="font-label-sm text-label-sm uppercase tracking-widest text-secondary block" for="description">Job Description</label>
-                    <textarea class="form-input w-full p-4 rounded-xl border border-[#ECECEC] bg-white text-body-md resize-none" id="description" name="description" placeholder="Provide a detailed overview of the role..." rows="6"></textarea>
-                </div>
-
-                <!-- Requirements -->
-                <div class="space-y-2">
-                    <label class="font-label-sm text-label-sm uppercase tracking-widest text-secondary block" for="requirements">Key Requirements</label>
-                    <textarea class="form-input w-full p-4 rounded-xl border border-[#ECECEC] bg-white text-body-md resize-none" id="requirements" name="requirements" placeholder="List the essential skills and experience..." rows="4"></textarea>
-                </div>
-
-                <!-- Metadata Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="space-y-2">
-                        <label class="font-label-sm text-label-sm uppercase tracking-widest text-secondary block" for="city">City</label>
-                        <div class="relative">
-                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">location_on</span>
-                            <input class="form-input w-full p-4 pl-12 rounded-xl border border-[#ECECEC] bg-white text-body-md" id="city" name="city" placeholder="New York, NY" type="text" />
+        <!-- Main Content -->
+        <div class="flex-1 p-8 bg-gray-50 min-h-screen">
+            <div class="max-w-3xl mx-auto" x-data="jobForm()" x-init="loadCategories()">
+                <div class="space-y-6">
+                    <!-- Header -->
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <button onclick="history.back()" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all duration-200 hover:shadow-md mb-4">
+                                <i class="fas fa-arrow-left mr-2"></i>Back
+                            </button>
+                            <h1 class="text-3xl font-bold text-gray-900">Post a New Job</h1>
+                            <p class="text-gray-600 mt-1 flex items-center gap-2">
+                                <i class="fas fa-circle text-[6px] text-gray-300"></i>
+                                Create a job listing to find qualified candidates
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm text-gray-500">
+                                <i class="fas fa-clock mr-1"></i>
+                                <span x-text="new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"></span>
+                            </span>
                         </div>
                     </div>
 
-                    <div class="space-y-2">
-                        <label class="font-label-sm text-label-sm uppercase tracking-widest text-secondary block" for="job_type">Job Type</label>
-                        <select class="form-input w-full p-4 rounded-xl border border-[#ECECEC] bg-white text-body-md" id="job_type" name="job_type">
-                            <option value="full_time">Full-time</option>
-                            <option value="part_time">Part-time</option>
-                            <option value="contract">Contract</option>
-                            <option value="temporary">Temporary</option>
-                            <option value="internship">Internship</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="font-label-sm text-label-sm uppercase tracking-widest text-secondary block" for="min_salary">Min Salary</label>
-                        <div class="relative">
-                            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">payments</span>
-                            <input class="form-input w-full p-4 pl-12 rounded-xl border border-[#ECECEC] bg-white text-body-md" id="min_salary" name="min_salary" placeholder="80000" type="number" min="0" />
+                    <!-- Progress Steps -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1 flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center text-xs font-bold">1</div>
+                                <div class="flex-1 h-0.5 bg-gray-200 mx-2"></div>
+                            </div>
+                            <div class="flex-1 flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-xs font-bold">2</div>
+                                <div class="flex-1 h-0.5 bg-gray-200 mx-2"></div>
+                            </div>
+                            <div class="flex-1 flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-xs font-bold">3</div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between mt-2 text-xs text-gray-500">
+                            <span class="font-medium text-gray-900">Job Details</span>
+                            <span>Compensation</span>
+                            <span>Publish</span>
                         </div>
                     </div>
+
+                    <!-- Error Alert -->
+                    <div x-show="error" class="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 flex items-start" x-transition>
+                        <i class="fas fa-exclamation-circle mr-3 mt-0.5 text-red-500"></i>
+                        <span x-text="error"></span>
+                    </div>
+
+                    <!-- Success Alert -->
+                    <div x-show="success" class="p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 flex items-start" x-transition>
+                        <i class="fas fa-check-circle mr-3 mt-0.5 text-green-500"></i>
+                        <span x-text="success"></span>
+                    </div>
+
+                    <!-- Form -->
+                    <form @submit.prevent="submitForm()" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-6">
+                        <!-- Job Title -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-briefcase mr-2 text-gray-400"></i>Job Title
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-briefcase text-gray-400"></i>
+                                </div>
+                                <input
+                                    type="text"
+                                    x-model="form.title"
+                                    placeholder="e.g., Senior React Developer"
+                                    class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all duration-200"
+                                    required
+                                    minlength="5"
+                                    maxlength="100"
+                                >
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1" x-text="(form.title?.length || 0) + '/100 characters'"></p>
+                        </div>
+
+                        <!-- Job Description -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-align-left mr-2 text-gray-400"></i>Job Description
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute top-3 left-3 flex items-start pointer-events-none">
+                                    <i class="fas fa-align-left text-gray-400"></i>
+                                </div>
+                                <textarea
+                                    x-model="form.description"
+                                    placeholder="Describe the job, responsibilities, requirements, and benefits..."
+                                    rows="6"
+                                    class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all duration-200 resize-y"
+                                    required
+                                    minlength="20"
+                                ></textarea>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1" x-text="(form.description?.length || 0) + ' characters (minimum 20)'"></p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Category -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-tag mr-2 text-gray-400"></i>Category
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-tag text-gray-400"></i>
+                                    </div>
+                                    <select
+                                        x-model="form.category_id"
+                                        class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all duration-200 appearance-none bg-white"
+                                        required
+                                    >
+                                        <option value="">Select Category</option>
+                                        <template x-for="cat in categories" :key="cat.id">
+                                            <option :value="cat.id" x-text="cat.name"></option>
+                                        </template>
+                                    </select>
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-chevron-down text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Job Type -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-clock mr-2 text-gray-400"></i>Job Type
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-clock text-gray-400"></i>
+                                    </div>
+                                    <select
+                                        x-model="form.job_type"
+                                        class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all duration-200 appearance-none bg-white"
+                                        required
+                                    >
+                                        <option value="">Select Type</option>
+                                        <option value="full_time">Full Time</option>
+                                        <option value="part_time">Part Time</option>
+                                        <option value="remote">Remote</option>
+                                        <option value="contract">Contract</option>
+                                        <option value="internship">Internship</option>
+                                        <option value="freelance">Freelance</option>
+                                    </select>
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-chevron-down text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- City -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>City
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-map-marker-alt text-gray-400"></i>
+                                    </div>
+                                    <select
+                                        x-model="form.city"
+                                        class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all duration-200 appearance-none bg-white"
+                                        required
+                                    >
+                                        <option value="">Select City</option>
+                                        <option value="Lahore">Lahore</option>
+                                        <option value="Karachi">Karachi</option>
+                                        <option value="Islamabad">Islamabad</option>
+                                        <option value="Rawalpindi">Rawalpindi</option>
+                                        <option value="Faisalabad">Faisalabad</option>
+                                        <option value="Multan">Multan</option>
+                                        <option value="Peshawar">Peshawar</option>
+                                        <option value="Quetta">Quetta</option>
+                                        <option value="Hyderabad">Hyderabad</option>
+                                        <option value="Remote">Remote</option>
+                                    </select>
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-chevron-down text-gray-400"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Vacancies -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fas fa-users mr-2 text-gray-400"></i>Vacancies
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-users text-gray-400"></i>
+                                    </div>
+                                    <input
+                                        type="number"
+                                        x-model.number="form.vacancies"
+                                        placeholder="1"
+                                        min="1"
+                                        max="100"
+                                        class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all duration-200"
+                                        required
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Salary Range -->
+                        <div class="border-t border-gray-200 pt-6">
+                            <h3 class="text-md font-semibold text-gray-900 mb-4">
+                                <i class="fas fa-dollar-sign mr-2 text-gray-400"></i>Compensation
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Min Salary -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Minimum Salary
+                                    </label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <span class="text-gray-400 font-medium">$</span>
+                                        </div>
+                                        <input
+                                            type="number"
+                                            x-model.number="form.min_salary"
+                                            placeholder="30000"
+                                            min="0"
+                                            step="1000"
+                                            class="w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all duration-200"
+                                        >
+                                    </div>
+                                </div>
+
+                                <!-- Max Salary -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        Maximum Salary
+                                    </label>
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <span class="text-gray-400 font-medium">$</span>
+                                        </div>
+                                        <input
+                                            type="number"
+                                            x-model.number="form.max_salary"
+                                            placeholder="50000"
+                                            min="0"
+                                            step="1000"
+                                            class="w-full pl-8 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all duration-200"
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Leave blank if you prefer to discuss compensation during interviews
+                            </p>
+                        </div>
+
+                        <!-- Deadline -->
+                        <div class="border-t border-gray-200 pt-6">
+                            <h3 class="text-md font-semibold text-gray-900 mb-4">
+                                <i class="fas fa-calendar-alt mr-2 text-gray-400"></i>Application Deadline
+                            </h3>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    Deadline Date
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-calendar-alt text-gray-400"></i>
+                                    </div>
+                                    <input
+                                        type="date"
+                                        x-model="form.deadline"
+                                        :min="today()"
+                                        class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all duration-200"
+                                        required
+                                    >
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    <i class="fas fa-exclamation-triangle text-yellow-500 mr-1"></i>
+                                    Applications will not be accepted after this date
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+                            <button
+                                type="submit"
+                                :disabled="loading"
+                                class="flex-1 relative overflow-hidden group bg-gray-900 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <span class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></span>
+                                <span x-show="!loading">
+                                    <i class="fas fa-paper-plane mr-2"></i>Post Job
+                                </span>
+                                <span x-show="loading">
+                                    <i class="fas fa-spinner fa-spin mr-2"></i>Publishing...
+                                </span>
+                            </button>
+                            <button
+                                type="reset"
+                                @click="resetForm()"
+                                class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200"
+                            >
+                                <i class="fas fa-undo mr-2"></i>Reset
+                            </button>
+                            <button
+                                type="button"
+                                onclick="window.location.href='/employer/jobs'"
+                                class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200"
+                            >
+                                <i class="fas fa-times mr-2"></i>Cancel
+                            </button>
+                        </div>
+                    </form>
                 </div>
-
-                <!-- Deadline & Final Action -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="space-y-2">
-                        <label class="font-label-sm text-label-sm uppercase tracking-widest text-secondary block" for="max_salary">Max Salary</label>
-                        <input class="form-input w-full p-4 rounded-xl border border-[#ECECEC] bg-white text-body-md" id="max_salary" name="max_salary" placeholder="120000" type="number" min="0" />
-                    </div>
-                    <div class="space-y-2">
-                        <label class="font-label-sm text-label-sm uppercase tracking-widest text-secondary block" for="vacancies">Vacancies</label>
-                        <input class="form-input w-full p-4 rounded-xl border border-[#ECECEC] bg-white text-body-md" id="vacancies" name="vacancies" value="1" type="number" min="1" />
-                    </div>
-                    <div class="space-y-2">
-                        <label class="font-label-sm text-label-sm uppercase tracking-widest text-secondary block" for="status">Status</label>
-                        <select class="form-input w-full p-4 rounded-xl border border-[#ECECEC] bg-white text-body-md" id="status" name="status">
-                            <option value="open">Open</option>
-                            <option value="draft">Draft</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="flex flex-col md:flex-row items-end justify-between gap-8 pt-8 border-t border-[#ECECEC]">
-                    <div class="w-full md:w-1/2 space-y-2">
-                        <label class="font-label-sm text-label-sm uppercase tracking-widest text-secondary block" for="deadline">Application Deadline</label>
-                        <input class="form-input w-full p-4 rounded-xl border border-[#ECECEC] bg-white text-body-md" id="deadline" name="deadline" type="date" />
-                    </div>
-
-                    <div class="flex gap-4 w-full md:w-auto">
-                        <button class="flex-1 md:flex-none px-10 py-4 text-[#111111] border border-[#ECECEC] font-bold rounded-full hover:bg-surface-container-low transition-all" type="button">Save Draft</button>
-                        <button class="flex-1 md:flex-none px-12 py-4 bg-[#111111] text-white font-bold rounded-full transition-transform active:scale-95" type="submit">Post Job</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-
-        <!-- Preview Card -->
-        <div class="mt-12 p-8 bg-[#F3F3F3] rounded-[24px] border border-dashed border-outline-variant">
-            <div class="flex items-center gap-4 mb-4">
-                <span class="material-symbols-outlined text-secondary">visibility</span>
-                <span class="font-label-sm text-label-sm uppercase tracking-widest text-secondary">Listing Preview</span>
             </div>
-
-            <div class="flex items-start justify-between">
-                <div>
-                    <h3 class="font-headline-md text-headline-md text-primary" id="preview-title">Senior Product Designer</h3>
-                    <div class="flex flex-wrap gap-2 mt-4">
-                        <span class="bg-[#e4e2e2] text-secondary text-[12px] px-3 py-1 rounded-full font-semibold">Full-time</span>
-                        <span class="bg-[#e4e2e2] text-secondary text-[12px] px-3 py-1 rounded-full font-semibold">New York</span>
-                        <span class="bg-[#e4e2e2] text-secondary text-[12px] px-3 py-1 rounded-full font-semibold">$120k - $150k</span>
-                    </div>
-                </div>
-
-                <div class="w-12 h-12 bg-white rounded-lg border border-[#ECECEC] flex items-center justify-center">
-                    <span class="material-symbols-outlined text-primary">auto_awesome</span>
-                </div>
-            </div>
         </div>
-
     </div>
-</main>
-@endsection
+</div>
 
-@push('scripts')
 <script>
-    // Simple reactive preview logic
-    const titleInput = document.querySelector('#postJobForm input[name="title"]');
-    const previewTitle = document.getElementById('preview-title');
+function jobForm() {
+    return {
+        form: {
+            title: '',
+            description: '',
+            category_id: '',
+            job_type: '',
+            city: '',
+            min_salary: '',
+            max_salary: '',
+            vacancies: 1,
+            deadline: ''
+        },
+        categories: [],
+        loading: false,
+        error: '',
+        success: '',
 
-    if (titleInput && previewTitle) {
-        titleInput.addEventListener('input', (e) => {
-            previewTitle.textContent = e.target.value || "Senior Product Designer";
-        });
-    }
+        today() {
+            const today = new Date();
+            return today.toISOString().split('T')[0];
+        },
 
-    // Micro-interactions for form focus
-    document.querySelectorAll('#postJobForm .form-input').forEach(input => {
-        input.addEventListener('focus', () => {
-            const label = input.closest('.space-y-2')?.querySelector('label');
-            if (label) label.style.color = '#111111';
-        });
-        input.addEventListener('blur', () => {
-            const label = input.closest('.space-y-2')?.querySelector('label');
-            if (label) label.style.color = '';
-        });
-    });
-
-    document.addEventListener('DOMContentLoaded', loadCategories);
-
-    async function loadCategories() {
-        const categorySelect = document.getElementById('category_id');
-        try {
-            const response = await fetch(`${API_URL}/categories`, {
-                headers: { 'Accept': 'application/json' }
-            });
-            const data = await response.json();
-            const categories = data?.data?.data || data?.data || [];
-            categorySelect.innerHTML = '<option value="">Select a Category</option>' + categories.map(category => `
-                <option value="${category.id}">${category.name}</option>
-            `).join('');
-        } catch (error) {
-            categorySelect.innerHTML = '<option value="">Failed to load categories</option>';
-        }
-    }
-
-    document.getElementById('postJobForm').addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const submitButton = event.target.querySelector('button[type="submit"]');
-        submitButton.disabled = true;
-        submitButton.textContent = 'Posting...';
-
-        try {
-            const response = await fetch(`${API_URL}/jobs`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                },
-                body: JSON.stringify({
-                    title: document.getElementById('title').value,
-                    description: document.getElementById('description').value,
-                    category_id: document.getElementById('category_id').value,
-                    job_type: document.getElementById('job_type').value,
-                    city: document.getElementById('city').value,
-                    min_salary: document.getElementById('min_salary').value || null,
-                    max_salary: document.getElementById('max_salary').value || null,
-                    vacancies: document.getElementById('vacancies').value || 1,
-                    status: document.getElementById('status').value,
-                    deadline: document.getElementById('deadline').value || null,
-                }),
-            });
-            const data = await response.json();
-            if (!response.ok || !data.success) {
-                throw new Error(data.message || 'Failed to create job');
+        async loadCategories() {
+            try {
+                const response = await axios.get('/api/categories');
+                if (response.data.success) {
+                    this.categories = response.data.data;
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
             }
-            alert('Job created successfully.');
-            window.location.href = '/jobs';
-        } catch (error) {
-            alert(error.message);
-        } finally {
-            submitButton.disabled = false;
-            submitButton.textContent = 'Post Job';
+        },
+
+        resetForm() {
+            if (confirm('Are you sure you want to reset the form? All entered data will be lost.')) {
+                this.form = {
+                    title: '',
+                    description: '',
+                    category_id: '',
+                    job_type: '',
+                    city: '',
+                    min_salary: '',
+                    max_salary: '',
+                    vacancies: 1,
+                    deadline: ''
+                };
+                this.error = '';
+                this.success = '';
+            }
+        },
+
+        async submitForm() {
+            this.error = '';
+            this.success = '';
+
+            // Validation
+            if (!this.form.title || this.form.title.length < 5) {
+                this.error = 'Please enter a job title (minimum 5 characters)';
+                return;
+            }
+
+            if (!this.form.description || this.form.description.length < 20) {
+                this.error = 'Please enter a job description (minimum 20 characters)';
+                return;
+            }
+
+            if (!this.form.category_id) {
+                this.error = 'Please select a category';
+                return;
+            }
+
+            if (!this.form.job_type) {
+                this.error = 'Please select a job type';
+                return;
+            }
+
+            if (!this.form.city) {
+                this.error = 'Please select a city';
+                return;
+            }
+
+            if (!this.form.vacancies || this.form.vacancies < 1) {
+                this.error = 'Please enter a valid number of vacancies (minimum 1)';
+                return;
+            }
+
+            if (!this.form.deadline) {
+                this.error = 'Please select a deadline date';
+                return;
+            }
+
+            // Check if min salary > max salary
+            if (this.form.min_salary && this.form.max_salary && this.form.min_salary > this.form.max_salary) {
+                this.error = 'Minimum salary cannot be greater than maximum salary';
+                return;
+            }
+
+            this.loading = true;
+
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    window.location.href = '/auth/login';
+                    return;
+                }
+
+                const response = await axios.post('/api/employer/jobs', this.form, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.data.success) {
+                    this.success = 'Job posted successfully! Redirecting...';
+                    setTimeout(() => {
+                        window.location.href = '/employer/jobs';
+                    }, 1500);
+                } else {
+                    this.error = response.data.message || 'Failed to post job';
+                }
+            } catch (error) {
+                if (error.response?.status === 401) {
+                    window.location.href = '/auth/login';
+                } else if (error.response?.data?.errors) {
+                    const errors = error.response.data.errors;
+                    this.error = Object.values(errors).flat().join(', ');
+                } else if (error.response?.data?.message) {
+                    this.error = error.response.data.message;
+                } else {
+                    this.error = 'An error occurred. Please try again.';
+                }
+            } finally {
+                this.loading = false;
+            }
         }
-    });
+    }
+}
 </script>
-@endpush
+
+<style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+    }
+
+    /* Smooth transitions */
+    .transition-all {
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 200ms;
+    }
+
+    /* Input focus */
+    input:focus, textarea:focus, select:focus {
+        box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.1);
+    }
+
+    /* Number input arrows */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+</style>
+@endsection

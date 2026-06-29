@@ -4,7 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\CandidateProfile;
 use App\Repositories\Interfaces\CandidateProfileRepositoryInterface;
-use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class CandidateProfileRepository implements CandidateProfileRepositoryInterface
@@ -79,7 +79,7 @@ class CandidateProfileRepository implements CandidateProfileRepositoryInterface
     /**
      * Filter candidate profiles by search and skills
      */
-    public function filterProfiles(?string $search = null, ?string $skills = null, int $page = 1, int $perPage = 15): Paginator
+    public function filterProfiles(?string $search = null, ?string $skills = null, int $page = 1, int $perPage = 15): LengthAwarePaginator
     {
         $query = $this->model->query();
 

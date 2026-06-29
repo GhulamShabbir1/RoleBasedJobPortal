@@ -8,6 +8,7 @@ use App\Models\Job;
 use App\Models\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class BusinessRulesTest extends TestCase
@@ -21,11 +22,14 @@ class BusinessRulesTest extends TestCase
 
         Company::factory()->create(['user_id' => $employer->id, 'status' => 'pending']);
 
-        $response = $this->postJson('/api/companies', [
+        Storage::fake('local');
+        $response = $this->post('/api/companies', [
             'name' => 'Second Company',
             'email' => 'second@company.com',
             'city' => 'Test City',
-        ], ['Authorization' => 'Bearer ' . $token]);
+            'logo' => UploadedFile::fake()->create('logo.jpg', 100, 'image/jpeg'),
+            'certificate' => UploadedFile::fake()->create('cert.jpg', 100, 'image/jpeg'),
+        ], ['Authorization' => 'Bearer ' . $token, 'Accept' => 'application/json']);
 
         $response->assertStatus(400);
         $this->assertDatabaseCount('companies', 1);
@@ -37,6 +41,7 @@ class BusinessRulesTest extends TestCase
         $token = auth()->login($employer);
         $company = Company::factory()->create(['user_id' => $employer->id, 'status' => 'pending']);
 
+        $category = \App\Models\Category::factory()->create();
         $response = $this->postJson('/api/jobs', [
             'title' => 'Test Job',
             'description' => 'Test Description',
@@ -44,8 +49,10 @@ class BusinessRulesTest extends TestCase
             'min_salary' => 30000,
             'max_salary' => 50000,
             'job_type' => 'full_time',
-            'category' => 'Test Category',
+            'category_id' => $category->id,
             'company_id' => $company->id,
+            'vacancies' => 2,
+            'deadline' => '2027-12-31',
         ], ['Authorization' => 'Bearer ' . $token]);
 
         $response->assertStatus(403);
@@ -60,8 +67,10 @@ class BusinessRulesTest extends TestCase
             'min_salary' => 30000,
             'max_salary' => 50000,
             'job_type' => 'full_time',
-            'category' => 'Test Category',
+            'category_id' => $category->id,
             'company_id' => $company->id,
+            'vacancies' => 2,
+            'deadline' => '2027-12-31',
         ], ['Authorization' => 'Bearer ' . $token]);
 
         $response->assertStatus(201);
@@ -79,6 +88,15 @@ class BusinessRulesTest extends TestCase
         $token = auth()->login($employer2);
         $response = $this->putJson("/api/jobs/{$job->id}", [
             'title' => 'Updated Job',
+            'description' => 'Test Description',
+            'city' => 'Test City',
+            'min_salary' => 30000,
+            'max_salary' => 50000,
+            'job_type' => 'full_time',
+            'category_id' => \App\Models\Category::factory()->create()->id,
+            'company_id' => $company->id,
+            'vacancies' => 2,
+            'deadline' => '2027-12-31',
         ], ['Authorization' => 'Bearer ' . $token]);
 
         $response->assertStatus(403);
@@ -86,6 +104,15 @@ class BusinessRulesTest extends TestCase
         $token = auth()->login($employer1);
         $response = $this->putJson("/api/jobs/{$job->id}", [
             'title' => 'Updated Job',
+            'description' => 'Test Description',
+            'city' => 'Test City',
+            'min_salary' => 30000,
+            'max_salary' => 50000,
+            'job_type' => 'full_time',
+            'category_id' => \App\Models\Category::factory()->create()->id,
+            'company_id' => $company->id,
+            'vacancies' => 2,
+            'deadline' => '2027-12-31',
         ], ['Authorization' => 'Bearer ' . $token]);
 
         $response->assertStatus(200);
@@ -102,14 +129,16 @@ class BusinessRulesTest extends TestCase
         $openJob = Job::factory()->create(['user_id' => $employer->id, 'company_id' => $company->id, 'status' => 'open']);
 
         Storage::fake('local');
-        $response = $this->postJson("/api/jobs/{$closedJob->id}/apply", [
-            'resume' => 'fake/file.pdf',
-        ], ['Authorization' => 'Bearer ' . $token]);
-        $response->assertStatus(400);
+        $response = $this->post("/api/jobs/{$closedJob->id}/apply", [
+            'job_id' => $closedJob->id,
+            'resume' => UploadedFile::fake()->createWithContent('resume.pdf', 'dummy content'),
+        ], ['Authorization' => 'Bearer ' . $token, 'Accept' => 'application/json']);
+        $response->assertStatus(403);
 
-        $response = $this->postJson("/api/jobs/{$openJob->id}/apply", [
-            'resume' => 'fake/file.pdf',
-        ], ['Authorization' => 'Bearer ' . $token]);
+        $response = $this->post("/api/jobs/{$openJob->id}/apply", [
+            'job_id' => $openJob->id,
+            'resume' => UploadedFile::fake()->createWithContent('resume.pdf', 'dummy content'),
+        ], ['Authorization' => 'Bearer ' . $token, 'Accept' => 'application/json']);
         $response->assertStatus(201);
     }
 
@@ -125,11 +154,12 @@ class BusinessRulesTest extends TestCase
         Storage::fake('local');
         Application::factory()->create(['candidate_id' => $candidate->id, 'job_id' => $job->id, 'status' => 'pending']);
 
-        $response = $this->postJson("/api/jobs/{$job->id}/apply", [
-            'resume' => 'fake/file.pdf',
-        ], ['Authorization' => 'Bearer ' . $token]);
+        $response = $this->post("/api/jobs/{$job->id}/apply", [
+            'job_id' => $job->id,
+            'resume' => UploadedFile::fake()->createWithContent('resume.pdf', 'dummy content'),
+        ], ['Authorization' => 'Bearer ' . $token, 'Accept' => 'application/json']);
 
-        $response->assertStatus(400);
+        $response->assertStatus(409);
         $this->assertDatabaseCount('applications', 1);
     }
 
@@ -142,7 +172,7 @@ class BusinessRulesTest extends TestCase
         $company = Company::factory()->create(['user_id' => $employer->id, 'status' => 'approved']);
         $job = Job::factory()->create(['user_id' => $employer->id, 'company_id' => $company->id, 'status' => 'open']);
 
-        $response = $this->postJson("/api/jobs/{$job->id}/apply", [], ['Authorization' => 'Bearer ' . $token]);
+        $response = $this->postJson("/api/jobs/{$job->id}/apply", ['job_id' => $job->id], ['Authorization' => 'Bearer ' . $token]);
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors('resume');
@@ -158,11 +188,12 @@ class BusinessRulesTest extends TestCase
         $job = Job::factory()->create(['user_id' => $employer->id, 'company_id' => $company->id, 'status' => 'closed']);
 
         Storage::fake('local');
-        $response = $this->postJson("/api/jobs/{$job->id}/apply", [
-            'resume' => 'fake/file.pdf',
-        ], ['Authorization' => 'Bearer ' . $token]);
+        $response = $this->post("/api/jobs/{$job->id}/apply", [
+            'job_id' => $job->id,
+            'resume' => UploadedFile::fake()->createWithContent('resume.pdf', 'dummy content'),
+        ], ['Authorization' => 'Bearer ' . $token, 'Accept' => 'application/json']);
 
-        $response->assertStatus(400);
+        $response->assertStatus(403);
     }
 
     public function test_admin_has_full_access_to_all_resources()

@@ -3,7 +3,7 @@
 namespace App\Repositories\Interfaces;
 
 use App\Models\User;
-use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 interface UserRepositoryInterface
@@ -66,5 +66,5 @@ interface UserRepositoryInterface
     /**
      * Filter users by role and search
      */
-    public function filterUsers(?string $role = null, ?string $search = null, int $page = 1, int $perPage = 15): Paginator;
+    public function filterUsers(?string $role = null, ?string $search = null, int $page = 1, int $perPage = 15): LengthAwarePaginator;
 }

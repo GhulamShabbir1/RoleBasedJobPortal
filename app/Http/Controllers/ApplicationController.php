@@ -30,16 +30,22 @@ class ApplicationController extends Controller
         try {
             $dto = ApplicationFilterDTO::fromRequest($request);
             $applications = $this->filterApplicationsByRoleFeature->handle($dto->toArray());
+            
+            // If limit is provided, return just the first N items as a collection
+            $limit = $request->query('limit');
+            if ($limit && is_numeric($limit)) {
+                $applications = $applications->take((int)$limit);
+            }
 
             return response()->json([
                 'success' => true,
-                'data' => $applications,
+                'data' => $applications instanceof \Illuminate\Pagination\LengthAwarePaginator ? $applications->items() : $applications,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ], 500);
+            ], $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500);
         }
     }
 
@@ -61,7 +67,7 @@ class ApplicationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ], 404);
+            ], $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500);
         }
     }
 
@@ -92,7 +98,7 @@ class ApplicationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ], $e->getCode() ?? 400);
+            ], $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500);
         }
     }
 
@@ -123,7 +129,7 @@ class ApplicationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ], 400);
+            ], $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500);
         }
     }
 
@@ -153,6 +159,14 @@ class ApplicationController extends Controller
     }
 
     /**
+     * Spec-aligned: GET /api/resumes/download/{application_id}
+     */
+    public function downloadResumeByApplicationId(int $application_id): \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\JsonResponse
+    {
+        return $this->downloadResume((string) $application_id);
+    }
+
+    /**
      * Delete an application
      */
     public function destroy(
@@ -177,7 +191,7 @@ class ApplicationController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-            ], 404);
+            ], $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500);
         }
     }
 }

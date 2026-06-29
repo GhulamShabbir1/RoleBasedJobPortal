@@ -1,732 +1,998 @@
 <!DOCTYPE html>
-<html class="light" lang="en">
+<html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>jobboard | Find your dream job</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "on-secondary-fixed": "#1b1c1c",
-                        "on-error": "#ffffff",
-                        "on-secondary-fixed-variant": "#464747",
-                        "secondary": "#5e5e5e",
-                        "surface-container-highest": "#e2e2e2",
-                        "tertiary-container": "#1a1c1c",
-                        "surface-bright": "#f9f9f9",
-                        "surface-container-lowest": "#ffffff",
-                        "tertiary-fixed-dim": "#c6c6c6",
-                        "tertiary-fixed": "#e2e2e2",
-                        "on-primary-fixed-variant": "#474646",
-                        "tertiary": "#000000",
-                        "surface-container-low": "#f3f3f3",
-                        "surface-container": "#eeeeee",
-                        "on-surface": "#1a1c1c",
-                        "surface-dim": "#dadada",
-                        "surface-variant": "#e2e2e2",
-                        "secondary-fixed": "#e4e2e2",
-                        "outline": "#747878",
-                        "inverse-surface": "#2f3131",
-                        "primary-fixed-dim": "#c8c6c5",
-                        "on-tertiary-fixed-variant": "#454747",
-                        "error": "#ba1a1a",
-                        "surface-container-high": "#e8e8e8",
-                        "on-secondary": "#ffffff",
-                        "on-primary": "#ffffff",
-                        "secondary-container": "#e4e2e2",
-                        "inverse-on-surface": "#f0f1f1",
-                        "background": "#f9f9f9",
-                        "surface-tint": "#5f5e5e",
-                        "outline-variant": "#c4c7c7",
-                        "on-tertiary-container": "#838484",
-                        "on-error-container": "#93000a",
-                        "on-primary-fixed": "#1c1b1b",
-                        "on-primary-container": "#858383",
-                        "on-tertiary-fixed": "#1a1c1c",
-                        "on-tertiary": "#ffffff",
-                        "secondary-fixed-dim": "#c8c6c6",
-                        "surface": "#f9f9f9",
-                        "inverse-primary": "#c8c6c5",
-                        "on-surface-variant": "#444748",
-                        "on-secondary-container": "#646464",
-                        "error-container": "#ffdad6",
-                        "primary": "#000000",
-                        "primary-fixed": "#e5e2e1",
-                        "on-background": "#1a1c1c"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
-                        "full": "9999px"
-                    },
-                    "spacing": {
-                        "sidebar_width": "280px",
-                        "gutter": "24px",
-                        "margin_desktop": "40px",
-                        "margin_mobile": "16px",
-                        "container_max_width": "1440px",
-                        "topbar_height": "72px"
-                    },
-                    "fontFamily": {
-                        "headline-md": ["Inter"],
-                        "label-sm": ["Inter"],
-                        "body-lg": ["Inter"],
-                        "headline-lg-mobile": ["Inter"],
-                        "headline-lg": ["Inter"],
-                        "body-md": ["Inter"],
-                        "display": ["Inter"]
-                    },
-                    "fontSize": {
-                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
-                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
-                        "body-lg": ["16px", {"lineHeight": "26px", "fontWeight": "400"}],
-                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
-                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
-                        "body-md": ["14px", {"lineHeight": "22px", "fontWeight": "400"}],
-                        "display": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
-                    }
-                },
-            },
-        }
-    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobHub - Find Your Perfect Job</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            vertical-align: middle;
-        }
-        .luxury-shadow { box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
-        .luxury-shadow-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .luxury-shadow-hover:hover { box-shadow: 0 12px 28px rgba(0,0,0,0.06); transform: translateY(-4px); }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* Accessibility improvements */
-        .skip-link {
-            position: absolute;
-            top: -100%;
-            left: 16px;
-            background: #000;
-            color: #fff;
-            padding: 8px 16px;
-            z-index: 100;
-            border-radius: 4px;
-            font-weight: 600;
-        }
-        .skip-link:focus {
-            top: 16px;
-        }
-        
-        /* Focus styles */
-        *:focus-visible {
-            outline: 2px solid #000;
-            outline-offset: 2px;
-            border-radius: 4px;
-        }
-        
-        /* Smooth scroll */
-        html {
-            scroll-behavior: smooth;
-        }
-        
-        /* Custom animation */
+        /* Custom Animations */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(30px);
             }
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        .animate-fade-in-up {
-            animation: fadeInUp 0.6s ease-out forwards;
-        }
-        
-        /* Better contrast for hero text */
-        .hero-overlay {
-            background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7));
-        }
-    </style>
-</head>
-<body class="bg-background text-on-background selection:bg-primary selection:text-white">
 
-<!-- Skip to content for accessibility -->
-<a href="#main-content" class="skip-link">Skip to main content</a>
-
-<!-- Navigation Bar -->
-<header class="bg-surface-bright sticky top-0 z-50 h-topbar_height border-b border-surface-container-highest shadow-sm flex justify-between items-center w-full px-margin_mobile md:px-margin_desktop" role="banner">
-    <div class="flex items-center gap-8">
-        <a href="/" class="font-headline-lg text-headline-lg text-primary" style="text-decoration:none;" aria-label="jobboard home">jobboard</a>
-        <nav class="hidden md:flex gap-6 items-center" role="navigation" aria-label="Main navigation">
-            <a class="text-primary font-bold border-b-2 border-primary py-2 font-label-sm text-label-sm" href="/" aria-current="page">Home</a>
-            <a class="text-on-secondary-fixed-variant hover:bg-surface-container-low transition-all px-3 py-2 rounded-lg font-label-sm text-label-sm focus-visible:bg-surface-container-low" href="/jobs">Jobs</a>
-            <a class="text-on-secondary-fixed-variant hover:bg-surface-container-low transition-all px-3 py-2 rounded-lg font-label-sm text-label-sm focus-visible:bg-surface-container-low" href="/companies">Companies</a>
-            <a class="text-on-secondary-fixed-variant hover:bg-surface-container-low transition-all px-3 py-2 rounded-lg font-label-sm text-label-sm focus-visible:bg-surface-container-low" href="#resources">Resources</a>
-        </nav>
-    </div>
-    <div class="flex items-center gap-4" id="navActions">
-        <!-- Search trigger for mobile -->
-        <button class="md:hidden material-symbols-outlined text-primary p-2 hover:bg-surface-container-low rounded-full" aria-label="Search jobs">search</button>
-        
-        <!-- Default State: Logged out -->
-        <div class="hidden md:flex items-center gap-4">
-            <a href="/auth/login" class="text-primary font-bold px-4 py-2 hover:bg-surface-container-low rounded-full transition-colors text-sm focus-visible:bg-surface-container-low">Log in</a>
-            <a href="/auth/signup" class="bg-primary text-white font-bold px-6 py-2 rounded-full hover:scale-105 transition-transform text-sm focus-visible:scale-105">Sign up</a>
-        </div>
-        
-        <!-- Mobile menu button -->
-        <button class="md:hidden material-symbols-outlined text-primary p-2 hover:bg-surface-container-low rounded-full" aria-label="Menu" aria-expanded="false" id="mobileMenuBtn">menu</button>
-    </div>
-</header>
-
-<!-- Mobile Menu (Hidden by default) -->
-<div class="hidden fixed inset-0 z-40 bg-background/95 backdrop-blur-sm md:hidden" id="mobileMenu">
-    <div class="flex flex-col pt-24 px-margin_mobile gap-6">
-        <a class="text-primary font-bold text-lg py-2" href="/">Home</a>
-        <a class="text-on-secondary-fixed-variant text-lg py-2" href="/jobs">Jobs</a>
-        <a class="text-on-secondary-fixed-variant text-lg py-2" href="/companies">Companies</a>
-        <a class="text-on-secondary-fixed-variant text-lg py-2" href="#resources">Resources</a>
-        <hr class="border-surface-container-highest"/>
-        <a href="/auth/login" class="text-primary font-bold py-3 text-center border border-outline rounded-full">Log in</a>
-        <a href="/auth/signup" class="bg-primary text-white font-bold py-3 text-center rounded-full">Sign up</a>
-    </div>
-</div>
-
-<main id="main-content" class="w-full max-w-container_max_width mx-auto">
-    <!-- Hero Section -->
-    <section class="relative text-on-primary-container pt-24 pb-32 px-margin_mobile md:px-margin_desktop overflow-hidden" style="background-image: url('https://lh3.googleusercontent.com/aida/AP1WRLtkWIn8hBiDR_YbS8LreE6cndqRPe7yxtX-EnvOZLgupqrZiQ-KwTjfOQrr6ygWMBz656OQYsIHHvnV3z16fFG4tIYhm_hl6jhGifWP6C_jQvy7Bq3QcbkvVmG8CTkLSLYdGQiEqbNoJ_Zlr3kr5m8ZHphUVuB2GQA66pTHH_WAlRsv9l8HsNfisIgV3kSnhx-B5gTVRUCvv3NQharG_cV6ihcJhQ6ItK6sns4p0iKBz7ZoTASYqLGmOA'); background-size: cover; background-position: center;">
-        <div class="absolute inset-0 hero-overlay"></div>
-        <div class="relative z-10 max-w-3xl mx-auto text-center">
-            <span class="inline-block py-1 px-3 mb-6 border border-white/30 rounded-full font-label-sm text-label-sm text-surface-container-lowest tracking-widest uppercase bg-white/10 backdrop-blur-sm">The Future of Talent</span>
-            <h1 class="font-display text-display text-surface-container-lowest mb-6 leading-tight">Find your dream job</h1>
-            <p class="font-body-lg text-body-lg text-surface-container-lowest/90 mb-10 max-w-xl mx-auto">
-                Navigate the next chapter of your career with the world's most elite recruitment portal. Precision data meets editorial luxury.
-            </p>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a href="/auth/signup" class="bg-surface-container-lowest text-primary font-bold px-10 py-4 rounded-full hover:scale-105 transition-transform inline-block text-center shadow-lg hover:shadow-xl focus-visible:scale-105">Get Started</a>
-                <a href="/jobs" class="border-2 border-white/40 text-surface-container-lowest font-bold px-10 py-4 rounded-full hover:bg-white/10 transition-colors inline-block text-center backdrop-blur-sm focus-visible:bg-white/10">Explore Jobs</a>
-            </div>
-            <div class="mt-20 grid grid-cols-3 gap-4 md:gap-8 border-t border-white/20 pt-12">
-                <div class="text-center">
-                    <div class="font-headline-lg text-headline-lg md:text-3xl text-surface-container-lowest">10k+</div>
-                    <div class="font-label-sm text-label-sm text-surface-container-lowest/80 uppercase mt-1">Active Jobs</div>
-                </div>
-                <div class="text-center">
-                    <div class="font-headline-lg text-headline-lg md:text-3xl text-surface-container-lowest">450</div>
-                    <div class="font-label-sm text-label-sm text-surface-container-lowest/80 uppercase mt-1">Top Brands</div>
-                </div>
-                <div class="text-center">
-                    <div class="font-headline-lg text-headline-lg md:text-3xl text-surface-container-lowest">24h</div>
-                    <div class="font-label-sm text-label-sm text-surface-container-lowest/80 uppercase mt-1">Avg Response</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- NEW: Trusted By Section -->
-    <section class="py-16 px-margin_mobile md:px-margin_desktop bg-surface-container-lowest border-b border-surface-container-highest">
-        <p class="text-center font-label-sm text-label-sm text-secondary uppercase tracking-widest mb-8">Trusted by innovative companies worldwide</p>
-        <div class="flex flex-wrap justify-center items-center gap-8 md:gap-12 opacity-50 grayscale hover:grayscale-0 transition-all">
-            <div class="font-headline-md text-headline-md text-secondary/50">Stripe</div>
-            <div class="font-headline-md text-headline-md text-secondary/50">Airbnb</div>
-            <div class="font-headline-md text-headline-md text-secondary/50">Spotify</div>
-            <div class="font-headline-md text-headline-md text-secondary/50">Shopify</div>
-            <div class="font-headline-md text-headline-md text-secondary/50">Notion</div>
-            <div class="font-headline-md text-headline-md text-secondary/50">Figma</div>
-        </div>
-    </section>
-
-    <!-- Category Grid (Bento Style) -->
-    <section class="py-24 px-margin_mobile md:px-margin_desktop" id="categories">
-        <div class="flex justify-between items-end mb-12">
-            <div>
-                <h2 class="font-headline-lg text-headline-lg text-primary mb-2">Browse by Category</h2>
-                <p class="font-body-md text-body-md text-secondary">Discover opportunities across the most high-impact industries.</p>
-            </div>
-            <a href="/jobs" class="text-primary font-bold hidden sm:flex items-center gap-2 group decoration-transparent">
-                View All Categories <span class="material-symbols-outlined transition-transform group-hover:translate-x-1" aria-hidden="true">arrow_forward</span>
-            </a>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            <!-- Large Feature -->
-            <a href="/jobs?category=engineering" class="sm:col-span-2 sm:row-span-2 bg-white rounded-[24px] p-6 md:p-8 border border-surface-container-highest luxury-shadow-hover flex flex-col justify-between group cursor-pointer relative overflow-hidden decoration-transparent text-current" aria-label="Engineering category - 2,450 openings">
-                <div class="relative z-10">
-                    <span class="material-symbols-outlined text-4xl mb-6 text-primary" aria-hidden="true">engineering</span>
-                    <h3 class="font-headline-md text-headline-md mb-2">Engineering</h3>
-                    <p class="font-body-md text-body-md text-secondary">Software, Hardware, AI, and DevOps roles at scale.</p>
-                </div>
-                <div class="font-label-sm text-label-sm text-primary mt-8 z-10">2,450 Openings</div>
-                <div class="absolute -right-12 -bottom-12 opacity-[0.03] scale-150 group-hover:rotate-12 transition-transform duration-700" aria-hidden="true">
-                    <span class="material-symbols-outlined text-[200px]">engineering</span>
-                </div>
-            </a>
-            <!-- Small Grid Items -->
-            <a href="/jobs?category=design" class="bg-white rounded-[24px] p-6 md:p-8 border border-surface-container-highest luxury-shadow-hover flex flex-col justify-between cursor-pointer decoration-transparent text-current" aria-label="Design category - 840 openings">
-                <span class="material-symbols-outlined text-3xl mb-4 text-primary" aria-hidden="true">palette</span>
-                <div>
-                    <h3 class="font-headline-md text-headline-md text-sm mb-1">Design</h3>
-                    <div class="font-label-sm text-label-sm text-secondary">840 Openings</div>
-                </div>
-            </a>
-            <a href="/jobs?category=marketing" class="bg-white rounded-[24px] p-6 md:p-8 border border-surface-container-highest luxury-shadow-hover flex flex-col justify-between cursor-pointer decoration-transparent text-current" aria-label="Marketing category - 1,120 openings">
-                <span class="material-symbols-outlined text-3xl mb-4 text-primary" aria-hidden="true">campaign</span>
-                <div>
-                    <h3 class="font-headline-md text-headline-md text-sm mb-1">Marketing</h3>
-                    <div class="font-label-sm text-label-sm text-secondary">1,120 Openings</div>
-                </div>
-            </a>
-            <a href="/jobs?category=finance" class="bg-white rounded-[24px] p-6 md:p-8 border border-surface-container-highest luxury-shadow-hover flex flex-col justify-between cursor-pointer decoration-transparent text-current" aria-label="Finance category - 560 openings">
-                <span class="material-symbols-outlined text-3xl mb-4 text-primary" aria-hidden="true">account_balance</span>
-                <div>
-                    <h3 class="font-headline-md text-headline-md text-sm mb-1">Finance</h3>
-                    <div class="font-label-sm text-label-sm text-secondary">560 Openings</div>
-                </div>
-            </a>
-            <a href="/jobs?category=operations" class="bg-white rounded-[24px] p-6 md:p-8 border border-surface-container-highest luxury-shadow-hover flex flex-col justify-between cursor-pointer decoration-transparent text-current" aria-label="Operations category - 420 openings">
-                <span class="material-symbols-outlined text-3xl mb-4 text-primary" aria-hidden="true">description</span>
-                <div>
-                    <h3 class="font-headline-md text-headline-md text-sm mb-1">Operations</h3>
-                    <div class="font-label-sm text-label-sm text-secondary">420 Openings</div>
-                </div>
-            </a>
-        </div>
-        <!-- Mobile view all link -->
-        <div class="mt-8 text-center sm:hidden">
-            <a href="/jobs" class="text-primary font-bold flex items-center justify-center gap-2 group decoration-transparent">
-                View All Categories <span class="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span>
-            </a>
-        </div>
-    </section>
-
-    <!-- NEW: How It Works Section -->
-    <section class="py-24 px-margin_mobile md:px-margin_desktop bg-surface-container-low">
-        <div class="text-center mb-16">
-            <h2 class="font-headline-lg text-headline-lg text-primary mb-4">How It Works</h2>
-            <p class="font-body-md text-body-md text-secondary max-w-lg mx-auto">Three simple steps to land your dream role.</p>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div class="text-center group">
-                <div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                    <span class="material-symbols-outlined text-3xl text-white">person_add</span>
-                </div>
-                <h3 class="font-headline-md text-headline-md mb-3">Create Profile</h3>
-                <p class="font-body-md text-body-md text-secondary">Build your professional profile with your skills, experience, and preferences in under 5 minutes.</p>
-            </div>
-            <div class="text-center group">
-                <div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                    <span class="material-symbols-outlined text-3xl text-white">search</span>
-                </div>
-                <h3 class="font-headline-md text-headline-md mb-3">Smart Matching</h3>
-                <p class="font-body-md text-body-md text-secondary">Our AI matches you with roles that fit your skills, salary expectations, and culture preferences.</p>
-            </div>
-            <div class="text-center group">
-                <div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                    <span class="material-symbols-outlined text-3xl text-white">rocket_launch</span>
-                </div>
-                <h3 class="font-headline-md text-headline-md mb-3">Get Hired</h3>
-                <p class="font-body-md text-body-md text-secondary">Apply with one click and get responses from top companies within 24 hours on average.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Featured Jobs -->
-    <section class="py-24 bg-surface-container-lowest px-margin_mobile md:px-margin_desktop" id="featured-jobs">
-        <div class="text-center mb-16">
-            <h2 class="font-headline-lg text-headline-lg text-primary mb-4">Featured Opportunities</h2>
-            <p class="font-body-md text-body-md text-secondary max-w-lg mx-auto">Hand-picked roles from global industry leaders that define the next generation of business.</p>
-        </div>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 max-w-5xl mx-auto">
-            <!-- Job Card 1 -->
-            <article class="bg-white rounded-[24px] p-6 border border-surface-container-highest luxury-shadow-hover flex flex-col sm:flex-row gap-6 items-start">
-                <div class="w-16 h-16 rounded-xl bg-surface-container-low flex items-center justify-center shrink-0">
-                    <img class="w-10 h-10 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD10MoQ9iczi1sILcqUzQYDBncbE3XazDiyjaNZ1TO9k2z7ck2Yd0sE5LIC7BjJCT6ud6toVkc8nbwu_DUu1QkI6Q-qnePhl3g4u3my6WOhWMWkEBVEHDbAKG6DdKbXrzTWI3wmV1_-gOz1pKOo4jkmoTuXKmLaIKS535Rd3CkwAcm-9tWpCScNwyt_RkYZvWc8EClWqZCJRCjRj3qsrNVUcaQuInpMfKRv-FPqY87DvZSnCpIQXdBeF1okhP9gHaqp2FCSDl7UFo4" alt="Starlight Systems logo" onerror="this.style.display='none'"/>
-                </div>
-                <div class="flex-grow min-w-0">
-                    <div class="flex justify-between items-start flex-wrap gap-2">
-                        <div>
-                            <h3 class="font-headline-md text-headline-md text-lg mb-1">Senior Product Designer</h3>
-                            <p class="font-body-md text-body-md text-secondary">Starlight Systems • Remote</p>
-                        </div>
-                        <span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-sm text-label-sm shrink-0">Featured</span>
-                    </div>
-                    <div class="mt-6 flex flex-wrap gap-2">
-                        <span class="border border-surface-container-highest px-3 py-1 rounded-full font-label-sm text-label-sm text-secondary">UX/UI</span>
-                        <span class="border border-surface-container-highest px-3 py-1 rounded-full font-label-sm text-label-sm text-secondary">Design System</span>
-                        <span class="border border-surface-container-highest px-3 py-1 rounded-full font-label-sm text-label-sm text-secondary">Figma</span>
-                    </div>
-                    <div class="mt-6 flex justify-between items-center flex-wrap gap-4">
-                        <span class="font-headline-md text-headline-md text-sm">$140k - $190k</span>
-                        <a href="/jobs/1" class="bg-primary text-white font-bold px-6 py-2 rounded-full text-sm inline-block hover:scale-105 transition-transform focus-visible:scale-105" aria-label="Apply for Senior Product Designer position">Apply Now</a>
-                    </div>
-                </div>
-            </article>
-            <!-- Job Card 2 -->
-            <article class="bg-white rounded-[24px] p-6 border border-surface-container-highest luxury-shadow-hover flex flex-col sm:flex-row gap-6 items-start">
-                <div class="w-16 h-16 rounded-xl bg-surface-container-low flex items-center justify-center shrink-0">
-                    <img class="w-10 h-10 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5IxtmXc4hjoQh_IGnkXzc01hjCiK67P_olDENHd08XB8QLp2qla-Tl9t1fx3YhiMc8LXZr1-2FhVjWtwwXZXghZeOWrqO_z-5G0BM0vn0wFAVulg9gzuUVL_ho0pkAuiCrtLHYSWP_Q335B6_5KZjjgoZpQTzDtl5TCvxBGLrlfF8KR2A6PfaOzs66pZYARHxkp-4E_5MgQkRynxwaGqxifCzxaLmQtr5r6AX3Ouvd9OA-_Qp5pZotp27MnKTmWZrSoykVqDK58I" alt="Apex Global logo" onerror="this.style.display='none'"/>
-                </div>
-                <div class="flex-grow min-w-0">
-                    <div class="flex justify-between items-start flex-wrap gap-2">
-                        <div>
-                            <h3 class="font-headline-md text-headline-md text-lg mb-1">Full Stack Engineer</h3>
-                            <p class="font-body-md text-body-md text-secondary">Apex Global • New York, NY</p>
-                        </div>
-                        <span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-sm text-label-sm shrink-0">Premium</span>
-                    </div>
-                    <div class="mt-6 flex flex-wrap gap-2">
-                        <span class="border border-surface-container-highest px-3 py-1 rounded-full font-label-sm text-label-sm text-secondary">React</span>
-                        <span class="border border-surface-container-highest px-3 py-1 rounded-full font-label-sm text-label-sm text-secondary">Node.js</span>
-                        <span class="border border-surface-container-highest px-3 py-1 rounded-full font-label-sm text-label-sm text-secondary">AWS</span>
-                    </div>
-                    <div class="mt-6 flex justify-between items-center flex-wrap gap-4">
-                        <span class="font-headline-md text-headline-md text-sm">$160k - $220k</span>
-                        <a href="/jobs/2" class="bg-primary text-white font-bold px-6 py-2 rounded-full text-sm inline-block hover:scale-105 transition-transform focus-visible:scale-105" aria-label="Apply for Full Stack Engineer position">Apply Now</a>
-                    </div>
-                </div>
-            </article>
-            <!-- Job Card 3 -->
-            <article class="bg-white rounded-[24px] p-6 border border-surface-container-highest luxury-shadow-hover flex flex-col sm:flex-row gap-6 items-start">
-                <div class="w-16 h-16 rounded-xl bg-surface-container-low flex items-center justify-center shrink-0">
-                    <img class="w-10 h-10 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3GJ1Gu-lYl0Bb4FRoAaKQaTYtPv48yBDha5C8ArC9oyYtJFDaqV8zpcHGAXGO1T7P1clxAfFD66NyVnI-ETmmrKE8kNzuYcqOrSlDeV4rY07WPRHAb5ZZarSShmw_J3-Ou6gIkLAd7tw97WgoSkgTmj2xPTfhV_n2JkSR1rNlK_kbrzPH2aDuem8mB4B8_GSmJWg22O7OXgGoZdIRAAacBfgSiDQAaRphc2ESekkldbxwp0OhtGp68Jwnco7SuBUtzq-BY79Ce9Y" alt="Neural Labs logo" onerror="this.style.display='none'"/>
-                </div>
-                <div class="flex-grow min-w-0">
-                    <div class="flex justify-between items-start flex-wrap gap-2">
-                        <div>
-                            <h3 class="font-headline-md text-headline-md text-lg mb-1">AI Research Lead</h3>
-                            <p class="font-body-md text-body-md text-secondary">Neural Labs • San Francisco, CA</p>
-                        </div>
-                        <span class="bg-error-container text-on-error-container px-3 py-1 rounded-full font-label-sm text-label-sm shrink-0">Urgent</span>
-                    </div>
-                    <div class="mt-6 flex flex-wrap gap-2">
-                        <span class="border border-surface-container-highest px-3 py-1 rounded-full font-label-sm text-label-sm text-secondary">PyTorch</span>
-                        <span class="border border-surface-container-highest px-3 py-1 rounded-full font-label-sm text-label-sm text-secondary">NLP</span>
-                        <span class="border border-surface-container-highest px-3 py-1 rounded-full font-label-sm text-label-sm text-secondary">LLMs</span>
-                    </div>
-                    <div class="mt-6 flex justify-between items-center flex-wrap gap-4">
-                        <span class="font-headline-md text-headline-md text-sm">$200k - $280k</span>
-                        <a href="/jobs/3" class="bg-primary text-white font-bold px-6 py-2 rounded-full text-sm inline-block hover:scale-105 transition-transform focus-visible:scale-105" aria-label="Apply for AI Research Lead position">Apply Now</a>
-                    </div>
-                </div>
-            </article>
-            <!-- Job Card 4 -->
-            <article class="bg-white rounded-[24px] p-6 border border-surface-container-highest luxury-shadow-hover flex flex-col sm:flex-row gap-6 items-start">
-                <div class="w-16 h-16 rounded-xl bg-surface-container-low flex items-center justify-center shrink-0">
-                    <img class="w-10 h-10 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz06unz5B0ZD0-YdjZDApcI_wa0JGOC_Rkj7Mko0RFhn_tRuRwN6utH2MaW0sO5iwbmd6MpnMloX3ErGEbZZm4y63r3mdriesr4uD7MEPsd1pTs9jX4aL_snUbSgM6zHYybPxsM_WO_KQW6e4V8ARGcarptf5Vp7StDkhgbiyEhyOUbd6Y85d0SKClAIzpcPJvXwqJ8ep7cT3PMjkQcVUGccCp3_hMoYLssvhKppNnTS19P0graIbXCsMm3NySRVd8EFIed0yAmhY" alt="Velvet & Co logo" onerror="this.style.display='none'"/>
-                </div>
-                <div class="flex-grow min-w-0">
-                    <div class="flex justify-between items-start flex-wrap gap-2">
-                        <div>
-                            <h3 class="font-headline-md text-headline-md text-lg mb-1">Growth Marketing Manager</h3>
-                            <p class="font-body-md text-body-md text-secondary">Velvet & Co • London, UK</p>
-                        </div>
-                        <span class="bg-tertiary-fixed text-tertiary-container px-3 py-1 rounded-full font-label-sm text-label-sm shrink-0">New</span>
-                    </div>
-                    <div class="mt-6 flex flex-wrap gap-2">
-                        <span class="border border-surface-container-highest px-3 py-1 rounded-full font-label-sm text-label-sm text-secondary">SEO/SEM</span>
-                        <span class="border border-surface-container-highest px-3 py-1 rounded-full font-label-sm text-label-sm text-secondary">Strategy</span>
-                        <span class="border border-surface-container-highest px-3 py-1 rounded-full font-label-sm text-label-sm text-secondary">Analytics</span>
-                    </div>
-                    <div class="mt-6 flex justify-between items-center flex-wrap gap-4">
-                        <span class="font-headline-md text-headline-md text-sm">$110k - $150k</span>
-                        <a href="/jobs/4" class="bg-primary text-white font-bold px-6 py-2 rounded-full text-sm inline-block hover:scale-105 transition-transform focus-visible:scale-105" aria-label="Apply for Growth Marketing Manager position">Apply Now</a>
-                    </div>
-                </div>
-            </article>
-        </div>
-        <div class="mt-16 text-center">
-            <a href="/jobs" class="inline-block border-2 border-outline text-primary font-bold px-12 py-4 rounded-full hover:bg-primary hover:text-white hover:border-primary transition-all focus-visible:bg-primary focus-visible:text-white">
-                Browse All 10,000+ Jobs
-            </a>
-        </div>
-    </section>
-
-    <!-- NEW: Testimonials Section -->
-    <section class="py-24 px-margin_mobile md:px-margin_desktop bg-surface-container-low">
-        <div class="text-center mb-16">
-            <h2 class="font-headline-lg text-headline-lg text-primary mb-4">What Our Users Say</h2>
-            <p class="font-body-md text-body-md text-secondary max-w-lg mx-auto">Join thousands of professionals who found their perfect role through jobboard.</p>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <div class="bg-white rounded-[24px] p-8 border border-surface-container-highest luxury-shadow-hover">
-                <div class="flex gap-1 mb-4 text-yellow-500">
-                    <span class="material-symbols-outlined filled">star</span>
-                    <span class="material-symbols-outlined filled">star</span>
-                    <span class="material-symbols-outlined filled">star</span>
-                    <span class="material-symbols-outlined filled">star</span>
-                    <span class="material-symbols-outlined filled">star</span>
-                </div>
-                <p class="font-body-md text-body-md text-secondary mb-6 italic">"jobboard transformed my job search. The quality of listings and the smart matching algorithm saved me countless hours. Landed my dream role in just two weeks!"</p>
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center font-bold text-sm">SJ</div>
-                    <div>
-                        <div class="font-headline-md text-headline-md text-sm">Sarah Johnson</div>
-                        <div class="font-label-sm text-label-sm text-secondary">Product Designer at Stripe</div>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white rounded-[24px] p-8 border border-surface-container-highest luxury-shadow-hover">
-                <div class="flex gap-1 mb-4 text-yellow-500">
-                    <span class="material-symbols-outlined filled">star</span>
-                    <span class="material-symbols-outlined filled">star</span>
-                    <span class="material-symbols-outlined filled">star</span>
-                    <span class="material-symbols-outlined filled">star</span>
-                    <span class="material-symbols-outlined filled">star</span>
-                </div>
-                <p class="font-body-md text-body-md text-secondary mb-6 italic">"As a hiring manager, the quality of candidates from jobboard is unmatched. The platform attracts truly exceptional talent."</p>
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center font-bold text-sm">MK</div>
-                    <div>
-                        <div class="font-headline-md text-headline-md text-sm">Michael Kim</div>
-                        <div class="font-label-sm text-label-sm text-secondary">Engineering Manager at Airbnb</div>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white rounded-[24px] p-8 border border-surface-container-highest luxury-shadow-hover">
-                <div class="flex gap-1 mb-4 text-yellow-500">
-                    <span class="material-symbols-outlined filled">star</span>
-                    <span class="material-symbols-outlined filled">star</span>
-                    <span class="material-symbols-outlined filled">star</span>
-                    <span class="material-symbols-outlined filled">star</span>
-                    <span class="material-symbols-outlined filled">star</span>
-                </div>
-                <p class="font-body-md text-body-md text-secondary mb-6 italic">"The transparency on salary ranges and company culture is a game-changer. I've already recommended jobboard to my entire network."</p>
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center font-bold text-sm">AD</div>
-                    <div>
-                        <div class="font-headline-md text-headline-md text-sm">Alexandra Diaz</div>
-                        <div class="font-label-sm text-label-sm text-secondary">Data Scientist at Spotify</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- NEW: Resources Section -->
-    <section class="py-24 px-margin_mobile md:px-margin_desktop" id="resources">
-        <div class="flex justify-between items-end mb-12">
-            <div>
-                <h2 class="font-headline-lg text-headline-lg text-primary mb-2">Career Resources</h2>
-                <p class="font-body-md text-body-md text-secondary">Expert advice to accelerate your professional growth.</p>
-            </div>
-            <a href="#" class="text-primary font-bold hidden sm:flex items-center gap-2 group decoration-transparent">
-                View All Articles <span class="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span>
-            </a>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <a href="#" class="bg-white rounded-[24px] overflow-hidden border border-surface-container-highest luxury-shadow-hover group cursor-pointer decoration-transparent text-current">
-                <div class="h-48 bg-surface-container-low flex items-center justify-center">
-                    <span class="material-symbols-outlined text-6xl text-secondary/30">article</span>
-                </div>
-                <div class="p-6">
-                    <span class="font-label-sm text-label-sm text-secondary uppercase">Career Advice</span>
-                    <h3 class="font-headline-md text-headline-md mt-2 mb-2 group-hover:text-primary transition-colors">How to Negotiate Your Salary Like a Pro</h3>
-                    <p class="font-body-md text-body-md text-secondary line-clamp-2">Master the art of negotiation and secure the compensation you deserve with these proven strategies.</p>
-                    <div class="font-label-sm text-label-sm text-secondary mt-4">8 min read</div>
-                </div>
-            </a>
-            <a href="#" class="bg-white rounded-[24px] overflow-hidden border border-surface-container-highest luxury-shadow-hover group cursor-pointer decoration-transparent text-current">
-                <div class="h-48 bg-surface-container-low flex items-center justify-center">
-                    <span class="material-symbols-outlined text-6xl text-secondary/30">trending_up</span>
-                </div>
-                <div class="p-6">
-                    <span class="font-label-sm text-label-sm text-secondary uppercase">Industry Trends</span>
-                    <h3 class="font-headline-md text-headline-md mt-2 mb-2 group-hover:text-primary transition-colors">Top Tech Skills in Demand for 2026</h3>
-                    <p class="font-body-md text-body-md text-secondary line-clamp-2">Stay ahead of the curve with the most sought-after technical skills this year.</p>
-                    <div class="font-label-sm text-label-sm text-secondary mt-4">5 min read</div>
-                </div>
-            </a>
-            <a href="#" class="bg-white rounded-[24px] overflow-hidden border border-surface-container-highest luxury-shadow-hover group cursor-pointer decoration-transparent text-current">
-                <div class="h-48 bg-surface-container-low flex items-center justify-center">
-                    <span class="material-symbols-outlined text-6xl text-secondary/30">work</span>
-                </div>
-                <div class="p-6">
-                    <span class="font-label-sm text-label-sm text-secondary uppercase">Remote Work</span>
-                    <h3 class="font-headline-md text-headline-md mt-2 mb-2 group-hover:text-primary transition-colors">Building a Standout Remote Work Portfolio</h3>
-                    <p class="font-body-md text-body-md text-secondary line-clamp-2">Learn how to showcase your skills and land remote positions at top companies.</p>
-                    <div class="font-label-sm text-label-sm text-secondary mt-4">6 min read</div>
-                </div>
-            </a>
-        </div>
-    </section>
-
-    <!-- Newsletter / CTA -->
-    <section class="py-24 px-margin_mobile md:px-margin_desktop">
-        <div class="rounded-[32px] p-12 md:p-20 text-center relative overflow-hidden" style="background:#1a1c1c;">
-            <div class="relative z-10 max-w-2xl mx-auto">
-                <h2 class="font-headline-lg text-headline-lg text-surface-container-lowest mb-6">Stay ahead of the curve</h2>
-                <p class="font-body-lg text-body-lg mb-10" style="color:#c6c6c6;">Get weekly insights and premium job alerts directly to your inbox. No noise, just the best roles.</p>
-                <form class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto" onsubmit="event.preventDefault(); handleSubscribe(this);">
-                    <label for="newsletter-email" class="sr-only">Enter your work email</label>
-                    <input id="newsletter-email" class="flex-grow bg-white/10 border border-white/20 rounded-full px-6 py-4 text-white placeholder:text-white/40 focus:outline-none focus:border-white focus:bg-white/20 transition-colors" placeholder="Enter your work email" type="email" required aria-required="true"/>
-                    <button type="submit" class="bg-surface-container-lowest text-primary font-bold px-8 py-4 rounded-full whitespace-nowrap hover:scale-105 transition-transform focus-visible:scale-105" style="background:#fff; color:#111;">Subscribe</button>
-                </form>
-                <p class="font-label-sm text-label-sm mt-4" style="color:#747878;">No spam, unsubscribe anytime.</p>
-            </div>
-            <!-- Decorative elements -->
-            <div class="absolute top-0 right-0 opacity-5" aria-hidden="true">
-                <span class="material-symbols-outlined text-[300px]">mail</span>
-            </div>
-        </div>
-    </section>
-</main>
-
-<!-- Minimalist Footer -->
-<footer class="bg-white border-t border-surface-container-highest py-16 px-margin_mobile md:px-margin_desktop" role="contentinfo">
-    <div class="max-w-container_max_width mx-auto flex flex-col md:flex-row justify-between items-start gap-12">
-        <div class="max-w-xs">
-            <span class="font-headline-lg text-headline-lg text-primary mb-6 block">jobboard</span>
-            <p class="font-body-md text-body-md text-secondary">The world's premier platform for professional growth and elite career transitions. Founded 2026.</p>
-            <div class="flex gap-3 mt-6">
-                <a class="w-10 h-10 rounded-full border border-surface-container-highest flex items-center justify-center text-secondary hover:text-primary hover:border-primary transition-all decoration-transparent focus-visible:border-primary" href="#" aria-label="Twitter">
-                    <span class="material-symbols-outlined text-xl">share</span>
-                </a>
-                <a class="w-10 h-10 rounded-full border border-surface-container-highest flex items-center justify-center text-secondary hover:text-primary hover:border-primary transition-all decoration-transparent focus-visible:border-primary" href="#" aria-label="LinkedIn">
-                    <span class="material-symbols-outlined text-xl">public</span>
-                </a>
-                <a class="w-10 h-10 rounded-full border border-surface-container-highest flex items-center justify-center text-secondary hover:text-primary hover:border-primary transition-all decoration-transparent focus-visible:border-primary" href="#" aria-label="GitHub">
-                    <span class="material-symbols-outlined text-xl">code</span>
-                </a>
-            </div>
-        </div>
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-16">
-            <div>
-                <h5 class="font-label-sm text-label-sm text-primary uppercase tracking-widest mb-6">Platform</h5>
-                <ul class="space-y-4 font-body-md text-body-md text-secondary">
-                    <li><a class="hover:text-primary transition-colors decoration-transparent focus-visible:text-primary" href="/jobs">Browse Jobs</a></li>
-                    <li><a class="hover:text-primary transition-colors decoration-transparent focus-visible:text-primary" href="/companies">Companies</a></li>
-                    <li><a class="hover:text-primary transition-colors decoration-transparent focus-visible:text-primary" href="#resources">Career Blog</a></li>
-                    <li><a class="hover:text-primary transition-colors decoration-transparent focus-visible:text-primary" href="#">Salary Guide</a></li>
-                </ul>
-            </div>
-            <div>
-                <h5 class="font-label-sm text-label-sm text-primary uppercase tracking-widest mb-6">Company</h5>
-                <ul class="space-y-4 font-body-md text-body-md text-secondary">
-                    <li><a class="hover:text-primary transition-colors decoration-transparent focus-visible:text-primary" href="#">About Us</a></li>
-                    <li><a class="hover:text-primary transition-colors decoration-transparent focus-visible:text-primary" href="#">Contact</a></li>
-                    <li><a class="hover:text-primary transition-colors decoration-transparent focus-visible:text-primary" href="#">Privacy</a></li>
-                    <li><a class="hover:text-primary transition-colors decoration-transparent focus-visible:text-primary" href="#">Careers</a></li>
-                </ul>
-            </div>
-            <div class="col-span-2 md:col-span-1">
-                <h5 class="font-label-sm text-label-sm text-primary uppercase tracking-widest mb-6">Support</h5>
-                <ul class="space-y-4 font-body-md text-body-md text-secondary">
-                    <li><a class="hover:text-primary transition-colors decoration-transparent focus-visible:text-primary" href="#">Help Center</a></li>
-                    <li><a class="hover:text-primary transition-colors decoration-transparent focus-visible:text-primary" href="#">FAQ</a></li>
-                    <li><a class="hover:text-primary transition-colors decoration-transparent focus-visible:text-primary" href="#">Community</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <div class="max-w-container_max_width mx-auto mt-16 pt-8 border-t border-surface-container-low flex flex-col md:flex-row justify-between items-center gap-4">
-        <span class="font-label-sm text-label-sm text-secondary">© 2026 jobboard Inc. All rights reserved.</span>
-        <div class="flex gap-6 font-label-sm text-label-sm text-secondary">
-            <a class="hover:text-primary decoration-transparent focus-visible:text-primary" href="#">Terms</a>
-            <a class="hover:text-primary decoration-transparent focus-visible:text-primary" href="#">Cookies</a>
-            <a class="hover:text-primary decoration-transparent focus-visible:text-primary" href="#">Legal</a>
-        </div>
-    </div>
-</footer>
-
-<script>
-    // Enhanced interactions and accessibility
-    document.addEventListener('DOMContentLoaded', () => {
-        // Smooth hover effects for cards
-        const cards = document.querySelectorAll('.luxury-shadow-hover');
-        cards.forEach(card => {
-            card.addEventListener('mouseenter', () => {
-                card.style.transform = 'translateY(-4px)';
-            });
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = 'translateY(0)';
-            });
-        });
-
-        // Mobile menu toggle
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const mobileMenu = document.getElementById('mobileMenu');
-        let menuOpen = false;
-
-        if (mobileMenuBtn && mobileMenu) {
-            mobileMenuBtn.addEventListener('click', () => {
-                menuOpen = !menuOpen;
-                mobileMenu.classList.toggle('hidden', !menuOpen);
-                mobileMenuBtn.setAttribute('aria-expanded', menuOpen);
-                mobileMenuBtn.textContent = menuOpen ? 'close' : 'menu';
-                document.body.style.overflow = menuOpen ? 'hidden' : '';
-            });
-
-            // Close menu when clicking links
-            mobileMenu.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => {
-                    menuOpen = false;
-                    mobileMenu.classList.add('hidden');
-                    mobileMenuBtn.setAttribute('aria-expanded', 'false');
-                    mobileMenuBtn.textContent = 'menu';
-                    document.body.style.overflow = '';
-                });
-            });
-        }
-
-        // Auth Logic check to toggle Dashboard link in top right
-        if (localStorage.getItem('token')) {
-            const navActions = document.getElementById('navActions');
-            if (navActions) {
-                navActions.innerHTML = `
-                    <button class="material-symbols-outlined text-primary p-2 hover:bg-surface-container-low rounded-full focus-visible:bg-surface-container-low" aria-label="Search">search</button>
-                    <button class="material-symbols-outlined text-primary p-2 hover:bg-surface-container-low rounded-full focus-visible:bg-surface-container-low relative" aria-label="Notifications">
-                        notifications
-                        <span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
-                    </button>
-                    <a href="/dashboard" class="h-8 w-8 rounded-full overflow-hidden border-2 border-outline-variant cursor-pointer block hover:border-primary transition-colors focus-visible:border-primary" aria-label="Dashboard">
-                        <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1dqyZgXsYJXT5UBS0uvrx1ggMiyFasGdpCpXYTmm4MgbxNK7egWM5DoPShoB1kXGVQjtdGVDsssYOkGTg81k6Uw-XpAQeQqK7knfhi0H1s-fbsuyOxq3Qm78-FW73x6WSYOcIzz2t3o0w0G2hD37tltmb5spG1mnQpaHj_rIdLuhYZYO-bIh2jeukL8oiX8X1b2USipVsXiVyEksJhvXTDOMIfLOcQPPN5QUkGrnipThqJ_y-dsgCecpf2-ULEQaF-sqp41vX4sU" alt="User avatar" />
-                    </a>
-                `;
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
 
-        // Add intersection observer for animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        // Observe sections for fade-in effect
-        document.querySelectorAll('section').forEach(section => {
-            section.style.opacity = '0';
-            section.style.transform = 'translateY(20px)';
-            section.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
-            observer.observe(section);
-        });
-    });
-
-    // Newsletter subscription handler
-    function handleSubscribe(form) {
-        const email = form.querySelector('input[type="email"]').value;
-        if (email) {
-            // In production, send to your API
-            console.log('Subscribing:', email);
-            alert('Thank you for subscribing! Check your email for confirmation.');
-            form.reset();
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
-    }
-</script>
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-15px) rotate(2deg);
+            }
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+            100% {
+                background-position: 1000px 0;
+            }
+        }
+
+        @keyframes rotateSlow {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-fadeInUp {
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .animate-fadeInDown {
+            animation: fadeInDown 0.8s ease-out forwards;
+        }
+
+        .animate-slideInLeft {
+            animation: slideInLeft 0.8s ease-out forwards;
+        }
+
+        .animate-slideInRight {
+            animation: slideInRight 0.8s ease-out forwards;
+        }
+
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .animate-pulse-slow {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .animate-gradient {
+            background-size: 200% 200%;
+            animation: gradientShift 4s ease infinite;
+        }
+
+        .animate-shimmer {
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+            background-size: 1000px 100%;
+            animation: shimmer 3s infinite;
+        }
+
+        .animate-rotate-slow {
+            animation: rotateSlow 20s linear infinite;
+        }
+
+        .animate-scaleIn {
+            animation: scaleIn 0.6s ease-out forwards;
+        }
+
+        .delay-100 {
+            animation-delay: 0.1s;
+            opacity: 0;
+        }
+
+        .delay-200 {
+            animation-delay: 0.2s;
+            opacity: 0;
+        }
+
+        .delay-300 {
+            animation-delay: 0.3s;
+            opacity: 0;
+        }
+
+        .delay-400 {
+            animation-delay: 0.4s;
+            opacity: 0;
+        }
+
+        .delay-500 {
+            animation-delay: 0.5s;
+            opacity: 0;
+        }
+
+        /* Hero Overlay */
+        .hero-overlay {
+            background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 40%, rgba(0,0,0,0.8) 100%);
+        }
+
+        /* Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-dark {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .glass-white {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Hover Effects */
+        .hover-lift {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .hover-glow:hover {
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.05);
+        }
+
+        .hover-scale {
+            transition: transform 0.3s ease;
+        }
+
+        .hover-scale:hover {
+            transform: scale(1.05);
+        }
+
+        /* Feature Icons */
+        .feature-icon {
+            transition: all 0.4s ease;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        /* Stats Counter */
+        .stat-number {
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover .stat-number {
+            transform: scale(1.1);
+        }
+
+        /* Testimonial Cards */
+        .testimonial-card {
+            transition: all 0.4s ease;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #444;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            height: 4px;
+            background: linear-gradient(90deg, #ffffff, #666666);
+            animation: gradientShift 3s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        /* Gradient Border */
+        .gradient-border {
+            position: relative;
+        }
+
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.3), transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+        }
+
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Section Divider */
+        .section-divider {
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, white, transparent);
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-md border-b border-white/5 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center hover:scale-110 transition-transform">
+                        <i class="fas fa-briefcase text-black text-xl"></i>
+                    </div>
+                    <span class="text-2xl font-bold text-white tracking-tight">JobHub</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#jobs" class="text-gray-300 hover:text-white transition-colors text-sm">Jobs</a>
+                    <a href="#companies" class="text-gray-300 hover:text-white transition-colors text-sm">Companies</a>
+                    <a href="#features" class="text-gray-300 hover:text-white transition-colors text-sm">Features</a>
+                    <a href="#testimonials" class="text-gray-300 hover:text-white transition-colors text-sm">Testimonials</a>
+                    <a href="#blog" class="text-gray-300 hover:text-white transition-colors text-sm">Blog</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    @auth
+                        <a href="{{ route('dashboard') }}" class="text-gray-300 hover:text-white transition-colors">Dashboard</a>
+                    @else
+                        <a href="{{ route('auth.login') }}" class="text-gray-300 hover:text-white transition-colors">Login</a>
+                        <a href="{{ route('auth.signup') }}" class="bg-white text-black px-5 py-2 rounded-lg font-semibold hover:bg-gray-200 transition-all hover:scale-105">
+                            Sign Up
+                        </a>
+                    @endauth
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ========== HERO SECTION ========== -->
+    <section class="relative min-h-screen flex items-center overflow-hidden pt-16" id="home">
+        <!-- Background Image -->
+        <div class="absolute inset-0 z-0">
+            <img
+                src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
+                alt="Office background"
+                class="w-full h-full object-cover"
+            >
+            <div class="absolute inset-0 hero-overlay"></div>
+        </div>
+
+        <!-- Animated Background Elements -->
+        <div class="absolute inset-0 z-0 overflow-hidden">
+            <div class="absolute top-20 left-10 w-72 h-72 bg-white/5 rounded-full blur-3xl animate-float"></div>
+            <div class="absolute bottom-20 right-10 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-float" style="animation-delay: 1.5s;"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border border-white/5 rounded-full animate-rotate-slow"></div>
+        </div>
+
+        <!-- Hero Content -->
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <div class="inline-block px-4 py-2 bg-white/10 rounded-full backdrop-blur-sm border border-white/10 mb-6 animate-fadeInUp">
+                        <span class="text-sm font-medium text-white/80">
+                            <i class="fas fa-rocket mr-2"></i> 10,000+ Jobs Available
+                        </span>
+                    </div>
+
+                    <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6 animate-slideInLeft">
+                        Find Your
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 animate-gradient">
+                            Dream Job
+                        </span>
+                        <br>
+                        <span class="text-gray-300">Today</span>
+                    </h1>
+
+                    <p class="text-xl text-gray-300 mb-8 max-w-lg animate-slideInLeft delay-100">
+                        Connect with thousands of opportunities from top companies worldwide. Your next career move starts here.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row gap-4 animate-slideInLeft delay-200">
+                        <a href="#jobs" class="group bg-white text-black px-8 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-all hover:scale-105 flex items-center justify-center">
+                            <span>Browse Jobs</span>
+                            <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                        @guest
+                            <a href="{{ route('auth.signup') }}" class="group border border-white/30 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-all hover:scale-105 flex items-center justify-center">
+                                <span>Get Started</span>
+                                <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                            </a>
+                        @endguest
+                    </div>
+
+                    <!-- Trust Badges -->
+                    <div class="flex items-center gap-6 mt-8 animate-fadeInUp delay-300">
+                        <div class="flex -space-x-2">
+                            <div class="w-10 h-10 rounded-full border-2 border-black bg-white/10 flex items-center justify-center text-sm font-bold">JD</div>
+                            <div class="w-10 h-10 rounded-full border-2 border-black bg-white/10 flex items-center justify-center text-sm font-bold">AK</div>
+                            <div class="w-10 h-10 rounded-full border-2 border-black bg-white/10 flex items-center justify-center text-sm font-bold">MS</div>
+                            <div class="w-10 h-10 rounded-full border-2 border-black bg-white/10 flex items-center justify-center text-sm font-bold">+</div>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-400">Trusted by <span class="text-white font-semibold">50,000+</span> professionals</p>
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side - Animated Stats Cards -->
+                <div class="grid grid-cols-2 gap-4 animate-slideInRight delay-200">
+                    <div class="glass p-6 rounded-xl text-center hover-lift">
+                        <div class="text-4xl font-bold text-white mb-1 stat-number">10K+</div>
+                        <p class="text-sm text-gray-400">Active Jobs</p>
+                    </div>
+                    <div class="glass p-6 rounded-xl text-center hover-lift delay-100">
+                        <div class="text-4xl font-bold text-white mb-1 stat-number">5K+</div>
+                        <p class="text-sm text-gray-400">Companies</p>
+                    </div>
+                    <div class="glass p-6 rounded-xl text-center hover-lift delay-200">
+                        <div class="text-4xl font-bold text-white mb-1 stat-number">50K+</div>
+                        <p class="text-sm text-gray-400">Candidates</p>
+                    </div>
+                    <div class="glass p-6 rounded-xl text-center hover-lift delay-300">
+                        <div class="text-4xl font-bold text-white mb-1 stat-number">100K+</div>
+                        <p class="text-sm text-gray-400">Applications</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">
+            <a href="#features" class="text-white/40 hover:text-white/60 transition-colors">
+                <i class="fas fa-chevron-down text-2xl"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- ========== PROGRESS BAR ========== -->
+    <div class="progress-bar"></div>
+
+    <!-- ========== FEATURES SECTION ========== -->
+    <section class="py-20 bg-black border-t border-white/5" id="features">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-sm font-medium text-gray-400 uppercase tracking-wider">Why Choose Us</span>
+                <h2 class="text-4xl font-bold mt-2">Everything You Need to Succeed</h2>
+                <div class="section-divider mt-4"></div>
+                <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Discover why thousands of professionals trust JobHub for their career journey</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all hover:scale-105">
+                    <div class="w-16 h-16 bg-white/10 rounded-xl flex items-center justify-center mb-6 feature-icon group-hover:bg-white/20">
+                        <i class="fas fa-search text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Smart Search</h3>
+                    <p class="text-gray-400 leading-relaxed">Find jobs with advanced filters - by category, location, salary, and more. Powered by AI.</p>
+                    <div class="mt-4 flex items-center text-white/60 group-hover:text-white transition-colors">
+                        <span class="text-sm">Learn more</span>
+                        <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+
+                <div class="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all hover:scale-105">
+                    <div class="w-16 h-16 bg-white/10 rounded-xl flex items-center justify-center mb-6 feature-icon group-hover:bg-white/20">
+                        <i class="fas fa-building text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Top Companies</h3>
+                    <p class="text-gray-400 leading-relaxed">Connect with leading employers looking for talented professionals like you.</p>
+                    <div class="mt-4 flex items-center text-white/60 group-hover:text-white transition-colors">
+                        <span class="text-sm">Learn more</span>
+                        <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+
+                <div class="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-all hover:scale-105">
+                    <div class="w-16 h-16 bg-white/10 rounded-xl flex items-center justify-center mb-6 feature-icon group-hover:bg-white/20">
+                        <i class="fas fa-bolt text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Quick Apply</h3>
+                    <p class="text-gray-400 leading-relaxed">Apply to jobs instantly with your profile and resume. One-click applications.</p>
+                    <div class="mt-4 flex items-center text-white/60 group-hover:text-white transition-colors">
+                        <span class="text-sm">Learn more</span>
+                        <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== STATS SECTION ========== -->
+    <section class="py-16 bg-white/5 border-y border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="text-center stat-card">
+                    <p class="text-5xl font-bold text-white stat-number">10K+</p>
+                    <p class="text-gray-400 mt-2">Active Jobs</p>
+                </div>
+                <div class="text-center stat-card">
+                    <p class="text-5xl font-bold text-white stat-number">5K+</p>
+                    <p class="text-gray-400 mt-2">Companies</p>
+                </div>
+                <div class="text-center stat-card">
+                    <p class="text-5xl font-bold text-white stat-number">50K+</p>
+                    <p class="text-gray-400 mt-2">Candidates</p>
+                </div>
+                <div class="text-center stat-card">
+                    <p class="text-5xl font-bold text-white stat-number">100K+</p>
+                    <p class="text-gray-400 mt-2">Applications</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== JOB CATEGORIES SECTION ========== -->
+    <section class="py-20 bg-black" id="jobs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-sm font-medium text-gray-400 uppercase tracking-wider">Categories</span>
+                <h2 class="text-4xl font-bold mt-2">Popular Job Categories</h2>
+                <div class="section-divider mt-4"></div>
+                <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Find jobs in your preferred industry from top companies</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div class="glass hover:bg-white/10 transition-all p-6 rounded-xl text-center hover-lift">
+                    <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-code text-2xl text-white"></i>
+                    </div>
+                    <h4 class="font-semibold">Technology</h4>
+                    <p class="text-sm text-gray-400 mt-1">2,345 jobs</p>
+                </div>
+                <div class="glass hover:bg-white/10 transition-all p-6 rounded-xl text-center hover-lift">
+                    <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-line text-2xl text-white"></i>
+                    </div>
+                    <h4 class="font-semibold">Finance</h4>
+                    <p class="text-sm text-gray-400 mt-1">1,234 jobs</p>
+                </div>
+                <div class="glass hover:bg-white/10 transition-all p-6 rounded-xl text-center hover-lift">
+                    <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-heartbeat text-2xl text-white"></i>
+                    </div>
+                    <h4 class="font-semibold">Healthcare</h4>
+                    <p class="text-sm text-gray-400 mt-1">1,876 jobs</p>
+                </div>
+                <div class="glass hover:bg-white/10 transition-all p-6 rounded-xl text-center hover-lift">
+                    <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-graduation-cap text-2xl text-white"></i>
+                    </div>
+                    <h4 class="font-semibold">Education</h4>
+                    <p class="text-sm text-gray-400 mt-1">987 jobs</p>
+                </div>
+                <div class="glass hover:bg-white/10 transition-all p-6 rounded-xl text-center hover-lift">
+                    <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shopping-cart text-2xl text-white"></i>
+                    </div>
+                    <h4 class="font-semibold">Sales</h4>
+                    <p class="text-sm text-gray-400 mt-1">1,543 jobs</p>
+                </div>
+                <div class="glass hover:bg-white/10 transition-all p-6 rounded-xl text-center hover-lift">
+                    <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-paint-brush text-2xl text-white"></i>
+                    </div>
+                    <h4 class="font-semibold">Design</h4>
+                    <p class="text-sm text-gray-400 mt-1">876 jobs</p>
+                </div>
+                <div class="glass hover:bg-white/10 transition-all p-6 rounded-xl text-center hover-lift">
+                    <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-bullhorn text-2xl text-white"></i>
+                    </div>
+                    <h4 class="font-semibold">Marketing</h4>
+                    <p class="text-sm text-gray-400 mt-1">1,234 jobs</p>
+                </div>
+                <div class="glass hover:bg-white/10 transition-all p-6 rounded-xl text-center hover-lift">
+                    <div class="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-tools text-2xl text-white"></i>
+                    </div>
+                    <h4 class="font-semibold">Engineering</h4>
+                    <p class="text-sm text-gray-400 mt-1">2,109 jobs</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== FEATURED JOBS SECTION ========== -->
+    <section class="py-20 bg-white/5 border-y border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-sm font-medium text-gray-400 uppercase tracking-wider">Opportunities</span>
+                <h2 class="text-4xl font-bold mt-2">Featured Jobs</h2>
+                <div class="section-divider mt-4"></div>
+                <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Handpicked opportunities from top companies</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="glass p-6 rounded-xl hover-lift">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-building text-xl text-white"></i>
+                        </div>
+                        <span class="bg-white/10 px-3 py-1 rounded-full text-xs text-gray-300">Full-time</span>
+                    </div>
+                    <h4 class="text-lg font-semibold mb-2">Senior PHP Developer</h4>
+                    <p class="text-gray-400 text-sm mb-3">TechCorp Inc. • New York, NY</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-white font-semibold">$80K - $120K</span>
+                        <a href="#" class="text-white/60 hover:text-white transition-colors text-sm">View Details →</a>
+                    </div>
+                </div>
+
+                <div class="glass p-6 rounded-xl hover-lift">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-building text-xl text-white"></i>
+                        </div>
+                        <span class="bg-white/10 px-3 py-1 rounded-full text-xs text-gray-300">Remote</span>
+                    </div>
+                    <h4 class="text-lg font-semibold mb-2">UX/UI Designer</h4>
+                    <p class="text-gray-400 text-sm mb-3">DesignStudio • Remote</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-white font-semibold">$60K - $90K</span>
+                        <a href="#" class="text-white/60 hover:text-white transition-colors text-sm">View Details →</a>
+                    </div>
+                </div>
+
+                <div class="glass p-6 rounded-xl hover-lift">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-building text-xl text-white"></i>
+                        </div>
+                        <span class="bg-white/10 px-3 py-1 rounded-full text-xs text-gray-300">Part-time</span>
+                    </div>
+                    <h4 class="text-lg font-semibold mb-2">Marketing Manager</h4>
+                    <p class="text-gray-400 text-sm mb-3">BrandAgency • San Francisco, CA</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-white font-semibold">$70K - $100K</span>
+                        <a href="#" class="text-white/60 hover:text-white transition-colors text-sm">View Details →</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-10">
+                <a href="#" class="inline-block border border-white/30 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-all hover:scale-105">
+                    View All Jobs <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== HOW IT WORKS SECTION ========== -->
+    <section class="py-20 bg-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-sm font-medium text-gray-400 uppercase tracking-wider">Process</span>
+                <h2 class="text-4xl font-bold mt-2">How It Works</h2>
+                <div class="section-divider mt-4"></div>
+                <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Three simple steps to find your dream job</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+                <!-- Connecting Line (Desktop) -->
+                <div class="hidden md:block absolute top-16 left-1/6 right-1/6 h-0.5 bg-gradient-to-r from-white/20 via-white/40 to-white/20"></div>
+
+                <div class="text-center relative">
+                    <div class="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl font-bold border-2 border-white/20 hover:bg-white/20 transition-all hover:scale-110">1</div>
+                    <h4 class="text-xl font-semibold mb-3">Create Account</h4>
+                    <p class="text-gray-400">Sign up in minutes and build your professional profile</p>
+                </div>
+
+                <div class="text-center relative">
+                    <div class="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl font-bold border-2 border-white/20 hover:bg-white/20 transition-all hover:scale-110">2</div>
+                    <h4 class="text-xl font-semibold mb-3">Search Jobs</h4>
+                    <p class="text-gray-400">Browse through thousands of opportunities that match your skills</p>
+                </div>
+
+                <div class="text-center relative">
+                    <div class="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl font-bold border-2 border-white/20 hover:bg-white/20 transition-all hover:scale-110">3</div>
+                    <h4 class="text-xl font-semibold mb-3">Get Hired</h4>
+                    <p class="text-gray-400">Apply instantly and land your dream job</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== TESTIMONIALS SECTION ========== -->
+    <section class="py-20 bg-white/5 border-y border-white/5" id="testimonials">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-sm font-medium text-gray-400 uppercase tracking-wider">Testimonials</span>
+                <h2 class="text-4xl font-bold mt-2">What Our Users Say</h2>
+                <div class="section-divider mt-4"></div>
+                <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Real stories from real people who found their dream jobs</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glass p-8 rounded-xl testimonial-card">
+                    <div class="flex text-yellow-400 mb-4">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-300 mb-6">"JobHub helped me find my dream job in just 2 weeks! The platform is incredibly user-friendly and the matching algorithm is spot on."</p>
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center font-bold text-lg">JD</div>
+                        <div class="ml-4">
+                            <p class="font-semibold">John Doe</p>
+                            <p class="text-sm text-gray-400">Senior Developer at Google</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass p-8 rounded-xl testimonial-card">
+                    <div class="flex text-yellow-400 mb-4">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-300 mb-6">"As an employer, I've found exceptional talent through JobHub. The quality of candidates and the ease of use is unmatched."</p>
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center font-bold text-lg">AK</div>
+                        <div class="ml-4">
+                            <p class="font-semibold">Sarah Kim</p>
+                            <p class="text-sm text-gray-400">HR Manager at Microsoft</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass p-8 rounded-xl testimonial-card">
+                    <div class="flex text-yellow-400 mb-4">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-300 mb-6">"I was job hunting for 6 months before I found JobHub. Within a week, I had multiple interviews and landed my perfect role!"</p>
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center font-bold text-lg">MS</div>
+                        <div class="ml-4">
+                            <p class="font-semibold">Michael Smith</p>
+                            <p class="text-sm text-gray-400">Data Scientist at Amazon</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== COMPANIES SECTION ========== -->
+    <section class="py-20 bg-black" id="companies">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-sm font-medium text-gray-400 uppercase tracking-wider">Partners</span>
+                <h2 class="text-4xl font-bold mt-2">Trusted by Leading Companies</h2>
+                <div class="section-divider mt-4"></div>
+                <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Join thousands of companies already using JobHub</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
+                <div class="glass p-6 rounded-xl text-center hover:bg-white/10 transition-all">
+                    <i class="fas fa-google text-4xl text-white/60"></i>
+                    <p class="text-sm text-gray-400 mt-2">Google</p>
+                </div>
+                <div class="glass p-6 rounded-xl text-center hover:bg-white/10 transition-all">
+                    <i class="fas fa-microsoft text-4xl text-white/60"></i>
+                    <p class="text-sm text-gray-400 mt-2">Microsoft</p>
+                </div>
+                <div class="glass p-6 rounded-xl text-center hover:bg-white/10 transition-all">
+                    <i class="fas fa-amazon text-4xl text-white/60"></i>
+                    <p class="text-sm text-gray-400 mt-2">Amazon</p>
+                </div>
+                <div class="glass p-6 rounded-xl text-center hover:bg-white/10 transition-all">
+                    <i class="fas fa-apple text-4xl text-white/60"></i>
+                    <p class="text-sm text-gray-400 mt-2">Apple</p>
+                </div>
+                <div class="glass p-6 rounded-xl text-center hover:bg-white/10 transition-all">
+                    <i class="fas fa-facebook text-4xl text-white/60"></i>
+                    <p class="text-sm text-gray-400 mt-2">Meta</p>
+                </div>
+                <div class="glass p-6 rounded-xl text-center hover:bg-white/10 transition-all">
+                    <i class="fas fa-twitter text-4xl text-white/60"></i>
+                    <p class="text-sm text-gray-400 mt-2">Twitter</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== BLOG / INSIGHTS SECTION ========== -->
+    <section class="py-20 bg-white/5 border-y border-white/5" id="blog">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-sm font-medium text-gray-400 uppercase tracking-wider">Insights</span>
+                <h2 class="text-4xl font-bold mt-2">Career Insights & Resources</h2>
+                <div class="section-divider mt-4"></div>
+                <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Tips, guides, and advice to help you grow your career</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glass overflow-hidden rounded-xl hover-lift">
+                    <div class="h-48 bg-gradient-to-br from-white/10 to-transparent flex items-center justify-center">
+                        <i class="fas fa-file-alt text-6xl text-white/30"></i>
+                    </div>
+                    <div class="p-6">
+                        <span class="text-xs text-gray-400 uppercase">Career Advice</span>
+                        <h4 class="text-xl font-semibold mt-2 mb-3">10 Tips for Acing Your Next Interview</h4>
+                        <p class="text-gray-400 text-sm mb-4">Learn the secrets to impressing recruiters and landing your dream job.</p>
+                        <a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Read More →</a>
+                    </div>
+                </div>
+
+                <div class="glass overflow-hidden rounded-xl hover-lift">
+                    <div class="h-48 bg-gradient-to-br from-white/10 to-transparent flex items-center justify-center">
+                        <i class="fas fa-chart-bar text-6xl text-white/30"></i>
+                    </div>
+                    <div class="p-6">
+                        <span class="text-xs text-gray-400 uppercase">Industry Trends</span>
+                        <h4 class="text-xl font-semibold mt-2 mb-3">Top Skills Employers Are Looking For in 2024</h4>
+                        <p class="text-gray-400 text-sm mb-4">Stay ahead of the competition with the most in-demand skills.</p>
+                        <a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Read More →</a>
+                    </div>
+                </div>
+
+                <div class="glass overflow-hidden rounded-xl hover-lift">
+                    <div class="h-48 bg-gradient-to-br from-white/10 to-transparent flex items-center justify-center">
+                        <i class="fas fa-rocket text-6xl text-white/30"></i>
+                    </div>
+                    <div class="p-6">
+                        <span class="text-xs text-gray-400 uppercase">Career Growth</span>
+                        <h4 class="text-xl font-semibold mt-2 mb-3">How to Negotiate Your Salary Like a Pro</h4>
+                        <p class="text-gray-400 text-sm mb-4">Expert strategies to get the compensation you deserve.</p>
+                        <a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Read More →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== NEWSLETTER SECTION ========== -->
+    <section class="py-20 bg-black">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="glass p-12 rounded-2xl relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"></div>
+                <div class="relative z-10">
+                    <i class="fas fa-envelope text-5xl text-white/20 mb-6"></i>
+                    <h2 class="text-3xl font-bold mb-4">Get Job Alerts</h2>
+                    <p class="text-gray-400 mb-8 max-w-lg mx-auto">Subscribe to our newsletter and never miss new job opportunities</p>
+                    <form class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+                        <input type="email" placeholder="Enter your email" class="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-white/30">
+                        <button type="submit" class="bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-all hover:scale-105 whitespace-nowrap">
+                            Subscribe
+                        </button>
+                    </form>
+                    <p class="text-xs text-gray-500 mt-4">We respect your privacy. Unsubscribe at any time.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== CTA SECTION ========== -->
+    <section class="py-20 relative overflow-hidden border-t border-white/5">
+        <div class="absolute inset-0">
+            <img
+                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
+                alt="Team collaboration"
+                class="w-full h-full object-cover"
+            >
+            <div class="absolute inset-0 bg-black/80"></div>
+        </div>
+
+        <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl font-bold mb-4 animate-fadeInUp">Ready to Find Your Next Opportunity?</h2>
+            <p class="text-xl text-gray-300 mb-8 animate-fadeInUp delay-100">Join thousands of job seekers and employers on JobHub today</p>
+
+            @guest
+                <div class="flex flex-col sm:flex-row justify-center gap-4 animate-fadeInUp delay-200">
+                    <a href="{{ route('auth.signup') }}?role=candidate" class="group bg-white text-black px-8 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-all hover:scale-105 flex items-center justify-center">
+                        <i class="fas fa-user mr-2"></i>
+                        <span>I'm a Candidate</span>
+                        <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                    <a href="{{ route('auth.signup') }}?role=employer" class="group border border-white/30 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-all hover:scale-105 flex items-center justify-center">
+                        <i class="fas fa-building mr-2"></i>
+                        <span>I'm an Employer</span>
+                        <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+            @endguest
+        </div>
+    </section>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="bg-black/95 border-t border-white/5 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
+                <div class="col-span-2 md:col-span-1">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                            <i class="fas fa-briefcase text-black text-xl"></i>
+                        </div>
+                        <span class="text-xl font-bold text-white">JobHub</span>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Your trusted partner in career growth and talent acquisition.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-semibold mb-4">For Candidates</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Browse Jobs</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Create Profile</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Career Advice</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Salary Guide</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-semibold mb-4">For Employers</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Post a Job</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Find Candidates</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Pricing</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Employer Resources</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Resources</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">Blog</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Help Center</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Community</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Events</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Company</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Careers</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-sm text-gray-500">&copy; 2024 JobHub. All rights reserved.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-sm text-gray-500 hover:text-white transition-colors">Terms</a>
+                    <a href="#" class="text-sm text-gray-500 hover:text-white transition-colors">Privacy</a>
+                    <a href="#" class="text-sm text-gray-500 hover:text-white transition-colors">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button onclick="window.scrollTo({top:0,behavior:'smooth'})" class="fixed bottom-8 right-8 bg-white text-black w-12 h-12 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all hover:scale-110 shadow-lg z-50">
+        <i class="fas fa-arrow-up"></i>
+    </button>
 </body>
 </html>

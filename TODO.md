@@ -1,21 +1,20 @@
-# TODO Progress Tracker
+# TODO - Fix Alpine errors (installHook.js)
 
-- [x] Step 1: Enforce business rules in Feature/Repository layer
-    - [x] Company must be approved before creating jobs
+## What was found
 
-    - [ ] Employer can manage only own company/jobs
-    - [x] Candidate browse: only OPEN jobs + APPROVED companies
-        - [x] Candidate apply: resume mandatory + job open + company approved + duplicate apply prevention
-    - [x] Closed jobs cannot receive applications
+- Console errors: `selectedJob is not defined` from Alpine expressions like `selectedJob?.category?.name`.
+- Console errors: `showModal is not defined` from Alpine bindings.
+- These occur in `resources/views/jobs/admin-manage.blade.php`.
 
-- [ ] Step 2: Resolve candidate apply-flow conflict
-    - [ ] Disallow POST /applications for candidates (ensure backend rejects)
-- [ ] Step 3: Admin dashboard + wiring
-    - [ ] Admin stats endpoint(s) for total users/companies/jobs/applications/pending companies
-    - [ ] Ensure admin CRUD endpoints map to real data
-- [ ] Step 4: Candidate profile single-instance rule
-    - [x] Ensure one profile per candidate user
+## Planned fix
 
-- [ ] Step 5: Testing
-    - [ ] Run existing API tests/plans
-    - [ ] Add/adjust tests for above rules
+1. Ensure the modal and all `selectedJob`/`showModal` bindings live inside the `x-data="adminJobsPage()"` scope.
+2. Make sure `adminJobsPage()` defines `showModal` and `selectedJob` (already present).
+3. Make modal `x-show` safe by initializing `showModal: false` and using only `x-show="showModal"` inside the same Alpine component.
+4. Remove any inline `x-data`/DOM mismatch that could cause Alpine to evaluate expressions outside of the component scope.
+
+## Follow-up (after code changes)
+
+- Hard refresh the browser (clear cached JS).
+- Re-test the admin manage jobs page.
+- Verify no more `selectedJob`/`showModal` Alpine expression errors.

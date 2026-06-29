@@ -7,6 +7,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface ApplicationRepositoryInterface
 {
+    public function findById(string $id): ?Application;
+
     public function getApplicationById(int $id): ?Application;
 
     public function getApplicationStatusById(int $id): ?string;

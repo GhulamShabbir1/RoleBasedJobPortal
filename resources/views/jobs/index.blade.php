@@ -1,390 +1,507 @@
 @extends('layouts.app')
 
-@section('title', 'Browse Jobs · Job Board')
-@section('page_title', 'Browse Jobs')
-@section('page_subtitle', '· find your next role')
-
-@push('styles')
-<style>
-    /* --- FILTERS --- */
-    .filters {
-        background: #fff;
-        border-radius: 16px;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-        border: 1px solid #ececec;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-    }
-
-    .filter-group label {
-        display: block;
-        font-weight: 500;
-        font-size: 0.9rem;
-        color: #222;
-        margin-bottom: 0.5rem;
-    }
-
-    .filter-group input,
-    .filter-group select {
-        width: 100%;
-        padding: 0.6rem 1rem;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        background: #fcfcfc;
-        font-size: 0.9rem;
-        transition: border-color 0.2s;
-    }
-
-    .filter-group input:focus,
-    .filter-group select:focus {
-        outline: none;
-        border-color: #111;
-        background: #fff;
-    }
-
-    .btn-search {
-        background: #111;
-        color: #fff;
-        border: none;
-        padding: 0.6rem 1.8rem;
-        border-radius: 40px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: all 0.2s;
-        align-self: flex-end;
-    }
-
-    .btn-search:hover {
-        background: #2a2a2a;
-    }
-
-    /* --- JOBS GRID --- */
-    .jobs-list {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-    }
-
-    .job-item {
-        background: #fff;
-        border: 1px solid #ececec;
-        border-radius: 16px;
-        padding: 1.8rem;
-        transition: all 0.25s;
-    }
-
-    .job-item:hover {
-        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-        border-color: #ccc;
-    }
-
-    .job-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: start;
-        margin-bottom: 1rem;
-    }
-
-    .job-title-group h3 {
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: #111;
-        margin-bottom: 0.3rem;
-    }
-
-    .job-company {
-        color: #666;
-        font-weight: 500;
-        font-size: 0.95rem;
-    }
-
-    .job-status {
-        display: inline-block;
-        background: #111;
-        color: #fff;
-        font-size: 0.75rem;
-        font-weight: 600;
-        padding: 0.3rem 0.9rem;
-        border-radius: 40px;
-        letter-spacing: 0.01em;
-    }
-
-    .job-description {
-        color: #555;
-        margin: 1rem 0;
-        line-height: 1.7;
-    }
-
-    .job-meta {
-        display: flex;
-        gap: 1.5rem;
-        margin: 1rem 0;
-        flex-wrap: wrap;
-    }
-
-    .job-meta-item {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.9rem;
-        color: #666;
-    }
-
-    .job-meta-item i {
-        color: #888;
-    }
-
-    .job-tags {
-        display: flex;
-        gap: 0.6rem;
-        margin: 1rem 0;
-        flex-wrap: wrap;
-    }
-
-    .job-tag {
-        display: inline-block;
-        background: #f0f0f0;
-        padding: 0.25rem 0.8rem;
-        border-radius: 40px;
-        font-size: 0.8rem;
-        font-weight: 500;
-        color: #333;
-    }
-
-    .job-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 1.2rem;
-        padding-top: 1rem;
-        border-top: 1px solid #f0f0f0;
-    }
-
-    .job-salary {
-        font-weight: 600;
-        color: #111;
-        font-size: 1rem;
-    }
-
-    .btn-apply {
-        background: #111;
-        color: #fff;
-        border: none;
-        padding: 0.6rem 1.8rem;
-        border-radius: 40px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: all 0.2s;
-        text-decoration: none;
-        display: inline-block;
-    }
-
-    .btn-apply:hover {
-        background: #2a2a2a;
-        transform: scale(1.02);
-    }
-
-    /* --- EMPTY STATE --- */
-    .empty-state {
-        text-align: center;
-        padding: 3rem 2rem;
-        background: #fff;
-        border-radius: 16px;
-        border: 1px solid #ececec;
-    }
-
-    .empty-state i {
-        font-size: 3rem;
-        color: #ccc;
-        margin-bottom: 1rem;
-    }
-
-    .empty-state h3 {
-        color: #111;
-        margin-bottom: 0.5rem;
-    }
-
-    .empty-state p {
-        color: #666;
-    }
-
-    /* --- LOADING --- */
-    .loading-spinner {
-        display: inline-block;
-        width: 24px;
-        height: 24px;
-        border: 2px solid #ddd;
-        border-top-color: #111;
-        border-radius: 50%;
-        animation: spin 0.7s linear infinite;
-    }
-
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-
-    @media (max-width: 820px) {
-        .filters { grid-template-columns: 1fr 1fr; }
-        .job-header { flex-direction: column; }
-        .job-footer { flex-direction: column; gap: 1rem; align-items: flex-start; }
-    }
-
-    @media (max-width: 480px) {
-        .filters { grid-template-columns: 1fr; }
-        .job-meta { gap: 0.8rem; font-size: 0.85rem; }
-        .btn-apply { width: 100%; text-align: center; }
-    }
-</style>
-@endpush
+@section('title', 'Browse Jobs - JobHub')
 
 @section('content')
-<!-- FILTERS -->
-<div class="filters">
-    <div class="filter-group">
-        <label for="search">Search</label>
-        <input type="text" id="search" placeholder="Job title, keywords..." />
-    </div>
-    <div class="filter-group">
-        <label for="location">Location</label>
-        <input type="text" id="location" placeholder="City or remote" />
-    </div>
-    <div class="filter-group">
-        <label for="jobType">Job Type</label>
-        <select id="jobType">
-            <option value="">All types</option>
-            <option value="full-time">Full-time</option>
-            <option value="part-time">Part-time</option>
-            <option value="contract">Contract</option>
-        </select>
-    </div>
-    <div class="filter-group">
-        <label for="salaryMin">Salary Min ($)</label>
-        <input type="number" id="salaryMin" placeholder="50000" />
-    </div>
-    <button class="btn-search" onclick="filterJobs()"><i class="fas fa-filter"></i> Search</button>
-</div>
+<div class="min-h-screen bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="jobsPage()" x-init="loadJobs(), loadCategories()">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 tracking-tight">Find Your Next Opportunity</h1>
+            <p class="text-gray-600 mt-2 text-lg">Explore thousands of job listings from top companies</p>
+        </div>
 
-<!-- JOBS LIST -->
-<div class="jobs-list" id="jobsList">
-    <div class="empty-state">
-        <div class="loading-spinner" style="margin: 0 auto; margin-bottom: 1rem;"></div>
-        <p>Loading jobs...</p>
-    </div>
-</div>
-@endsection
+        <!-- Featured Banner -->
+        <div class="bg-gradient-to-r from-gray-900 to-gray-700 rounded-2xl p-6 mb-8 text-white">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-bold">🚀 10,000+ Jobs Available</h2>
+                    <p class="text-gray-300 text-sm mt-1">Find your dream job today</p>
+                </div>
+                <div class="flex gap-3">
+                    <span class="px-4 py-2 bg-white/10 rounded-lg text-sm backdrop-blur-sm">
+                        <i class="fas fa-building mr-2"></i> 5,000+ Companies
+                    </span>
+                    <span class="px-4 py-2 bg-white/10 rounded-lg text-sm backdrop-blur-sm">
+                        <i class="fas fa-users mr-2"></i> 50,000+ Candidates
+                    </span>
+                </div>
+            </div>
+        </div>
 
-@push('scripts')
-<script>
-    let allJobs = [];
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <!-- Sidebar: Filters -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-6 sticky top-24">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-gray-900">Filters</h3>
+                        <span class="text-xs text-gray-500" x-text="activeFiltersCount + ' active'"></span>
+                    </div>
 
-    async function loadJobs() {
-        try {
-            const response = await fetch(`${API_URL}/jobs`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
-            });
-
-            const data = await response.json();
-
-            if (data.success && data.data) {
-                // Handle pagination if data.data is paginated
-                const items = data.data.data ? data.data.data : data.data;
-                allJobs = Array.isArray(items) ? items : [items];
-                displayJobs(allJobs);
-            } else {
-                showEmpty();
-            }
-        } catch (err) {
-            console.error('Error loading jobs:', err);
-            showEmpty('Failed to load jobs. Please try again.');
-        }
-    }
-
-    function displayJobs(jobs) {
-        const jobsList = document.getElementById('jobsList');
-
-        if (jobs.length === 0) {
-            showEmpty('No jobs found matching your criteria.');
-            return;
-        }
-
-        jobsList.innerHTML = jobs.map(job => `
-            <div class="job-item">
-                <div class="job-header">
-                    <div class="job-title-group">
-                        <h3><a href="/jobs/${job.id}" style="color: inherit; text-decoration: none;">${job.title || 'Untitled'}</a></h3>
-                        <div class="job-company">
-                            <i class="fas fa-building" style="margin-right:0.4rem;"></i>
-                            ${job.company_name || 'Unknown Company'}
+                    <!-- Search -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-search mr-2 text-gray-400"></i>Search
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                            <input
+                                type="text"
+                                x-model="filters.search"
+                                @input="applyFilters()"
+                                placeholder="Job title or company..."
+                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all duration-200"
+                            >
                         </div>
                     </div>
-                    <span class="job-status">Active</span>
-                </div>
 
-                <div class="job-description">
-                    ${job.description ? job.description.substring(0, 200) + '...' : 'No description available'}
-                </div>
+                    <!-- Category -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-tag mr-2 text-gray-400"></i>Category
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-tag text-gray-400"></i>
+                            </div>
+                            <select
+                                x-model="filters.category_id"
+                                @change="applyFilters()"
+                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all duration-200 appearance-none bg-white"
+                            >
+                                <option value="">All Categories</option>
+                                <template x-for="cat in categories" :key="cat.id">
+                                    <option :value="cat.id" x-text="cat.name"></option>
+                                </template>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fas fa-chevron-down text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
 
-                <div class="job-meta">
-                    <div class="job-meta-item">
-                        <i class="fas fa-map-marker-alt"></i>
-                        ${job.city || 'Remote'}
+                    <!-- City -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>City
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-map-marker-alt text-gray-400"></i>
+                            </div>
+                            <select
+                                x-model="filters.city"
+                                @change="applyFilters()"
+                                class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all duration-200 appearance-none bg-white"
+                            >
+                                <option value="">All Cities</option>
+                                <option value="Lahore">Lahore</option>
+                                <option value="Karachi">Karachi</option>
+                                <option value="Islamabad">Islamabad</option>
+                                <option value="Rawalpindi">Rawalpindi</option>
+                                <option value="Faisalabad">Faisalabad</option>
+                                <option value="Multan">Multan</option>
+                                <option value="Peshawar">Peshawar</option>
+                                <option value="Quetta">Quetta</option>
+                                <option value="Hyderabad">Hyderabad</option>
+                                <option value="Remote">Remote</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fas fa-chevron-down text-gray-400"></i>
+                            </div>
+                        </div>
                     </div>
-                    <div class="job-meta-item">
-                        <i class="fas fa-briefcase"></i>
-                        ${job.job_type || 'Full-time'}
-                    </div>
-                </div>
 
-                <div class="job-footer">
-                    <div class="job-salary">
-                        $${job.min_salary || 'TBD'} - $${job.max_salary || 'TBD'}
+                    <!-- Job Type -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-briefcase mr-2 text-gray-400"></i>Job Type
+                        </label>
+                        <div class="space-y-2">
+                            <template x-for="type in ['full_time', 'part_time', 'remote', 'contract', 'internship', 'freelance']" :key="type">
+                                <label class="flex items-center cursor-pointer group">
+                                    <input
+                                        type="checkbox"
+                                        :value="type"
+                                        x-model="filters.job_type"
+                                        @change="applyFilters()"
+                                        class="rounded border-gray-300 text-gray-900 focus:ring-gray-900 transition-all duration-200"
+                                    >
+                                    <span class="ml-2 text-sm text-gray-600 group-hover:text-gray-900 transition-colors" x-text="type.replace('_', ' ').toUpperCase()"></span>
+                                </label>
+                            </template>
+                        </div>
                     </div>
-                    <a href="/jobs/${job.id}" class="btn-apply">
-                        View Details <i class="fas fa-arrow-right" style="margin-left:0.4rem;"></i>
-                    </a>
+
+                    <!-- Salary Range -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-dollar-sign mr-2 text-gray-400"></i>Salary Range
+                        </label>
+                        <div class="space-y-2">
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-400 font-medium">$</span>
+                                </div>
+                                <input
+                                    type="number"
+                                    x-model.number="filters.salary_min"
+                                    @change="applyFilters()"
+                                    placeholder="Min"
+                                    min="0"
+                                    class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all duration-200"
+                                >
+                            </div>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-400 font-medium">$</span>
+                                </div>
+                                <input
+                                    type="number"
+                                    x-model.number="filters.salary_max"
+                                    @change="applyFilters()"
+                                    placeholder="Max"
+                                    min="0"
+                                    class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all duration-200"
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reset Filters -->
+                    <button @click="resetFilters()" class="w-full px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200 hover:shadow-md flex items-center justify-center">
+                        <i class="fas fa-redo mr-2"></i>Reset All Filters
+                    </button>
                 </div>
             </div>
-        `).join('');
-    }
 
-    function showEmpty(message = 'No jobs found.') {
-        const jobsList = document.getElementById('jobsList');
-        jobsList.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-briefcase"></i>
-                <h3>No Results</h3>
-                <p>${message}</p>
+            <!-- Main: Job Listings -->
+            <div class="lg:col-span-3">
+                <!-- Results Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                    <div class="text-sm text-gray-600">
+                        <span class="font-semibold text-gray-900" x-text="pagination.total || 0"></span> jobs found
+                        <span x-show="filters.search || filters.category_id || filters.city || filters.job_type.length || filters.salary_min || filters.salary_max" class="text-gray-400">
+                            with your filters
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs text-gray-500">Sort by:</span>
+                        <select x-model="filters.sort" @change="applyFilters()" class="text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none bg-white">
+                            <option value="recent">Most Recent</option>
+                            <option value="relevance">Relevance</option>
+                            <option value="salary_high">Highest Salary</option>
+                            <option value="salary_low">Lowest Salary</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Loading -->
+                <div x-show="loading" class="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+                    <div class="inline-block">
+                        <i class="fas fa-spinner fa-spin text-4xl text-gray-400"></i>
+                    </div>
+                    <p class="text-gray-600 mt-4">Loading jobs...</p>
+                </div>
+
+                <!-- Job Listings -->
+                <div x-show="!loading" class="space-y-4">
+                    <template x-for="job in jobs" :key="job.id">
+                        <a :href="`/jobs/${job.id}`" class="block bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300 hover:border-gray-300 group">
+                            <div class="p-6">
+                                <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                                    <div class="flex-1">
+                                        <div class="flex items-start gap-4">
+                                            <!-- Company Logo Placeholder -->
+                                            <div class="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-gray-200 transition-colors">
+                                                <i class="fas fa-building text-gray-500 text-2xl"></i>
+                                            </div>
+                                            <div>
+                                                <div class="flex flex-wrap items-center gap-2 mb-1">
+                                                    <h3 class="text-lg font-semibold text-gray-900 group-hover:text-gray-700 transition-colors" x-text="job.title"></h3>
+                                                    <span class="px-2.5 py-0.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full border border-blue-100" x-text="job.job_type?.replace('_', ' ').toUpperCase() || 'N/A'"></span>
+                                                    <span x-show="job.status === 'open'" class="px-2.5 py-0.5 bg-green-50 text-green-700 text-xs font-medium rounded-full border border-green-100">
+                                                        <i class="fas fa-check-circle mr-1"></i>Active
+                                                    </span>
+                                                </div>
+                                                <p class="text-gray-600 text-sm" x-text="job.company?.name || 'N/A'"></p>
+                                            </div>
+                                        </div>
+
+                                        <p class="text-gray-700 text-sm mt-3 line-clamp-2" x-text="job.description || 'No description available'"></p>
+
+                                        <div class="flex flex-wrap gap-2 mt-4">
+                                            <span class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">
+                                                <i class="fas fa-map-marker-alt mr-1 text-gray-400"></i>
+                                                <span x-text="job.city || 'N/A'"></span>
+                                            </span>
+                                            <span class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">
+                                                <i class="fas fa-tag mr-1 text-gray-400"></i>
+                                                <span x-text="job.category?.name || 'N/A'"></span>
+                                            </span>
+                                            <template x-if="job.min_salary && job.max_salary">
+                                                <span class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">
+                                                    <i class="fas fa-dollar-sign mr-1 text-gray-400"></i>
+                                                    <span x-text="'$' + job.min_salary + ' - $' + job.max_salary"></span>
+                                                </span>
+                                            </template>
+                                            <template x-if="!job.min_salary && !job.max_salary">
+                                                <span class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">
+                                                    <i class="fas fa-dollar-sign mr-1 text-gray-400"></i>
+                                                    <span>Negotiable</span>
+                                                </span>
+                                            </template>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex flex-col items-end gap-2 flex-shrink-0">
+                                        <span class="text-xs text-gray-500">
+                                            <i class="far fa-calendar-alt mr-1"></i>
+                                            <span x-text="'Posted ' + timeAgo(job.created_at)"></span>
+                                        </span>
+                                        <span class="text-xs text-gray-500" x-show="job.deadline">
+                                            <i class="far fa-clock mr-1"></i>
+                                            <span x-text="'Deadline: ' + new Date(job.deadline).toLocaleDateString()"></span>
+                                        </span>
+                                        <span class="inline-flex items-center text-sm font-medium text-gray-900 group-hover:text-gray-700 transition-colors">
+                                            View Details
+                                            <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </template>
+
+                    <!-- No Jobs Found -->
+                    <div x-show="jobs.length === 0" class="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+                        <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-search text-4xl text-gray-400"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">No Jobs Found</h3>
+                        <p class="text-gray-600">We couldn't find any jobs matching your criteria. Try adjusting your filters.</p>
+                        <button @click="resetFilters()" class="mt-4 inline-flex items-center px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-all duration-200">
+                            <i class="fas fa-times mr-2"></i>Clear All Filters
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div x-show="!loading && pagination.total > pagination.per_page" class="mt-8 flex items-center justify-between">
+                    <p class="text-sm text-gray-500">
+                        Showing <span x-text="((pagination.current_page - 1) * pagination.per_page) + 1"></span>
+                        - <span x-text="Math.min(pagination.current_page * pagination.per_page, pagination.total)"></span>
+                        of <span x-text="pagination.total"></span> jobs
+                    </p>
+                    <div class="flex items-center gap-2">
+                        <button @click="previousPage()" :disabled="pagination.current_page === 1" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
+                            <i class="fas fa-chevron-left mr-1"></i> Previous
+                        </button>
+                        <span class="px-4 py-2 text-sm text-gray-600 font-medium" x-text="`Page ${pagination.current_page} of ${Math.ceil(pagination.total / pagination.per_page)}`"></span>
+                        <button @click="nextPage()" :disabled="pagination.current_page >= Math.ceil(pagination.total / pagination.per_page)" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
+                            Next <i class="fas fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
-        `;
+        </div>
+    </div>
+</div>
+
+<script>
+function jobsPage() {
+    return {
+        // defaults to avoid Alpine "not defined" evaluation errors
+        selectedJob: null,
+        showModal: false,
+        jobs: [],
+        categories: [],
+        loading: false,
+        // Ensure these exist even if Alpine template evaluation happens early.
+        selectedJob: null,
+        showModal: false,
+        filters: {
+            search: '',
+            category_id: '',
+            city: '',
+            job_type: [],
+            salary_min: '',
+            salary_max: '',
+            sort: 'recent',
+            page: 1
+        },
+        pagination: {
+            current_page: 1,
+            per_page: 10,
+            total: 0
+        },
+
+        get activeFiltersCount() {
+            let count = 0;
+            if (this.filters.search) count++;
+            if (this.filters.category_id) count++;
+            if (this.filters.city) count++;
+            if (this.filters.job_type.length) count++;
+            if (this.filters.salary_min || this.filters.salary_max) count++;
+            if (this.filters.sort !== 'recent') count++;
+            return count;
+        },
+
+        timeAgo(date) {
+            const now = new Date();
+            const diff = Math.floor((now - new Date(date)) / 1000);
+            if (diff < 60) return 'just now';
+            if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+            if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+            if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+            return new Date(date).toLocaleDateString();
+        },
+
+        async loadJobs() {
+            this.loading = true;
+            try {
+                const params = {
+                    title: this.filters.search,
+                    category_id: this.filters.category_id,
+                    city: this.filters.city,
+                    job_type: this.filters.job_type.join(','),
+                    salary_min: this.filters.salary_min,
+                    salary_max: this.filters.salary_max,
+                    sort: this.filters.sort,
+                    page: this.filters.page
+                };
+
+                const response = await axios.get('/api/jobs', { params });
+                if (response.data.success) {
+                    // API may return paginated structure or a plain array depending on backend
+                    const payload = response.data.data;
+                    this.jobs = Array.isArray(payload) ? payload : (payload?.data ?? []);
+                    this.pagination = response.data.pagination || {"
+                        current_page: 1,
+                        per_page: 10,
+                        total: response.data.data.length
+                    };
+                }
+            } catch (error) {
+                console.error('Error loading jobs:', error);
+                alert('Failed to load jobs. Please try again.');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async loadCategories() {
+            try {
+                const response = await axios.get('/api/categories');
+                if (response.data.success) {
+                    this.categories = response.data.data;
+                }
+            } catch (error) {
+                console.error('Error loading categories:', error);
+            }
+        },
+
+        applyFilters() {
+            this.filters.page = 1;
+            this.loadJobs();
+        },
+
+        resetFilters() {
+            this.filters = {
+                search: '',
+                category_id: '',
+                city: '',
+                job_type: [],
+                salary_min: '',
+                salary_max: '',
+                sort: 'recent',
+                page: 1
+            };
+            this.loadJobs();
+        },
+
+        nextPage() {
+            if (this.pagination.current_page < Math.ceil(this.pagination.total / this.pagination.per_page)) {
+                this.filters.page++;
+                this.loadJobs();
+            }
+        },
+
+        previousPage() {
+            if (this.filters.page > 1) {
+                this.filters.page--;
+                this.loadJobs();
+            }
+        }
     }
-
-    function filterJobs() {
-        const search = document.getElementById('search').value.toLowerCase();
-        const location = document.getElementById('location').value.toLowerCase();
-        const jobType = document.getElementById('jobType').value.toLowerCase();
-        const salaryMin = parseInt(document.getElementById('salaryMin').value) || 0;
-
-        const filtered = allJobs.filter(job => {
-            const titleMatch = (job.title || '').toLowerCase().includes(search);
-            const locationMatch = (job.city || '').toLowerCase().includes(location);
-            const typeMatch = !jobType || (job.job_type || '').toLowerCase().includes(jobType);
-            const salaryMatch = (job.min_salary || 0) >= salaryMin;
-
-            return titleMatch && locationMatch && typeMatch && salaryMatch;
-        });
-
-        displayJobs(filtered);
-    }
-
-    document.addEventListener('DOMContentLoaded', loadJobs);
+}
 </script>
-@endpush
+
+<style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+    }
+
+    /* Line clamp for description */
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Smooth transitions */
+    .transition-all {
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 200ms;
+    }
+
+    /* Sticky sidebar */
+    .sticky {
+        position: sticky;
+        top: 100px;
+    }
+
+    /* Checkbox styling */
+    input[type="checkbox"] {
+        cursor: pointer;
+        width: 16px;
+        height: 16px;
+    }
+
+    input[type="checkbox"]:checked {
+        background-color: #1a1a1a;
+        border-color: #1a1a1a;
+    }
+
+    /* Featured banner animation */
+    @keyframes shimmer {
+        0% { background-position: -200% center; }
+        100% { background-position: 200% center; }
+    }
+
+    .bg-gradient-to-r {
+        background-size: 200% auto;
+        animation: shimmer 3s ease-in-out infinite;
+    }
+</style>
+@endsection

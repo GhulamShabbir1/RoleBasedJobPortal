@@ -36,9 +36,11 @@ class DatabaseSeeder extends Seeder
         ]);
     }
 
-    Category::factory(10)->create();
+    // Seed categories (so dropdowns are not empty)
+    $this->call(CategorySeeder::class);
 
     $jobs = [];
+
 
     foreach ($companies as $company) {
         $jobs[] = Job::factory()->create([

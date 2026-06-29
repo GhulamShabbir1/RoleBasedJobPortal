@@ -1,291 +1,506 @@
 @extends('layouts.app')
 
-@section('title', 'Candidate Dashboard · jobboard')
-@section('page_title', 'Candidate Dashboard')
-@section('page_subtitle', '· overview')
+@section('title', 'Candidate Dashboard - JobHub')
 
 @section('content')
-<div class="p-10 max-w-[1440px] w-full mx-auto space-y-10">
+<div class="min-h-screen bg-white">
+    <div class="flex gap-0">
+        <!-- Sidebar -->
+        @include('components.candidate-sidebar')
 
-    <!-- Bento Stat Grid -->
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Stat Card 1 -->
-        <div class="bg-white p-8 rounded-[24px] border border-[#ECECEC] stat-card-shadow flex flex-col justify-between h-[200px] group overflow-hidden relative">
-            <div class="absolute -right-4 -top-4 w-24 h-24 bg-surface-container-low rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 opacity-50"></div>
-            <div>
-                <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mb-1">Available Jobs</p>
-                <h3 class="font-display text-[42px] text-primary">1,284</h3>
-            </div>
-            <div class="flex items-center gap-2 text-[#008A5E]">
-                <span class="material-symbols-outlined text-[18px]">trending_up</span>
-                <span class="font-label-sm text-label-sm">+12% this week</span>
-            </div>
-        </div>
-
-        <!-- Stat Card 2 -->
-        <div class="bg-white p-8 rounded-[24px] border border-[#ECECEC] stat-card-shadow flex flex-col justify-between h-[200px] group overflow-hidden relative">
-            <div class="absolute -right-4 -top-4 w-24 h-24 bg-surface-container-low rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 opacity-50"></div>
-            <div>
-                <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mb-1">Applications Submitted</p>
-                <h3 class="font-display text-[42px] text-primary">24</h3>
-            </div>
-            <div class="flex items-center gap-2 text-on-surface-variant">
-                <span class="material-symbols-outlined text-[18px]">schedule</span>
-                <span class="font-label-sm text-label-sm">4 pending review</span>
-            </div>
-        </div>
-
-        <!-- Stat Card 3 -->
-        <div class="bg-white p-8 rounded-[24px] border border-[#ECECEC] stat-card-shadow flex flex-col justify-between h-[200px] group overflow-hidden relative">
-            <div class="absolute -right-4 -top-4 w-24 h-24 bg-surface-container-low rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 opacity-50"></div>
-            <div>
-                <p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mb-1">Profile Views</p>
-                <h3 class="font-display text-[42px] text-primary">492</h3>
-            </div>
-            <div class="flex items-center gap-2 text-primary">
-                <span class="material-symbols-outlined text-[18px]">visibility</span>
-                <span class="font-label-sm text-label-sm">Top 5% in category</span>
-            </div>
-        </div>
-    </section>
-
-    <!-- Main Dashboard Layout -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
-        <!-- Recent Activity Feed (List) -->
-        <div class="lg:col-span-8 space-y-6">
-
-            <div class="flex items-center justify-between">
-                <h4 class="font-headline-md text-headline-md text-primary">Recent Activity</h4>
-                <button class="text-primary font-label-sm text-label-sm underline underline-offset-4 hover:opacity-70 transition-opacity" type="button">View All</button>
-            </div>
-
-            <div class="bg-white rounded-[24px] border border-[#ECECEC] overflow-hidden">
-
-                <!-- Activity Row 1 -->
-                <div class="flex items-center justify-between p-6 hover:bg-[#F5F5F5] transition-colors border-b border-[#ECECEC]">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-surface-container-low rounded-xl flex items-center justify-center">
-                            <span class="material-symbols-outlined text-primary">apartment</span>
-                        </div>
+        <!-- Main Content -->
+        <div class="flex-1 p-8 bg-gray-50 min-h-screen">
+            <div class="max-w-7xl mx-auto" x-data="candidateDashboard()" x-init="loadStats()">
+                <div class="space-y-6">
+                    <!-- Header -->
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div>
-                            <p class="font-body-md text-body-md text-primary font-semibold">Application Received: Linear</p>
-                            <p class="font-label-sm text-label-sm text-on-surface-variant">Your application for 'Senior UI Designer' is being reviewed.</p>
+                            <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+                            <p class="text-gray-600 mt-1 flex items-center gap-2">
+                                <i class="fas fa-circle text-[6px] text-gray-300"></i>
+                                Welcome back, <span class="font-medium text-gray-900">{{ auth()->user()->name ?? 'Candidate' }}</span>
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm text-gray-500">
+                                <i class="fas fa-calendar-alt mr-1"></i>
+                                <span x-text="new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"></span>
+                            </span>
+                            <a href="{{ route('jobs.index') }}" class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg flex items-center transition-all duration-200 hover:shadow-lg hover:scale-105">
+                                <i class="fas fa-search mr-2"></i>Browse Jobs
+                            </a>
+                            <button @click="loadStats()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all duration-200 hover:shadow-md">
+                                <i class="fas fa-redo mr-2"></i>Refresh
+                            </button>
                         </div>
                     </div>
-                    <span class="font-label-sm text-[11px] text-on-surface-variant whitespace-nowrap ml-4">2h ago</span>
-                </div>
 
-                <!-- Activity Row 2 -->
-                <div class="flex items-center justify-between p-6 hover:bg-[#F5F5F5] transition-colors border-b border-[#ECECEC]">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-surface-container-low rounded-xl flex items-center justify-center">
-                            <span class="material-symbols-outlined text-primary">mail</span>
+                    <!-- Profile Completion Alert -->
+                    <div x-show="!loading && profileCompletion < 100" class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex items-start gap-3">
+                        <i class="fas fa-exclamation-triangle text-yellow-600 mt-0.5"></i>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-yellow-800">Complete Your Profile</p>
+                            <p class="text-sm text-yellow-700">Your profile is <span x-text="profileCompletion + '%'"></span> complete. <a href="{{ route('candidate.profile.create') }}" class="font-medium underline hover:no-underline">Update now</a> to get noticed by employers.</p>
                         </div>
-                        <div>
-                            <p class="font-body-md text-body-md text-primary font-semibold">Message from Stripe</p>
-                            <p class="font-label-sm text-label-sm text-on-surface-variant">"We'd love to schedule a preliminary call regarding..."</p>
-                        </div>
-                    </div>
-                    <span class="font-label-sm text-[11px] text-on-surface-variant whitespace-nowrap ml-4">5h ago</span>
-                </div>
-
-                <!-- Activity Row 3 -->
-                <div class="flex items-center justify-between p-6 hover:bg-[#F5F5F5] transition-colors border-b border-[#ECECEC]">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-surface-container-low rounded-xl flex items-center justify-center">
-                            <span class="material-symbols-outlined text-primary">bookmark</span>
-                        </div>
-                        <div>
-                            <p class="font-body-md text-body-md text-primary font-semibold">New Match: Figma</p>
-                            <p class="font-label-sm text-label-sm text-on-surface-variant">A new 'Product Lead' role matches your profile preferences.</p>
+                        <div class="w-32">
+                            <div class="w-full h-2 bg-yellow-200 rounded-full overflow-hidden">
+                                <div class="h-full bg-yellow-600 rounded-full transition-all duration-1000" :style="{ width: profileCompletion + '%' }"></div>
+                            </div>
                         </div>
                     </div>
-                    <span class="font-label-sm text-[11px] text-on-surface-variant whitespace-nowrap ml-4">Yesterday</span>
-                </div>
 
-                <!-- Activity Row 4 -->
-                <div class="flex items-center justify-between p-6 hover:bg-[#F5F5F5] transition-colors">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-surface-container-low rounded-xl flex items-center justify-center">
-                            <span class="material-symbols-outlined text-primary">verified_user</span>
+                    <!-- Loading State -->
+                    <div x-show="loading" class="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+                        <div class="inline-block">
+                            <i class="fas fa-spinner fa-spin text-4xl text-gray-400"></i>
                         </div>
-                        <div>
-                            <p class="font-body-md text-body-md text-primary font-semibold">Identity Verified</p>
-                            <p class="font-label-sm text-label-sm text-on-surface-variant">Your professional credentials have been successfully validated.</p>
+                        <p class="text-gray-600 mt-4">Loading your dashboard...</p>
+                    </div>
+
+                    <!-- Stats Grid -->
+                    <div x-show="!loading" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <!-- Total Applications -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-all duration-200 hover:border-gray-300">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase tracking-wider">Applications</p>
+                                    <p class="text-2xl font-bold text-gray-900 mt-1" x-text="stats.total_applications || 0"></p>
+                                </div>
+                                <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-file-check text-blue-600"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2 flex items-center gap-1 text-xs">
+                                <span class="text-blue-600">📊</span>
+                                <span class="text-gray-400">Total applications sent</span>
+                            </div>
+                        </div>
+
+                        <!-- Pending Applications -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-all duration-200 hover:border-gray-300">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase tracking-wider">Pending</p>
+                                    <p class="text-2xl font-bold text-yellow-600 mt-1" x-text="stats.pending_applications || 0"></p>
+                                </div>
+                                <div class="w-10 h-10 bg-yellow-50 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-clock text-yellow-600"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2 flex items-center gap-1 text-xs">
+                                <span class="text-yellow-600">⏳</span>
+                                <span class="text-gray-400">Awaiting review</span>
+                            </div>
+                        </div>
+
+                        <!-- Reviewed Applications -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-all duration-200 hover:border-gray-300">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase tracking-wider">Under Review</p>
+                                    <p class="text-2xl font-bold text-orange-600 mt-1" x-text="stats.reviewed_applications || 0"></p>
+                                </div>
+                                <div class="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-eye text-orange-600"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2 flex items-center gap-1 text-xs">
+                                <span class="text-orange-600">👁️</span>
+                                <span class="text-gray-400">Being reviewed</span>
+                            </div>
+                        </div>
+
+                        <!-- Accepted Applications -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-all duration-200 hover:border-gray-300">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase tracking-wider">Accepted</p>
+                                    <p class="text-2xl font-bold text-green-600 mt-1" x-text="stats.accepted_applications || 0"></p>
+                                </div>
+                                <div class="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-check-circle text-green-600"></i>
+                                </div>
+                            </div>
+                            <div class="mt-2 flex items-center gap-1 text-xs">
+                                <span class="text-green-600">✅</span>
+                                <span class="text-gray-400">Offer received</span>
+                            </div>
                         </div>
                     </div>
-                    <span class="font-label-sm text-[11px] text-on-surface-variant whitespace-nowrap ml-4">2d ago</span>
+
+                    <!-- Charts Section -->
+                    <div x-show="!loading" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Application Status Chart -->
+                        <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900">Application Status</h3>
+                                    <p class="text-sm text-gray-500">Overview of your applications</p>
+                                </div>
+                                <span class="text-sm text-gray-500" x-text="'Total: ' + (stats.total_applications || 0)"></span>
+                            </div>
+                            <div class="h-64 flex items-end justify-between gap-3">
+                                <template x-for="(item, index) in statusData" :key="index">
+                                    <div class="flex flex-col items-center flex-1">
+                                        <div class="w-full bg-gray-100 rounded-t-lg relative group" style="height: 200px;">
+                                            <div class="absolute bottom-0 left-0 right-0 rounded-t-lg transition-all duration-1000 hover:brightness-110"
+                                                 :style="{ height: item.percentage + '%', background: item.color }">
+                                                <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                                    <span x-text="item.value"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <span class="text-xs text-gray-500 mt-2" x-text="item.label"></span>
+                                        <span class="text-xs font-semibold text-gray-700" x-text="item.value"></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Quick Stats & Tips -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-gray-900">Quick Tips</h3>
+                                    <p class="text-sm text-gray-500">Boost your chances</p>
+                                </div>
+                                <i class="fas fa-lightbulb text-yellow-500 text-xl"></i>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
+                                    <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Complete your profile</p>
+                                        <p class="text-xs text-gray-600">80% more likely to get noticed</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
+                                    <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Apply to relevant jobs</p>
+                                        <p class="text-xs text-gray-600">Tailor your applications</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
+                                    <div class="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Follow up</p>
+                                        <p class="text-xs text-gray-600">Send a thank you note</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3 p-3 bg-yellow-50 rounded-lg">
+                                    <div class="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <i class="fas fa-check text-white text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Update your resume</p>
+                                        <p class="text-xs text-gray-600">Keep it current</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Applications -->
+                    <div x-show="!loading && recentApplications.length > 0" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900">Recent Applications</h3>
+                                <p class="text-sm text-gray-500">Your latest job applications</p>
+                            </div>
+                            <a href="{{ route('applications.mine') }}" class="text-sm text-gray-900 hover:underline font-medium">
+                                View All <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                        <div class="space-y-3">
+                            <template x-for="app in recentApplications" :key="app.id">
+                                <div x-show="app && app.id" class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-briefcase text-gray-500"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-900" x-text="app.job_title || 'Job'"></p>
+                                            <p class="text-xs text-gray-500" x-text="app.company_name || 'Company'"></p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-xs px-2 py-1 rounded-full" :class="getStatusClass(app.status)">
+                                            <span x-text="(app.status || 'pending').toUpperCase()"></span>
+                                        </span>
+                                        <span class="text-xs text-gray-400" x-text="app.applied_at || 'N/A'"></span>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div x-show="!loading" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <a href="{{ route('jobs.index') }}" class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-all duration-200 hover:border-gray-300 group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+                                    <i class="fas fa-search text-blue-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">Find Jobs</p>
+                                    <p class="text-xs text-gray-500">Browse opportunities</p>
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('applications.mine') }}" class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-all duration-200 hover:border-gray-300 group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center group-hover:bg-green-100 transition-colors">
+                                    <i class="fas fa-file-check text-green-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">My Applications</p>
+                                    <p class="text-xs text-gray-500">Track status</p>
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('candidate.profile.create') }}" class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-all duration-200 hover:border-gray-300 group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center group-hover:bg-purple-100 transition-colors">
+                                    <i class="fas fa-user text-purple-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">My Profile</p>
+                                    <p class="text-xs text-gray-500">Update your info</p>
+                                </div>
+                            </div>
+                        </a>
+
+                        <a href="{{ route('jobs.index') }}?saved=true" class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-all duration-200 hover:border-gray-300 group">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-yellow-50 rounded-lg flex items-center justify-center group-hover:bg-yellow-100 transition-colors">
+                                    <i class="fas fa-bookmark text-yellow-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">Saved Jobs</p>
+                                    <p class="text-xs text-gray-500">Your favorites</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Error Alert -->
+                    <div x-show="error" class="bg-red-50 border border-red-200 rounded-xl text-red-700 p-4 flex items-start" x-transition>
+                        <i class="fas fa-exclamation-circle mr-3 mt-0.5 text-red-500"></i>
+                        <span x-text="error"></span>
+                    </div>
                 </div>
-
-            </div>
-        </div>
-
-        <!-- Right Column: Personal Branding / Quick Actions -->
-        <div class="lg:col-span-4 space-y-8">
-
-            <div class="bg-[#111111] text-white p-8 rounded-[24px] relative overflow-hidden">
-                <div class="relative z-10">
-                    <h5 class="font-headline-md text-headline-md mb-2">Upgrade to Pro</h5>
-                    <p class="font-body-md text-body-md opacity-70 mb-6">Get 3x more visibility and direct messaging with top-tier hiring managers.</p>
-                    <button class="bg-white text-black px-6 py-3 rounded-full font-label-sm text-label-sm w-full hover:bg-opacity-90 transition-all" type="button">Go Premium</button>
-                </div>
-                <div class="absolute -bottom-8 -right-8 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
-            </div>
-
-            <!-- Profile Completeness Card -->
-            <div class="bg-white p-8 rounded-[24px] border border-[#ECECEC] stat-card-shadow">
-                <div class="flex items-center justify-between mb-6">
-                    <h5 class="font-label-sm text-label-sm text-primary uppercase tracking-widest">Profile Strength</h5>
-                    <span class="text-primary font-bold">85%</span>
-                </div>
-
-                <div class="w-full bg-surface-container-low h-1.5 rounded-full mb-8 overflow-hidden">
-                    <div class="bg-primary h-full w-[85%] rounded-full"></div>
-                </div>
-
-                <ul class="space-y-4">
-                    <li class="flex items-center gap-3 text-on-surface-variant">
-                        <span class="material-symbols-outlined text-green-500 text-[20px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                        <span class="font-body-md text-body-md">Contact information</span>
-                    </li>
-                    <li class="flex items-center gap-3 text-on-surface-variant">
-                        <span class="material-symbols-outlined text-green-500 text-[20px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
-                        <span class="font-body-md text-body-md">Experience &amp; Education</span>
-                    </li>
-                    <li class="flex items-center gap-3 text-on-surface-variant">
-                        <span class="material-symbols-outlined text-outline-variant text-[20px]">circle</span>
-                        <span class="font-body-md text-body-md">Portfolio projects (2+ needed)</span>
-                    </li>
-                </ul>
             </div>
         </div>
     </div>
-
-    <!-- Horizontal Section: Featured Opportunities -->
-    <section class="space-y-6">
-        <div class="flex items-center justify-between">
-            <h4 class="font-headline-md text-headline-md text-primary">Recommended for You</h4>
-            <div class="flex gap-2">
-                <button class="p-2 border border-[#ECECEC] rounded-full hover:bg-white transition-all" type="button"><span class="material-symbols-outlined">chevron_left</span></button>
-                <button class="p-2 border border-[#ECECEC] rounded-full hover:bg-white transition-all" type="button"><span class="material-symbols-outlined">chevron_right</span></button>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            <!-- Job Card 1 -->
-            <div class="bg-white p-6 rounded-[24px] border border-[#ECECEC] stat-card-shadow group cursor-pointer">
-                <div class="flex items-start justify-between mb-6">
-                    <div class="w-14 h-14 bg-surface-container-low rounded-2xl flex items-center justify-center overflow-hidden border border-[#ECECEC]">
-                        <img class="w-8 h-8 object-contain" data-alt="Company logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBaZGHMn3PZAy-z_hCju254OkeNmWmUqLYzV_aindUyyJS-LJux8q6BhhgoIonkk3-ZmV2S7HNlo8vj1X1d48YpK75dUolP11yxBK9wxqtoUYhTpKvowPKXt1DUjijS0vImnvvABvlPxrECHaN2ppJoxczQHJ26iwxbX1Ew4GpRAcZX7kUBINOkHnCdtyDpFve3WknxLkruGaIWycmFBLZpEoCS8uX1ujrWYQh7pbYddUGbN03df66-5jwkUZLMuB---k07rmDyuX0" />
-                    </div>
-                    <span class="bg-[#F0FDF4] text-[#166534] px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider">New</span>
-                </div>
-
-                <h6 class="font-headline-md text-headline-md text-primary group-hover:underline underline-offset-4 decoration-2">Lead Product Designer</h6>
-                <p class="font-body-md text-body-md text-on-surface-variant mb-6">NextGen Systems • Remote</p>
-                <div class="flex items-center gap-4 flex-wrap">
-                    <span class="bg-surface-container-low text-on-surface-variant px-3 py-1.5 rounded-full text-[11px] font-semibold">$140k - $180k</span>
-                    <span class="bg-surface-container-low text-on-surface-variant px-3 py-1.5 rounded-full text-[11px] font-semibold">Full-time</span>
-                </div>
-            </div>
-
-            <!-- Job Card 2 -->
-            <div class="bg-white p-6 rounded-[24px] border border-[#ECECEC] stat-card-shadow group cursor-pointer">
-                <div class="flex items-start justify-between mb-6">
-                    <div class="w-14 h-14 bg-surface-container-low rounded-2xl flex items-center justify-center overflow-hidden border border-[#ECECEC]">
-                        <img class="w-8 h-8 object-contain" data-alt="Company logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUA1yn9Qm5WMzHkDVlntj6Rt8iQZSsmv2wCXzSyUfTCvQeA3oC_v1-O-DgKW_uWjfzgT36K0ge_w7qEERrFBkA9Jn4z8sCVkZx2Rxdol5871WlWZesHbETayHDlxAonT6XOCq7tvhRBSP7bIodubXbii360YLKWvS3F4YkQfRDq-v3eY5iL1_89j_DCzHrFM3IcDJ5hdRqnrGJJv2egopVL8zhAzqFbOqPk5fvJcPeJgBN-fpgO2vy27LLqlo76xb0obaPqiiIO5A" />
-                    </div>
-                    <button class="text-on-surface-variant hover:text-primary transition-colors" type="button"><span class="material-symbols-outlined">bookmark</span></button>
-                </div>
-
-                <h6 class="font-headline-md text-headline-md text-primary group-hover:underline underline-offset-4 decoration-2">Senior Brand strategist</h6>
-                <p class="font-body-md text-body-md text-on-surface-variant mb-6">Summit Creative • New York, NY</p>
-                <div class="flex items-center gap-4 flex-wrap">
-                    <span class="bg-surface-container-low text-on-surface-variant px-3 py-1.5 rounded-full text-[11px] font-semibold">$120k - $160k</span>
-                    <span class="bg-surface-container-low text-on-surface-variant px-3 py-1.5 rounded-full text-[11px] font-semibold">Contract</span>
-                </div>
-            </div>
-
-            <!-- Job Card 3 -->
-            <div class="bg-white p-6 rounded-[24px] border border-[#ECECEC] stat-card-shadow group cursor-pointer">
-                <div class="flex items-start justify-between mb-6">
-                    <div class="w-14 h-14 bg-surface-container-low rounded-2xl flex items-center justify-center overflow-hidden border border-[#ECECEC]">
-                        <img class="w-8 h-8 object-contain" data-alt="Company logo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrGLsiA0XC5PmCXwAE-jO20D0chk-NOb7HD4CZ0IpZ5hhrp5eXNj-iWufhNbx5cVi8Acl-oC5-uAYVg1OqRQxgQo9ErD3SBzUHf0xMjF4Jj1b4thx4BnnVqSXVppPGcH2hqbsO1x0C06bnBOaT6fsrU-wayO1eylrzA77l6TkUhkGfkaRX7k6kb7PmL4ch-JhaJnD2pVQ_prJN3ATFQ4uEqWWBPodhXGVCkqVl6a75qqUxObIE6XW91a77lgWRD8ZYGwBHVVgN230" />
-                    </div>
-                    <button class="text-on-surface-variant hover:text-primary transition-colors" type="button"><span class="material-symbols-outlined">bookmark</span></button>
-                </div>
-
-                <h6 class="font-headline-md text-headline-md text-primary group-hover:underline underline-offset-4 decoration-2">UX Researcher</h6>
-                <p class="font-body-md text-body-md text-on-surface-variant mb-6">Velocity AI • London, UK</p>
-                <div class="flex items-center gap-4 flex-wrap">
-                    <span class="bg-surface-container-low text-on-surface-variant px-3 py-1.5 rounded-full text-[11px] font-semibold">£90k - £120k</span>
-                    <span class="bg-surface-container-low text-on-surface-variant px-3 py-1.5 rounded-full text-[11px] font-semibold">Hybrid</span>
-                </div>
-            </div>
-        </div>
-    </section>
 </div>
-@endsection
 
-@push('styles')
-<style>
-    .stat-card-shadow {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-        transition: box-shadow 0.3s ease;
+<script>
+function candidateDashboard() {
+    return {
+        stats: {
+            total_applications: 0,
+            pending_applications: 0,
+            reviewed_applications: 0,
+            accepted_applications: 0
+        },
+        recentApplications: [],
+        profileCompletion: 0,
+        statusData: [],
+        loading: false,
+        error: '',
+
+        getStatusClass(status) {
+            const classes = {
+                'pending': 'bg-yellow-100 text-yellow-800',
+                'reviewed': 'bg-orange-100 text-orange-800',
+                'accepted': 'bg-green-100 text-green-800',
+                'rejected': 'bg-red-100 text-red-800'
+            };
+            return classes[status] || 'bg-gray-100 text-gray-800';
+        },
+
+        async loadStats() {
+            this.loading = true;
+            this.error = '';
+
+            try {
+                const token = localStorage.getItem('token');
+                const userStr = localStorage.getItem('user');
+                let userRole = null;
+                if (userStr) {
+                    try { userRole = JSON.parse(userStr).role; } catch (e) {}
+                }
+
+                if (!token || userRole !== 'candidate') {
+                    window.location.href = userRole ? `/dashboard/${userRole}` : '/auth/login';
+                    return;
+                }
+
+                // Load dashboard stats
+                try {
+                    const statsResponse = await axios.get('/api/dashboard/candidate');
+
+                    if (statsResponse.data.success) {
+                        this.stats = statsResponse.data.data || {
+                            total_applications: 0,
+                            pending_applications: 0,
+                            reviewed_applications: 0,
+                            accepted_applications: 0
+                        };
+                        this.generateStatusData();
+                    }
+                } catch (statsError) {
+                    console.error('Error loading stats:', statsError);
+                    this.stats = {
+                        total_applications: 0,
+                        pending_applications: 0,
+                        reviewed_applications: 0,
+                        accepted_applications: 0
+                    };
+                    this.generateStatusData();
+                }
+
+                // Load recent applications
+                try {
+                    const appsResponse = await axios.get('/api/candidate/applications', {
+                        params: { limit: 5 }
+                    });
+
+                    if (appsResponse.data.success && Array.isArray(appsResponse.data.data)) {
+                        this.recentApplications = appsResponse.data.data
+                            .filter(app => app && app.id) // Filter out null/undefined entries
+                            .map(app => ({
+                                id: app.id,
+                                job_title: app.job?.title || 'Unknown Job',
+                                company_name: app.job?.company?.name || 'Unknown Company',
+                                status: app.status || 'pending',
+                                applied_at: app.applied_at ? new Date(app.applied_at).toLocaleDateString() : 'N/A'
+                            }));
+                    }
+                } catch (appsError) {
+                    console.error('Error loading applications:', appsError);
+                    this.recentApplications = [];
+                }
+
+                // Load profile completion
+                try {
+                    const profileResponse = await axios.get('/api/candidate/profiles/me');
+
+                    if (profileResponse.data.success && profileResponse.data.data) {
+                        const profile = profileResponse.data.data;
+                        const fields = [
+                            profile.phone,
+                            profile.city,
+                            profile.skills,
+                            profile.experience,
+                            profile.education,
+                            profile.resume_url
+                        ];
+                        const filled = fields.filter(f => f).length;
+                        this.profileCompletion = Math.round((filled / fields.length) * 100);
+                    } else {
+                        this.profileCompletion = 0;
+                    }
+                } catch (profileError) {
+                    console.error('Error loading profile:', profileError);
+                    this.profileCompletion = 0;
+                }
+
+            } catch (error) {
+                if (error.response?.status === 401 || error.response?.status === 403) {
+                    window.location.href = '/auth/login';
+                } else {
+                    console.error('Error loading dashboard:', error);
+                    this.error = error.response?.data?.message || 'Failed to load dashboard data';
+                }
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        generateStatusData() {
+            const total = this.stats.total_applications || 1;
+            this.statusData = [
+                {
+                    label: 'Pending',
+                    value: this.stats.pending_applications || 0,
+                    percentage: ((this.stats.pending_applications || 0) / total) * 100,
+                    color: '#f59e0b'
+                },
+                {
+                    label: 'Review',
+                    value: this.stats.reviewed_applications || 0,
+                    percentage: ((this.stats.reviewed_applications || 0) / total) * 100,
+                    color: '#f97316'
+                },
+                {
+                    label: 'Accepted',
+                    value: this.stats.accepted_applications || 0,
+                    percentage: ((this.stats.accepted_applications || 0) / total) * 100,
+                    color: '#22c55e'
+                },
+                {
+                    label: 'Rejected',
+                    value: this.stats.rejected_applications || 0,
+                    percentage: ((this.stats.rejected_applications || 0) / total) * 100,
+                    color: '#ef4444'
+                }
+            ];
+        }
     }
-    .stat-card-shadow:hover {
-        box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+}
+</script>
+
+<style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+    }
+
+    /* Chart bar animations */
+    .rounded-t-lg {
+        transition: height 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Stats card hover */
+    .hover\:shadow-md:hover {
+        transform: translateY(-2px);
+        transition: all 0.3s ease;
+    }
+
+    /* Shimmer animation for stats */
+    @keyframes shimmer {
+        0% { opacity: 0.5; }
+        50% { opacity: 1; }
+        100% { opacity: 0.5; }
+    }
+
+    .stat-number {
+        animation: shimmer 2s ease-in-out infinite;
     }
 </style>
-@endpush
-
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', loadCandidateDashboardData);
-
-    async function apiGet(path, auth = false) {
-        const headers = { 'Accept': 'application/json' };
-        if (auth) {
-            headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
-        }
-        const response = await fetch(`${API_URL}${path}`, { headers });
-        const data = await response.json();
-        if (!response.ok || data.success === false) {
-            throw new Error(data.message || `Failed to load ${path}`);
-        }
-        const items = data.data?.data || data.data || [];
-        return Array.isArray(items) ? items : [items];
-    }
-
-    async function loadCandidateDashboardData() {
-        try {
-            const [jobs, applications] = await Promise.all([
-                apiGet('/jobs'),
-                apiGet('/applications', true).catch(() => []),
-            ]);
-
-            const statValues = document.querySelectorAll('section.grid h3.font-display');
-            if (statValues[0]) statValues[0].textContent = jobs.length;
-            if (statValues[1]) statValues[1].textContent = applications.length;
-
-            const pendingCount = applications.filter(application => (application.status || 'pending') === 'pending').length;
-            const appSubText = statValues[1]?.closest('div.bg-white')?.querySelector('.flex.items-center.gap-2 span:last-child');
-            if (appSubText) appSubText.textContent = `${pendingCount} pending review`;
-        } catch (error) {
-            console.error('Failed to load candidate dashboard data', error);
-        }
-    }
-
-    // Search bar focus effect (best-effort)
-    const searchInput = document.querySelector('input[type="text"]');
-    if (searchInput) {
-        searchInput.addEventListener('focus', () => {
-            searchInput.classList.add('w-80', 'bg-white', 'ring-1', 'ring-[#ECECEC]');
-        });
-        searchInput.addEventListener('blur', () => {
-            searchInput.classList.remove('w-80', 'bg-white', 'ring-1', 'ring-[#ECECEC]');
-        });
-    }
-</script>
-@endpush
+@endsection

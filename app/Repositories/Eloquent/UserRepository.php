@@ -4,7 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
-use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class UserRepository implements UserRepositoryInterface
@@ -119,7 +119,7 @@ class UserRepository implements UserRepositoryInterface
     /**
      * Filter users by role and search
      */
-    public function filterUsers(?string $role = null, ?string $search = null, int $page = 1, int $perPage = 15): Paginator
+    public function filterUsers(?string $role = null, ?string $search = null, int $page = 1, int $perPage = 15): LengthAwarePaginator
     {
         $query = $this->model->query();
 

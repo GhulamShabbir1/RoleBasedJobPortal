@@ -49,12 +49,20 @@ class CategoryController extends Controller
     ): JsonResponse {
         try {
             $dto = CategoryFilterDTO::fromRequest($request);
-            $categories = $feature->handle($dto);
+            $paginated = $feature->handle($dto);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Categories filtered successfully',
-                'data' => $categories,
+                'data' => $paginated->items(),
+                'pagination' => [
+                    'total' => $paginated->total(),
+                    'per_page' => $paginated->perPage(),
+                    'current_page' => $paginated->currentPage(),
+                    'last_page' => $paginated->lastPage(),
+                    'from' => $paginated->firstItem(),
+                    'to' => $paginated->lastItem(),
+                ],
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

@@ -87,4 +87,14 @@ class AuthRepository implements AuthRepositoryInterface
             }
         );
     }
+
+    /**
+     * Change authenticated user password
+     */
+    public function changePassword(string $userId, string $newPassword): bool
+    {
+        $user = User::findOrFail($userId);
+        $user->password = Hash::make($newPassword);
+        return $user->save();
+    }
 }

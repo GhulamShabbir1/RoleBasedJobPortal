@@ -16,11 +16,11 @@ class CandidateStatsDTO
     public function toArray(): array
     {
         return [
-            'totalApplications' => $this->totalApplications,
-            'pending' => $this->pending,
-            'reviewed' => $this->reviewed,
-            'accepted' => $this->accepted,
-            'rejected' => $this->rejected
+            'total_applications' => $this->totalApplications,
+            'pending_applications' => $this->pending,
+            'reviewed_applications' => $this->reviewed,
+            'accepted_applications' => $this->accepted,
+            'rejected_applications' => $this->rejected
         ];
     }
 }

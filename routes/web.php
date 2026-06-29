@@ -53,17 +53,29 @@ Route::get('/reset-password', function () {
 // ──────────────────────────────────────────────
 
 // Generic /dashboard: JS in the page reads role from localStorage and redirects
+// JWT Auth middleware for checking token from localStorage
 Route::get('/dashboard', function () {
-    // Server-side role detection (works when using Laravel session auth)
-    /** @var \App\Models\User|null $laravelUser */
-    $laravelUser = auth()->user();
-    $role = $laravelUser?->role ?? null;
+    // Check JWT token from header or redirect to login
+    $token = request()->bearerToken() ?? request()->query('token');
 
-    return match($role) {
-        'admin'    => redirect()->route('dashboard.admin'),
-        'employer' => redirect()->route('dashboard.employer'),
-        default    => redirect()->route('dashboard.candidate'),
-    };
+    if (!$token && !auth()->check()) {
+        return redirect()->route('auth.login');
+    }
+
+    // Try to get role from localStorage-sent headers
+    $role = request()->header('X-User-Role');
+
+    if ($role) {
+        return match($role) {
+            'admin'    => redirect()->route('dashboard.admin'),
+            'employer' => redirect()->route('dashboard.employer'),
+            'candidate' => redirect()->route('dashboard.candidate'),
+            default    => redirect()->route('auth.login'),
+        };
+    }
+
+    // Fallback: redirect to jobs if no role detected
+    return redirect()->route('jobs.index');
 })->name('dashboard');
 
 // Role-specific dashboards
@@ -100,8 +112,13 @@ Route::get('/jobs/{id}', function ($id) {
 
 // Admin: manage jobs
 Route::get('/admin/jobs', function () {
-    return view('jobs.manage');
+    return view('jobs.admin-manage');
 })->name('admin.jobs.manage');
+
+// Employer: my jobs
+Route::get('/employer/jobs', function () {
+    return view('jobs.employer-jobs');
+})->name('employer.jobs');
 
 // ──────────────────────────────────────────────
 // APPLICATIONS
@@ -110,7 +127,7 @@ Route::get('/admin/jobs', function () {
 // Smart redirect — JS detects role and redirects to the correct sub-route
 Route::get('/applications', function () {
     return view('applications.index');
-})->name('applications.index');
+})->name('page.applications.index');
 
 // Candidate: track own application statuses (Pending / Reviewed / Rejected)
 Route::get('/applications/mine', function () {
@@ -119,8 +136,23 @@ Route::get('/applications/mine', function () {
 
 // Employer + Admin: review incoming applications for their jobs
 Route::get('/applications/review', function () {
-    return view('dashboard.review-applications');
-})->name('applications.review');
+    return view('applications.review');
+})->name('page.applications.review');
+
+// Admin: view all applications
+Route::get('/admin/applications', function () {
+    return view('applications.admin-review');
+})->name('page.admin.applications.index');
+
+// Admin: view all candidate profiles
+Route::get('/candidate-profiles', function () {
+    return view('candidate-profiles.index');
+})->name('candidate-profiles.index');
+
+// View single candidate profile
+Route::get('/candidate-profiles/{id}', function ($id) {
+    return view('candidate-profiles.show', compact('id'));
+})->name('candidate-profiles.show')->where('id', '[0-9]+');
 
 // ──────────────────────────────────────────────
 // COMPANIES
@@ -129,7 +161,12 @@ Route::get('/applications/review', function () {
 // Public company directory
 Route::get('/companies', function () {
     return view('companies.index');
-})->name('companies.index');
+})->name('page.companies.index');
+
+// Employer: manage their company (checks if exists, shows form or view)
+Route::get('/employer/company', function () {
+    return view('companies.employer-manage');
+})->name('employer.company');
 
 // Employer: register / edit their company (logo + certificate upload)
 // NOTE: must come BEFORE /{id} to avoid being captured by the wildcard
@@ -137,15 +174,25 @@ Route::get('/companies/create', function () {
     return view('companies.register');
 })->name('companies.create');
 
+// Employer: edit their company
+Route::get('/companies/{id}/edit', function ($id) {
+    return view('companies.edit', compact('id'));
+})->name('companies.edit')->where('id', '[0-9]+');
+
 // Admin: pending company approvals queue
 Route::get('/companies/pending', function () {
-    return view('companies.pending-review');
+    return view('companies.admin-index');
 })->name('companies.pending');
+
+// Admin: view all companies
+Route::get('/admin/companies', function () {
+    return view('companies.admin-index');
+})->name('page.admin.companies.index');
 
 // Single company profile
 Route::get('/companies/{id}', function ($id) {
     return view('companies.show', compact('id'));
-})->name('companies.show')->where('id', '[0-9]+');
+})->name('page.companies.show')->where('id', '[0-9]+');
 
 // ──────────────────────────────────────────────
 // CATEGORIES

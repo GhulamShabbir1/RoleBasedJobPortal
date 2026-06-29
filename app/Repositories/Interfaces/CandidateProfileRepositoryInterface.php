@@ -3,7 +3,7 @@
 namespace App\Repositories\Interfaces;
 
 use App\Models\CandidateProfile;
-use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 interface CandidateProfileRepositoryInterface
@@ -41,5 +41,5 @@ interface CandidateProfileRepositoryInterface
     /**
      * Filter candidate profiles by search and skills
      */
-    public function filterProfiles(?string $search = null, ?string $skills = null, int $page = 1, int $perPage = 15): Paginator;
+    public function filterProfiles(?string $search = null, ?string $skills = null, int $page = 1, int $perPage = 15): LengthAwarePaginator;
 }

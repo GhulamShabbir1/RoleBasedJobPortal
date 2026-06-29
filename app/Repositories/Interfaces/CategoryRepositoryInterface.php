@@ -3,7 +3,7 @@
 namespace App\Repositories\Interfaces;
 
 use App\Models\Category;
-use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 interface CategoryRepositoryInterface
@@ -41,5 +41,5 @@ interface CategoryRepositoryInterface
     /**
      * Filter categories by search
      */
-    public function filterCategories(?string $search = null, int $page = 1, int $perPage = 15): Paginator;
+    public function filterCategories(?string $search = null, int $page = 1, int $perPage = 15): LengthAwarePaginator;
 }

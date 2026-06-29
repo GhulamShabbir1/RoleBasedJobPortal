@@ -24,7 +24,6 @@ class LoginUserFeature
             // Attempt login via repository
             $token = $this->authRepository->attemptLogin($dto->toCredentials());
 
-
             if (!$token) {
                 throw new Exception('Invalid credentials provided');
             }
@@ -32,9 +31,20 @@ class LoginUserFeature
             // Get authenticated user
             $user = $this->authRepository->getCurrentUser();
 
+            // If employer, include company status in response for UI routing
+            $companyStatus = null;
+            if ($user->role === 'employer') {
+                $company = \App\Models\Company::where('user_id', $user->id)->first();
+                $companyStatus = [
+                    'has_company' => $company !== null,
+                    'status' => $company?->status ?? 'no_company',
+                ];
+            }
+
             return [
                 'user' => $user,
                 'token' => $token,
+                'company_status' => $companyStatus,
             ];
         } catch (Exception $e) {
             throw $e;

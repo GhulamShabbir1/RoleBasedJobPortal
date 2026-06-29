@@ -4,7 +4,7 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\Category;
 use App\Repositories\Interfaces\CategoryRepositoryInterface;
-use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
 class CategoryRepository implements CategoryRepositoryInterface
@@ -79,7 +79,7 @@ class CategoryRepository implements CategoryRepositoryInterface
     /**
      * Filter categories by search
      */
-    public function filterCategories(?string $search = null, int $page = 1, int $perPage = 15): Paginator
+    public function filterCategories(?string $search = null, int $page = 1, int $perPage = 15): LengthAwarePaginator
     {
         $query = $this->model->query();
 

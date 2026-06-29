@@ -1,228 +1,528 @@
 @extends('layouts.app')
 
-@section('title', 'Manage Users · jobboard Admin')
-@section('page_title', 'Manage Users')
+@section('title', 'Manage Users - JobHub')
 
 @section('content')
-<section class="max-w-container_max_width mx-auto p-margin_desktop">
-    <!-- Header Section -->
-    <div class="flex justify-between items-end mb-8">
-        <div>
-            <h3 class="font-headline-lg text-headline-lg text-primary mb-2">User Directory</h3>
-            <p class="font-body-md text-body-md text-secondary max-w-lg">Manage permissions, monitor activity, and regulate user access across the recruitment ecosystem.</p>
-        </div>
-        <div class="flex space-x-3">
-            <button class="px-6 py-2.5 rounded-full border border-outline-variant text-primary font-label-sm text-label-sm hover:bg-surface-container-low transition-all" type="button">Export CSV</button>
-            <button class="px-6 py-2.5 rounded-full bg-primary text-white font-label-sm text-label-sm hover:bg-opacity-90 transition-all shadow-sm" type="button">+ Add New User</button>
-        </div>
-    </div>
+<div class="min-h-screen bg-white">
+    <div class="flex gap-0">
+        <!-- Sidebar -->
+        @include('components.admin-sidebar')
 
-    <!-- Stats/Metrics Bar (Bento style) -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white p-6 rounded-3xl border border-[#ECECEC] shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
-            <p class="text-secondary font-label-sm text-label-sm mb-1 uppercase tracking-wider">Total Users</p>
-            <p class="text-3xl font-bold text-primary" id="total-users">0</p>
-        </div>
-        <div class="bg-white p-6 rounded-3xl border border-[#ECECEC] shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
-            <p class="text-secondary font-label-sm text-label-sm mb-1 uppercase tracking-wider">Employers</p>
-            <p class="text-3xl font-bold text-primary" id="employer-count">0</p>
-        </div>
-        <div class="bg-white p-6 rounded-3xl border border-[#ECECEC] shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
-            <p class="text-secondary font-label-sm text-label-sm mb-1 uppercase tracking-wider">Candidates</p>
-            <p class="text-3xl font-bold text-primary" id="candidate-count">0</p>
-        </div>
-        <div class="bg-white p-6 rounded-3xl border border-[#ECECEC] shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
-            <p class="text-secondary font-label-sm text-label-sm mb-1 uppercase tracking-wider">Active Now</p>
-            <div class="flex items-center">
-                <p class="text-3xl font-bold text-primary">0</p>
-                <span class="ml-2 w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Table Container -->
-    <div class="bg-white rounded-3xl border border-[#ECECEC] shadow-[0_4px_12px_rgba(0,0,0,0.02)] overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="border-b border-[#ECECEC] bg-surface-bright">
-                        <th class="px-8 py-5 font-label-sm text-label-sm text-secondary uppercase tracking-widest w-12">
-                            <input class="rounded border-outline-variant text-primary focus:ring-primary h-4 w-4" type="checkbox" />
-                        </th>
-                        <th class="px-8 py-5 font-label-sm text-label-sm text-secondary uppercase tracking-widest">Name</th>
-                        <th class="px-8 py-5 font-label-sm text-label-sm text-secondary uppercase tracking-widest">Email Address</th>
-                        <th class="px-8 py-5 font-label-sm text-label-sm text-secondary uppercase tracking-widest">Role</th>
-                        <th class="px-8 py-5 font-label-sm text-label-sm text-secondary uppercase tracking-widest">Joined</th>
-                        <th class="px-8 py-5 font-label-sm text-label-sm text-secondary uppercase tracking-widest text-right">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-[#ECECEC]" id="usersTableBody">
-                    <tr><td class="px-8 py-6 text-secondary" colspan="6">Loading users...</td></tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="px-8 py-6 border-t border-[#ECECEC] flex items-center justify-between">
-            <p class="font-body-md text-body-md text-secondary" id="usersTableSummary">Loading real users...</p>
-            <div class="flex space-x-2">
-                <button class="w-10 h-10 flex items-center justify-center rounded-full border border-outline-variant hover:bg-surface-container-low transition-all" type="button">
-                    <span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
-                </button>
-                <button class="w-10 h-10 flex items-center justify-center rounded-full bg-primary text-white font-label-sm text-label-sm transition-all" type="button">1</button>
-                <button class="w-10 h-10 flex items-center justify-center rounded-full border border-outline-variant hover:bg-surface-container-low transition-all font-label-sm text-label-sm" type="button">2</button>
-                <button class="w-10 h-10 flex items-center justify-center rounded-full border border-outline-variant hover:bg-surface-container-low transition-all font-label-sm text-label-sm" type="button">3</button>
-                <button class="w-10 h-10 flex items-center justify-center rounded-full border border-outline-variant hover:bg-surface-container-low transition-all" type="button">
-                    <span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
-                </button>
-            </div>
-        </div>
-    </div>
-</section>
-@endsection
-
-@push('styles')
-<style>
-    body {
-        font-family: 'Inter', sans-serif;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-    }
-    .material-symbols-outlined {
-        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        vertical-align: middle;
-    }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #f1f1f1; }
-    ::-webkit-scrollbar-thumb { background: #d1d1d1; border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: #111111; }
-    .user-row-transition { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-</style>
-@endpush
-
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        loadStats();
-        loadUsers();
-    });
-
-    function initials(name) {
-        return (name || 'U').split(' ').map(part => part[0]).join('').substring(0, 2).toUpperCase();
-    }
-
-    async function loadStats() {
-        try {
-            const response = await fetch(`${API_URL}/dashboard/admin`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                    'Accept': 'application/json',
-                },
-            });
-            const data = await response.json();
-            if (response.ok && data.success) {
-                const stats = data.data;
-                document.getElementById('total-users').textContent = stats.totalUsers;
-                // We don't have separate employer/candidate counts from dashboard,
-                // for now, let's just set total users
-            }
-        } catch (error) {
-            console.error('Failed to load stats', error);
-        }
-    }
-
-    async function loadUsers() {
-        const tbody = document.getElementById('usersTableBody');
-        try {
-            const response = await fetch(`${API_URL}/users`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                    'Accept': 'application/json',
-                },
-            });
-            const data = await response.json();
-            if (!response.ok || !data.success) {
-                throw new Error(data.message || 'Failed to load users');
-            }
-
-            const users = data.data?.data || data.data || [];
-            document.getElementById('usersTableSummary').textContent = `Showing ${users.length} real user(s)`;
-            
-            // Update employer and candidate counts from users array
-            const employers = users.filter(u => u.role === 'employer').length;
-            const candidates = users.filter(u => u.role === 'candidate').length;
-            document.getElementById('employer-count').textContent = employers;
-            document.getElementById('candidate-count').textContent = candidates;
-            
-            if (!users.length) {
-                tbody.innerHTML = '<tr><td class="px-8 py-6 text-secondary" colspan="6">No users found.</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = users.map(user => `
-                <tr class="user-row-transition hover:bg-[#F5F5F5] group">
-                    <td class="px-8 py-4"><input class="rounded border-outline-variant text-primary focus:ring-primary h-4 w-4" type="checkbox" /></td>
-                    <td class="px-8 py-4">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center font-bold text-xs border border-outline-variant">${initials(user.name)}</div>
-                            <span class="font-headline-md text-body-lg text-primary">${user.name || 'Unknown User'}</span>
+        <!-- Main Content -->
+        <div class="flex-1 p-8 bg-gray-50 min-h-screen">
+            <div class="max-w-7xl mx-auto" x-data="usersPage()" x-init="loadUsers()">
+                <div class="space-y-6">
+                    <!-- Header -->
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <button onclick="history.back()" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-all duration-200 hover:shadow-md mb-4">
+                                <i class="fas fa-arrow-left mr-2"></i>Back
+                            </button>
+                            <h1 class="text-3xl font-bold text-gray-900">Manage Users</h1>
+                            <p class="text-gray-600 mt-1 flex items-center gap-2">
+                                <i class="fas fa-circle text-[6px] text-gray-300"></i>
+                                View and manage all system users
+                            </p>
                         </div>
-                    </td>
-                    <td class="px-8 py-4 font-body-md text-secondary">${user.email || '-'}</td>
-                    <td class="px-8 py-4">
-                        <select class="bg-transparent border border-outline-variant rounded-full px-3 py-1 text-label-sm font-label-sm focus:ring-0 focus:border-primary cursor-pointer" onchange="updateUserRole('${user.id}', this.value)">
-                            <option value="candidate" ${user.role === 'candidate' ? 'selected' : ''}>Candidate</option>
-                            <option value="employer" ${user.role === 'employer' ? 'selected' : ''}>Employer</option>
-                            <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
-                        </select>
-                    </td>
-                    <td class="px-8 py-4 font-body-md text-secondary">${user.created_at ? new Date(user.created_at).toLocaleDateString() : '-'}</td>
-                    <td class="px-8 py-4 text-right">
-                        <button class="text-secondary opacity-0 group-hover:opacity-100 hover:text-error transition-all p-2 rounded-full" type="button" onclick="deleteUser('${user.id}')" title="Delete User">
-                            <span class="material-symbols-outlined" data-icon="delete">delete</span>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        } catch (error) {
-            tbody.innerHTML = `<tr><td class="px-8 py-6 text-secondary" colspan="6">${error.message}</td></tr>`;
-        }
-    }
+                        <div class="flex items-center gap-3">
+                            <span class="text-sm text-gray-500">
+                                <i class="fas fa-users mr-1"></i> Total: <span x-text="users.length"></span> users
+                            </span>
+                            <button @click="loadUsers()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all duration-200 hover:shadow-md">
+                                <i class="fas fa-redo mr-2"></i>Refresh
+                            </button>
+                        </div>
+                    </div>
 
-    async function updateUserRole(userId, role) {
-        const response = await fetch(`${API_URL}/users/${userId}/role`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            },
-            body: JSON.stringify({ role }),
-        });
-        const data = await response.json();
-        if (!response.ok || !data.success) {
-            alert(data.message || 'Failed to update role');
-            loadUsers();
-        } else {
-            // Reload users to update counts
-            loadUsers();
-        }
-    }
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-all duration-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase tracking-wider">Total Users</p>
+                                    <p class="text-2xl font-bold text-gray-900 mt-1" x-text="stats.total"></p>
+                                </div>
+                                <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-users text-gray-600"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-all duration-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase tracking-wider">Admins</p>
+                                    <p class="text-2xl font-bold text-purple-600 mt-1" x-text="stats.admins"></p>
+                                </div>
+                                <div class="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user-shield text-purple-600"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-all duration-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase tracking-wider">Employers</p>
+                                    <p class="text-2xl font-bold text-blue-600 mt-1" x-text="stats.employers"></p>
+                                </div>
+                                <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-building text-blue-600"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-all duration-200">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase tracking-wider">Candidates</p>
+                                    <p class="text-2xl font-bold text-green-600 mt-1" x-text="stats.candidates"></p>
+                                </div>
+                                <div class="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user-graduate text-green-600"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-    async function deleteUser(userId) {
-        if (!confirm('Are you sure you want to remove this user from the recruitment portal? This action is permanent.')) return;
-        const response = await fetch(`${API_URL}/users/${userId}`, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Accept': 'application/json',
-            },
-        });
-        const data = await response.json();
-        if (!response.ok || !data.success) {
-            alert(data.message || 'Failed to delete user');
-            return;
+                    <!-- Search & Filter Bar -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <div class="flex-1 relative">
+                                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input
+                                    type="text"
+                                    x-model="search"
+                                    @input="applyFilters()"
+                                    placeholder="Search by name or email..."
+                                    class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all duration-200"
+                                >
+                            </div>
+                            <div class="flex gap-2">
+                                <select
+                                    x-model="filters.role"
+                                    @change="applyFilters()"
+                                    class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all duration-200 bg-white"
+                                >
+                                    <option value="">All Roles</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="employer">Employer</option>
+                                    <option value="candidate">Candidate</option>
+                                </select>
+                                <select
+                                    x-model="filters.status"
+                                    @change="applyFilters()"
+                                    class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all duration-200 bg-white"
+                                >
+                                    <option value="">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                                <button @click="resetFilters()" class="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors">
+                                    <i class="fas fa-times mr-1"></i>Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div x-show="loading" class="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+                        <div class="inline-block">
+                            <i class="fas fa-spinner fa-spin text-4xl text-gray-400"></i>
+                        </div>
+                        <p class="text-gray-600 mt-4">Loading users...</p>
+                    </div>
+
+                    <!-- Users Table -->
+                    <div x-show="!loading" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50 border-b border-gray-200">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">User</th>
+                                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
+                                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Role</th>
+                                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Joined</th>
+                                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <template x-for="user in filteredUsers" :key="user.id">
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-6 py-4">
+                                                <div class="flex items-center gap-3">
+                                                    <img :src="`https://ui-avatars.com/api/?name=${user.name}&background=1a1a1a&color=fff&size=32`"
+                                                         :alt="user.name"
+                                                         class="w-8 h-8 rounded-full ring-2 ring-gray-200">
+                                                    <span class="text-sm font-medium text-gray-900" x-text="user.name"></span>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4 text-sm text-gray-600" x-text="user.email"></td>
+                                            <td class="px-6 py-4 text-sm">
+                                                <span :class="getRoleClass(user.role)" class="px-3 py-1 rounded-full text-xs font-medium">
+                                                    <i class="fas" :class="getRoleIcon(user.role)"></i>
+                                                    <span x-text="user.role.toUpperCase()"></span>
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 text-sm">
+                                                <span :class="user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'" class="px-3 py-1 rounded-full text-xs font-medium">
+                                                    <i class="fas" :class="user.status === 'active' ? 'fa-check-circle' : 'fa-circle'"></i>
+                                                    <span x-text="user.status ? user.status.toUpperCase() : 'ACTIVE'"></span>
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 text-sm text-gray-600" x-text="new Date(user.created_at).toLocaleDateString()"></td>
+                                            <td class="px-6 py-4 text-sm">
+                                                <div class="flex items-center gap-2">
+                                                    <button @click="viewUser(user)" class="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors" title="View">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button @click="toggleStatus(user.id, user.status)" class="p-1.5 text-yellow-400 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors" title="Toggle Status">
+                                                        <i class="fas" :class="user.status === 'active' ? 'fa-pause' : 'fa-play'"></i>
+                                                    </button>
+                                                    <button @click="deleteUser(user.id)" class="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
+
+                                    <tr x-show="filteredUsers.length === 0">
+                                        <td colspan="6" class="px-6 py-12 text-center">
+                                            <div class="flex flex-col items-center">
+                                                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                                                    <i class="fas fa-users text-2xl text-gray-400"></i>
+                                                </div>
+                                                <p class="text-gray-500 font-medium">No users found</p>
+                                                <p class="text-sm text-gray-400 mt-1" x-text="search || filters.role || filters.status ? 'Try adjusting your search filters' : 'There are no users registered yet'"></p>
+                                                <button @click="resetFilters()" class="mt-3 text-sm text-gray-600 hover:text-gray-900 underline">
+                                                    Clear filters
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div x-show="!loading && filteredUsers.length > 0" class="flex items-center justify-between">
+                        <p class="text-sm text-gray-500">
+                            Showing <span x-text="filteredUsers.length"></span> of <span x-text="users.length"></span> users
+                        </p>
+                        <div class="flex items-center gap-2">
+                            <button @click="previousPage()" :disabled="page === 1" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
+                                <i class="fas fa-chevron-left mr-1"></i> Previous
+                            </button>
+                            <span class="px-4 py-2 text-sm text-gray-600 font-medium" x-text="`Page ${page}`"></span>
+                            <button @click="nextPage()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200">
+                                Next <i class="fas fa-chevron-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Details Modal -->
+            <div x-show="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" x-transition style="display: none;">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto" @click.away="showModal = false">
+        <div class="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
+            <h3 class="text-xl font-bold text-gray-900">User Details</h3>
+            <button @click="showModal = false" class="w-8 h-8 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center">
+                <i class="fas fa-times text-gray-500"></i>
+            </button>
+        </div>
+        <div class="p-6 space-y-4">
+            <!-- Avatar -->
+            <div class="flex items-center gap-4">
+                <img :src="`https://ui-avatars.com/api/?name=${selectedUser?.name}&background=1a1a1a&color=fff&size=64`"
+                     :alt="selectedUser?.name"
+                     class="w-16 h-16 rounded-full ring-4 ring-gray-200">
+                <div>
+                    <h4 class="text-xl font-bold text-gray-900" x-text="selectedUser?.name"></h4>
+                    <p class="text-gray-600" x-text="selectedUser?.email"></p>
+                    <span :class="getRoleClass(selectedUser?.role)" class="inline-block mt-1 px-3 py-1 rounded-full text-xs font-medium">
+                        <span x-text="selectedUser?.role?.toUpperCase()"></span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                <div>
+                    <p class="text-xs text-gray-500">Role</p>
+                    <p class="font-medium text-gray-900" x-text="selectedUser?.role?.toUpperCase()"></p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Status</p>
+                    <p class="font-medium text-gray-900" x-text="selectedUser?.status ? selectedUser.status.toUpperCase() : 'ACTIVE'"></p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">Joined</p>
+                    <p class="font-medium text-gray-900" x-text="selectedUser ? new Date(selectedUser.created_at).toLocaleDateString() : ''"></p>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500">User ID</p>
+                    <p class="font-medium text-gray-900 text-xs" x-text="selectedUser?.id"></p>
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-4 border-t border-gray-200">
+                <button @click="showModal = false" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200">
+                    Close
+                </button>
+                <button @click="toggleStatus(selectedUser?.id, selectedUser?.status)" class="flex-1 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-all duration-200">
+                    <i class="fas" :class="selectedUser?.status === 'active' ? 'fa-pause' : 'fa-play'"></i>
+                    <span x-text="selectedUser?.status === 'active' ? ' Deactivate' : ' Activate'"></span>
+                </button>
+                <button @click="deleteUser(selectedUser?.id)" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200">
+                    <i class="fas fa-trash mr-2"></i>Delete
+                </button>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+        </div>
+    </div>
+</div>
+
+<script>
+function usersPage() {
+    return {
+        users: [],
+        filteredUsers: [],
+        search: '',
+        page: 1,
+        showModal: false,
+        selectedUser: null,
+        filters: {
+            role: '',
+            status: ''
+        },
+        stats: {
+            total: 0,
+            admins: 0,
+            employers: 0,
+            candidates: 0
+        },
+        loading: false,
+
+        getRoleClass(role) {
+            const classes = {
+                'admin': 'bg-purple-100 text-purple-800',
+                'employer': 'bg-blue-100 text-blue-800',
+                'candidate': 'bg-green-100 text-green-800'
+            };
+            return classes[role] || 'bg-gray-100 text-gray-800';
+        },
+
+        getRoleIcon(role) {
+            const icons = {
+                'admin': 'fa-user-shield',
+                'employer': 'fa-building',
+                'candidate': 'fa-user-graduate'
+            };
+            return icons[role] || 'fa-user';
+        },
+
+        async loadUsers() {
+            this.loading = true;
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    window.location.href = '/auth/login';
+                    return;
+                }
+
+                const params = {
+                    search: this.search,
+                    role: this.filters.role,
+                    status: this.filters.status,
+                    page: this.page
+                };
+
+                const response = await axios.get('/api/users/filter', {
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    params
+                });
+
+                if (response.data.success) {
+                    this.users = response.data.data;
+                    this.applyFilters();
+                    this.updateStats();
+                } else {
+                    alert(response.data.message || 'Failed to load users');
+                }
+            } catch (error) {
+                if (error.response?.status === 401) {
+                    window.location.href = '/auth/login';
+                } else {
+                    console.error('Error loading users:', error);
+                    alert('Failed to load users. Please try again.');
+                }
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        applyFilters() {
+            let filtered = [...this.users];
+
+            if (this.search.trim()) {
+                const search = this.search.toLowerCase().trim();
+                filtered = filtered.filter(user =>
+                    user.name.toLowerCase().includes(search) ||
+                    user.email.toLowerCase().includes(search)
+                );
+            }
+
+            if (this.filters.role) {
+                filtered = filtered.filter(user => user.role === this.filters.role);
+            }
+
+            if (this.filters.status) {
+                const status = this.filters.status;
+                filtered = filtered.filter(user =>
+                    (user.status || 'active') === status
+                );
+            }
+
+            this.filteredUsers = filtered;
+        },
+
+        updateStats() {
+            const total = this.users.length;
+            const admins = this.users.filter(u => u.role === 'admin').length;
+            const employers = this.users.filter(u => u.role === 'employer').length;
+            const candidates = this.users.filter(u => u.role === 'candidate').length;
+
+            this.stats = { total, admins, employers, candidates };
+        },
+
+        resetFilters() {
+            this.search = '';
+            this.filters.role = '';
+            this.filters.status = '';
+            this.page = 1;
+            this.applyFilters();
+            this.loadUsers();
+        },
+
+        viewUser(user) {
+            this.selectedUser = user;
+            this.showModal = true;
+        },
+
+        async toggleStatus(userId, currentStatus) {
+            if (!userId) return;
+            const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+            const action = newStatus === 'active' ? 'activate' : 'deactivate';
+
+            if (!confirm(`Are you sure you want to ${action} this user?`)) return;
+
+            try {
+                const response = await axios.put(`/api/users/${userId}/status`, {
+                    status: newStatus
+                }, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (response.data.success) {
+                    this.showModal = false;
+                    this.loadUsers();
+                    alert(`User ${action}d successfully`);
+                } else {
+                    alert(response.data.message || `Failed to ${action} user`);
+                }
+            } catch (error) {
+                alert(error.response?.data?.message || `Failed to ${action} user`);
+            }
+        },
+
+        async deleteUser(userId) {
+            if (!userId) return;
+            if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+
+            try {
+                const response = await axios.delete(`/api/users/${userId}`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (response.data.success) {
+                    this.showModal = false;
+                    this.loadUsers();
+                    alert('User deleted successfully');
+                } else {
+                    alert(response.data.message || 'Failed to delete user');
+                }
+            } catch (error) {
+                alert(error.response?.data?.message || 'Failed to delete user');
+            }
+        },
+
+        nextPage() {
+            this.page++;
+            this.loadUsers();
+        },
+
+        previousPage() {
+            if (this.page > 1) {
+                this.page--;
+                this.loadUsers();
+            }
         }
-        loadUsers();
     }
+}
 </script>
-@endpush
+
+<style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+    }
+
+    /* Table hover */
+    .hover\:bg-gray-50:hover {
+        background-color: #f9fafb;
+        transition: background-color 0.2s ease;
+    }
+
+    /* Modal overlay */
+    .backdrop-blur-sm {
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+    }
+
+    /* Stats card hover */
+    .hover\:shadow-md:hover {
+        transform: translateY(-2px);
+        transition: all 0.3s ease;
+    }
+
+    /* Smooth transitions */
+    .transition-all {
+        transition-property: all;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 200ms;
+    }
+
+    /* Avatar ring */
+    .ring-2 {
+        transition: all 0.3s ease;
+    }
+</style>
+@endsection

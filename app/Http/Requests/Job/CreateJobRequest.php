@@ -32,7 +32,7 @@ class CreateJobRequest extends FormRequest
             'max_salary' => 'nullable|numeric|min:0',
             'vacancies' => 'required|integer|min:1',
             'status' => 'in:open,closed,draft',
-            'deadline' => 'nullable|date',
+            'deadline' => 'required|date|after_or_equal:today',
         ];
     }
 }

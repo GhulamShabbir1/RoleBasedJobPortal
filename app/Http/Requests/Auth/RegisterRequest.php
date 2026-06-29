@@ -26,7 +26,7 @@ class RegisterRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            'role' => 'in:employer,candidate'
+            'role' => 'in:employer,candidate,admin'
         ];
     }
 
@@ -37,7 +37,7 @@ class RegisterRequest extends FormRequest
             'email.required' => 'Email is required',
             'email.unique' => 'Email already exists',
             'password.required' => 'Password is required',
-            'role.in' => 'Role must be employer or candidate' // Admin accounts are created directly in DB or via seeder only
+            'role.in' => 'Role must be employer, candidate, or admin'
         ];
     }
 

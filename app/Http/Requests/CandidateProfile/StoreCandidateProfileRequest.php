@@ -24,10 +24,12 @@ class StoreCandidateProfileRequest extends FormRequest
     {
         return [
             'bio' => 'nullable|string|max:1000',
+            'phone' => 'nullable|string|max:50',
+            'city' => 'nullable|string|max:100',
             'skills' => 'nullable|string|max:500',
             'experience' => 'nullable|string|max:2000',
             'education' => 'nullable|string|max:1000',
-            'resume_url' => 'nullable|url|max:255',
+            'resume' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
             'portfolio_url' => 'nullable|url|max:255',
         ];
     }

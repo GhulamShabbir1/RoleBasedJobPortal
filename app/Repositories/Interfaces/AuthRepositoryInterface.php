@@ -45,4 +45,9 @@ interface AuthRepositoryInterface
      * Reset user password
      */
     public function resetUserPassword(array $data): string;
+
+    /**
+     * Change authenticated user password
+     */
+    public function changePassword(string $userId, string $newPassword): bool;
 }

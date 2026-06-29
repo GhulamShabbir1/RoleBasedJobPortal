@@ -5,7 +5,7 @@ namespace App\Features\CandidateProfile;
 use App\DTOs\CandidateProfile\CandidateProfileFilterDTO;
 use App\Repositories\Interfaces\CandidateProfileRepositoryInterface;
 use Exception;
-use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class FilterCandidateProfilesFeature
 {
@@ -18,10 +18,10 @@ class FilterCandidateProfilesFeature
      * Filter candidate profiles by search and skills
      *
      * @param CandidateProfileFilterDTO $dto Filter criteria
-     * @return Paginator
+     * @return LengthAwarePaginator
      * @throws Exception
      */
-    public function handle(CandidateProfileFilterDTO $dto): Paginator
+    public function handle(CandidateProfileFilterDTO $dto): LengthAwarePaginator
     {
         try {
             return $this->candidateProfileRepository->filterProfiles(
