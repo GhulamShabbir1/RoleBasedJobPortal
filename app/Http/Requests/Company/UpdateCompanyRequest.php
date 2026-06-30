@@ -27,7 +27,7 @@ class UpdateCompanyRequest extends FormRequest
      */
     public function rules(): array
     {
-        $companyId = $this->route('company') ?? $this->input('company_id');
+        $companyId = $this->route('id') ?? $this->input('company_id');
 
         return [
             'name' => 'sometimes|string|max:255|unique:companies,name,' . $companyId,
@@ -40,7 +40,7 @@ class UpdateCompanyRequest extends FormRequest
             'state' => 'nullable|string|max:100',
             'country' => 'nullable|string|max:100',
             'logo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'registration_certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ];
     }
 

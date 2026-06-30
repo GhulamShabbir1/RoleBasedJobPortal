@@ -178,9 +178,9 @@
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4">
-                                                <span class="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
+                                                <span class="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium cursor-pointer hover:bg-blue-100 transition" @click="viewApplications(job.id)" title="Click to view applications">
                                                     <i class="fas fa-users mr-1"></i>
-                                                    <span x-text="job.applications_count || 0"></span>
+                                                    <span x-text="(job.applications && job.applications.length) || 0"></span>
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4">
@@ -191,11 +191,11 @@
                                             </td>
                                             <td class="px-6 py-4">
                                                 <div class="flex items-center gap-2">
-<button @click="viewJob(job)" class="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors" title="View">
-                                                        <i class="fas fa-eye"></i>
+                                                    <button @click="toggleJobStatus(job)" :title="job.status === 'open' ? 'Close job' : 'Reopen job'" class="p-1.5 rounded-lg transition-colors" :class="job.status === 'open' ? 'text-yellow-400 hover:text-yellow-600 hover:bg-yellow-50' : 'text-green-400 hover:text-green-600 hover:bg-green-50'">
+                                                        <i class="fas" :class="job.status === 'open' ? 'fa-lock' : 'fa-unlock'"></i>
                                                     </button>
-                                                    <button @click="closeJob(job.id)" x-show="job.status === 'open'" class="p-1.5 text-yellow-400 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors" title="Close Job">
-                                                        <i class="fas fa-lock"></i>
+                                                    <button @click="viewJob(job)" class="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors" title="View">
+                                                        <i class="fas fa-eye"></i>
                                                     </button>
                                                     <button @click="deleteJob(job.id)" class="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
                                                         <i class="fas fa-trash"></i>
@@ -316,8 +316,9 @@
                 <button @click="showModal = false" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200">
                     Close
                 </button>
-                <button @click="closeJob(selectedJob?.id)" x-show="selectedJob?.status === 'open'" class="flex-1 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-all duration-200">
-                    <i class="fas fa-lock mr-2"></i>Close Job
+                <button @click="toggleJobStatus(selectedJob)" class="flex-1 px-4 py-2 transition-all duration-200" :class="selectedJob?.status === 'open' ? 'bg-yellow-600 hover:bg-yellow-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white'">
+                    <i class="fas mr-2" :class="selectedJob?.status === 'open' ? 'fa-lock' : 'fa-unlock'"></i>
+                    <span x-text="selectedJob?.status === 'open' ? 'Close Job' : 'Reopen Job'"></span>
                 </button>
                 <button @click="deleteJob(selectedJob?.id)" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200">
                     <i class="fas fa-trash mr-2"></i>Delete
@@ -378,7 +379,7 @@ function adminJobsPage() {
             const total = this.jobs.length;
             const open = this.jobs.filter(j => j.status === 'open').length;
             const closed = this.jobs.filter(j => j.status === 'closed').length;
-            const total_applications = this.jobs.reduce((sum, j) => sum + (j.applications_count || 0), 0);
+            const total_applications = this.jobs.reduce((sum, j) => sum + ((j.applications && j.applications.length) || 0), 0);
 
             this.stats = { total, open, closed, total_applications };
         },
@@ -422,6 +423,39 @@ function adminJobsPage() {
             }
         },
 
+        async toggleJobStatus(job) {
+            if (!job || !job.id) return;
+
+            const currentStatus = job.status;
+            const newStatus = currentStatus === 'open' ? 'closed' : 'open';
+            const action = newStatus === 'open' ? 'Reopen' : 'Close';
+
+            if (!confirm(`${action} this job posting?`)) return;
+
+            try {
+                const response = await axios.put(`/api/admin/jobs/${job.id}/status`, {
+                    status: newStatus
+                }, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (response.data.success) {
+                    this.showModal = false;
+                    this.loadJobs();
+                    alert(`Job ${newStatus} successfully`);
+                } else {
+                    alert(response.data.message || `Failed to ${newStatus} job`);
+                }
+            } catch (error) {
+                // Try the close endpoint if status endpoint fails
+                if (newStatus === 'closed') {
+                    this.closeJob(job.id);
+                } else {
+                    alert(error.response?.data?.message || `Failed to ${action} job`);
+                }
+            }
+        },
+
         async deleteJob(jobId) {
             if (!jobId) return;
             if (!confirm('Are you sure you want to delete this job? This action cannot be undone.')) return;
@@ -453,6 +487,11 @@ function adminJobsPage() {
                 this.page--;
                 this.loadJobs();
             }
+        },
+
+        viewApplications(jobId) {
+            // Navigate to applications view for this job
+            window.location.href = `/admin/jobs/${jobId}/applications`;
         }
     }
 }

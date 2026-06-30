@@ -26,6 +26,8 @@ class UpdateUserRequest extends FormRequest
             'name' => 'nullable|string|max:255',
             'email' => 'nullable|email|unique:users,email,' . $this->route('id'),
             'password' => 'nullable|string|min:6|confirmed',
+            'role' => 'nullable|in:admin,employer,candidate',
+            'status' => 'nullable|in:active,inactive',
         ];
     }
 
@@ -41,6 +43,8 @@ class UpdateUserRequest extends FormRequest
             'email.unique' => 'This email is already in use',
             'password.min' => 'Password must be at least 6 characters',
             'password.confirmed' => 'Password confirmation does not match',
+            'role.in' => 'Role must be admin, employer, or candidate',
+            'status.in' => 'Status must be active or inactive',
         ];
     }
 }

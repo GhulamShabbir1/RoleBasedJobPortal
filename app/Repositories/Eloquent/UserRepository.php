@@ -117,6 +117,14 @@ class UserRepository implements UserRepositoryInterface
     }
 
     /**
+     * Update user active status
+     */
+    public function updateStatus(string $id, bool $isActive): bool
+    {
+        return $this->updateUser($id, ['is_active' => $isActive]);
+    }
+
+    /**
      * Filter users by role and search
      */
     public function filterUsers(?string $role = null, ?string $search = null, int $page = 1, int $perPage = 15): LengthAwarePaginator

@@ -17,27 +17,27 @@ class CategoryRepository implements CategoryRepositoryInterface
     }
 
     /**
-     * Get all categories
+     * Get all categories with job counts
      */
     public function getAllCategories(): Collection
     {
-        return $this->model->all();
+        return $this->model->withCount('jobs')->get();
     }
 
     /**
-     * Find category by ID
+     * Find category by ID with job count
      */
     public function findById(string $id): ?Category
     {
-        return $this->model->find($id);
+        return $this->model->withCount('jobs')->find($id);
     }
 
     /**
-     * Find category by name
+     * Find category by name with job count
      */
     public function findByName(string $name): ?Category
     {
-        return $this->model->where('name', $name)->first();
+        return $this->model->withCount('jobs')->where('name', $name)->first();
     }
 
     /**

@@ -35,6 +35,13 @@ class AuthRepository implements AuthRepositoryInterface
      */
     public function attemptLogin(array $credentials): ?string
     {
+        // First verify that the user exists and is active
+        $user = User::where('email', $credentials['email'])->first();
+
+        if (!$user || !$user->is_active) {
+            return null;
+        }
+
         $token = auth()->attempt($credentials);
 
         return $token ?: null;

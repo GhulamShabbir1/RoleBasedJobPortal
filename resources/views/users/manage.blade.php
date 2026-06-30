@@ -3,14 +3,15 @@
 @section('title', 'Manage Users - JobHub')
 
 @section('content')
-<div class="min-h-screen bg-white">
-    <div class="flex gap-0">
+<div class="min-h-screen bg-white flex flex-col">
+    <div class="flex gap-0 flex-1">
         <!-- Sidebar -->
         @include('components.admin-sidebar')
 
         <!-- Main Content -->
-        <div class="flex-1 p-8 bg-gray-50 min-h-screen">
-            <div class="max-w-7xl mx-auto" x-data="usersPage()" x-init="loadUsers()">
+        <div class="flex-1 flex flex-col bg-gray-50">
+            <div class="flex-1 overflow-y-auto p-8">
+                <div class="max-w-7xl mx-auto" x-data="usersPage()" x-init="loadUsers()">
                 <div class="space-y-6">
                     <!-- Header -->
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -163,19 +164,19 @@
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 text-sm">
-                                                <span :class="user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'" class="px-3 py-1 rounded-full text-xs font-medium">
-                                                    <i class="fas" :class="user.status === 'active' ? 'fa-check-circle' : 'fa-circle'"></i>
-                                                    <span x-text="user.status ? user.status.toUpperCase() : 'ACTIVE'"></span>
+                                                <span :class="user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" class="px-3 py-1 rounded-full text-xs font-medium">
+                                                    <i class="fas" :class="user.is_active ? 'fa-check-circle' : 'fa-ban'"></i>
+                                                    <span x-text="user.is_active ? 'ACTIVE' : 'INACTIVE'"></span>
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 text-sm text-gray-600" x-text="new Date(user.created_at).toLocaleDateString()"></td>
                                             <td class="px-6 py-4 text-sm">
                                                 <div class="flex items-center gap-2">
-                                                    <button @click="viewUser(user)" class="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors" title="View">
-                                                        <i class="fas fa-eye"></i>
+                                                    <button @click="toggleStatus(user)" :title="user.is_active ? 'Deactivate user' : 'Activate user'" class="p-1.5 rounded-lg transition-colors" :class="user.is_active ? 'text-yellow-400 hover:text-yellow-600 hover:bg-yellow-50' : 'text-green-400 hover:text-green-600 hover:bg-green-50'">
+                                                        <i class="fas" :class="user.is_active ? 'fa-ban' : 'fa-check'"></i>
                                                     </button>
-                                                    <button @click="toggleStatus(user.id, user.status)" class="p-1.5 text-yellow-400 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors" title="Toggle Status">
-                                                        <i class="fas" :class="user.status === 'active' ? 'fa-pause' : 'fa-play'"></i>
+                                                    <button @click="editUser(user)" class="p-1.5 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit">
+                                                        <i class="fas fa-edit"></i>
                                                     </button>
                                                     <button @click="deleteUser(user.id)" class="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete">
                                                         <i class="fas fa-trash"></i>
@@ -222,65 +223,69 @@
                 </div>
             </div>
 
-            <!-- User Details Modal -->
+            <!-- User Edit Modal -->
             <div x-show="showModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" x-transition style="display: none;">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto" @click.away="showModal = false">
-        <div class="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
-            <h3 class="text-xl font-bold text-gray-900">User Details</h3>
-            <button @click="showModal = false" class="w-8 h-8 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center">
-                <i class="fas fa-times text-gray-500"></i>
-            </button>
-        </div>
-        <div class="p-6 space-y-4">
-            <!-- Avatar -->
-            <div class="flex items-center gap-4">
-                <img :src="`https://ui-avatars.com/api/?name=${selectedUser?.name}&background=1a1a1a&color=fff&size=64`"
-                     :alt="selectedUser?.name"
-                     class="w-16 h-16 rounded-full ring-4 ring-gray-200">
-                <div>
-                    <h4 class="text-xl font-bold text-gray-900" x-text="selectedUser?.name"></h4>
-                    <p class="text-gray-600" x-text="selectedUser?.email"></p>
-                    <span :class="getRoleClass(selectedUser?.role)" class="inline-block mt-1 px-3 py-1 rounded-full text-xs font-medium">
-                        <span x-text="selectedUser?.role?.toUpperCase()"></span>
-                    </span>
-                </div>
-            </div>
+                <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto" @click.away="showModal = false">
+                    <div class="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
+                        <h3 class="text-xl font-bold text-gray-900">Edit User</h3>
+                        <button @click="showModal = false" class="w-8 h-8 rounded-full hover:bg-gray-100 transition-colors flex items-center justify-center">
+                            <i class="fas fa-times text-gray-500"></i>
+                        </button>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <!-- Avatar -->
+                        <div class="flex items-center gap-4">
+                            <img :src="`https://ui-avatars.com/api/?name=${selectedUser?.name}&background=1a1a1a&color=fff&size=64`"
+                                 :alt="selectedUser?.name"
+                                 class="w-16 h-16 rounded-full ring-4 ring-gray-200">
+                            <div>
+                                <h4 class="text-xl font-bold text-gray-900" x-text="selectedUser?.name"></h4>
+                                <p class="text-gray-600" x-text="selectedUser?.email"></p>
+                            </div>
+                        </div>
 
-            <div class="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
-                <div>
-                    <p class="text-xs text-gray-500">Role</p>
-                    <p class="font-medium text-gray-900" x-text="selectedUser?.role?.toUpperCase()"></p>
-                </div>
-                <div>
-                    <p class="text-xs text-gray-500">Status</p>
-                    <p class="font-medium text-gray-900" x-text="selectedUser?.status ? selectedUser.status.toUpperCase() : 'ACTIVE'"></p>
-                </div>
-                <div>
-                    <p class="text-xs text-gray-500">Joined</p>
-                    <p class="font-medium text-gray-900" x-text="selectedUser ? new Date(selectedUser.created_at).toLocaleDateString() : ''"></p>
-                </div>
-                <div>
-                    <p class="text-xs text-gray-500">User ID</p>
-                    <p class="font-medium text-gray-900 text-xs" x-text="selectedUser?.id"></p>
-                </div>
-            </div>
+                        <!-- Edit Form -->
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Name</label>
+                                <input type="text" x-model="editForm.name" placeholder="Full name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Email</label>
+                                <input type="email" x-model="editForm.email" placeholder="Email address" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Role</label>
+                                <select x-model="editForm.role" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white">
+                                    <option value="admin">Admin</option>
+                                    <option value="employer">Employer</option>
+                                    <option value="candidate">Candidate</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Status</label>
+                                <div class="flex items-center gap-3 p-3 border border-gray-300 rounded-lg bg-gray-50">
+                                    <label class="flex items-center cursor-pointer">
+                                        <input type="checkbox" x-model="editForm.is_active" class="w-4 h-4 cursor-pointer">
+                                        <span class="ml-2 text-sm" :class="editForm.is_active ? 'text-green-600 font-medium' : 'text-red-600 font-medium'" x-text="editForm.is_active ? 'ACTIVE - User can login' : 'INACTIVE - User blocked'"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
 
-            <div class="flex gap-3 pt-4 border-t border-gray-200">
-                <button @click="showModal = false" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200">
-                    Close
-                </button>
-                <button @click="toggleStatus(selectedUser?.id, selectedUser?.status)" class="flex-1 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-all duration-200">
-                    <i class="fas" :class="selectedUser?.status === 'active' ? 'fa-pause' : 'fa-play'"></i>
-                    <span x-text="selectedUser?.status === 'active' ? ' Deactivate' : ' Activate'"></span>
-                </button>
-                <button @click="deleteUser(selectedUser?.id)" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200">
-                    <i class="fas fa-trash mr-2"></i>Delete
-                </button>
+                        <div class="flex gap-3 pt-4 border-t border-gray-200">
+                            <button @click="showModal = false" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all duration-200">
+                                Cancel
+                            </button>
+                            <button @click="saveUserChanges()" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200">
+                                <i class="fas fa-save mr-2"></i>Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
+                </div>
             </div>
-        </div>
-    </div>
-</div>
         </div>
     </div>
 </div>
@@ -294,6 +299,12 @@ function usersPage() {
         page: 1,
         showModal: false,
         selectedUser: null,
+        editForm: {
+            name: '',
+            email: '',
+            role: 'candidate',
+            is_active: true
+        },
         filters: {
             role: '',
             status: ''
@@ -381,9 +392,11 @@ function usersPage() {
 
             if (this.filters.status) {
                 const status = this.filters.status;
-                filtered = filtered.filter(user =>
-                    (user.status || 'active') === status
-                );
+                if (status === 'active') {
+                    filtered = filtered.filter(user => user.is_active === true);
+                } else if (status === 'inactive') {
+                    filtered = filtered.filter(user => user.is_active === false);
+                }
             }
 
             this.filteredUsers = filtered;
@@ -412,16 +425,58 @@ function usersPage() {
             this.showModal = true;
         },
 
-        async toggleStatus(userId, currentStatus) {
-            if (!userId) return;
-            const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
-            const action = newStatus === 'active' ? 'activate' : 'deactivate';
+        editUser(user) {
+            this.selectedUser = user;
+            this.editForm = {
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                is_active: user.is_active ?? true
+            };
+            this.showModal = true;
+        },
+
+        async saveUserChanges() {
+            if (!this.selectedUser?.id) return;
+
+            if (!this.editForm.name.trim() || !this.editForm.email.trim()) {
+                alert('Name and email are required');
+                return;
+            }
+
+            try {
+                const response = await axios.put(`/api/users/${this.selectedUser.id}`, {
+                    name: this.editForm.name,
+                    email: this.editForm.email,
+                    role: this.editForm.role,
+                    is_active: this.editForm.is_active
+                }, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (response.data.success) {
+                    this.showModal = false;
+                    this.loadUsers();
+                    alert('User updated successfully');
+                } else {
+                    alert(response.data.message || 'Failed to update user');
+                }
+            } catch (error) {
+                alert(error.response?.data?.message || 'Failed to update user');
+                console.error('Error updating user:', error);
+            }
+        },
+
+        async toggleStatus(user) {
+            if (!user?.id) return;
+            const newStatus = !user.is_active;
+            const action = newStatus ? 'activate' : 'deactivate';
 
             if (!confirm(`Are you sure you want to ${action} this user?`)) return;
 
             try {
-                const response = await axios.put(`/api/users/${userId}/status`, {
-                    status: newStatus
+                const response = await axios.put(`/api/users/${user.id}/status`, {
+                    is_active: newStatus
                 }, {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });

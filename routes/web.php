@@ -105,6 +105,11 @@ Route::get('/jobs/create', function () {
     return view('jobs.create');
 })->name('jobs.create');
 
+// Edit an existing job (employer only — enforced in JS/layout)
+Route::get('/jobs/{id}/edit', function ($id) {
+    return view('jobs.edit');
+})->name('jobs.edit')->where('id', '[0-9]+');
+
 // Single job detail + apply button
 Route::get('/jobs/{id}', function ($id) {
     return view('jobs.show', compact('id'));

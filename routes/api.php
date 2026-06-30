@@ -41,8 +41,8 @@ Route::prefix('candidate-profiles')->group(function () {
 
 // Public job listings (no auth required)
 Route::prefix('jobs')->group(function () {
-    Route::get('/', [JobController::class, 'index'])->name('jobs.index');
-    Route::get('/{id}', [JobController::class, 'show'])->name('jobs.show');
+    Route::get('/', [JobController::class, 'index'])->name('api.jobs.index');
+    Route::get('/{id}', [JobController::class, 'show'])->name('api.jobs.show');
 });
 
 // Protected routes (authentication required)
@@ -148,10 +148,12 @@ Route::middleware('jwt')->group(function () {
         Route::get('/users/{id}', [UserController::class, 'show'])->name('users.show');
         Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
         Route::put('/users/{id}/role', [UserController::class, 'updateRole'])->name('users.updateRole');
+        Route::put('/users/{id}/status', [UserController::class, 'updateStatus'])->name('users.updateStatus');
         Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
 
         // Admin can manage jobs
         Route::get('/admin/jobs', [JobController::class, 'adminIndex'])->name('admin.jobs.index');
+        Route::put('/admin/jobs/{id}/status', [JobController::class, 'updateStatus'])->name('admin.jobs.updateStatus');
         Route::post('/admin/jobs/{id}/close', [JobController::class, 'close'])->name('admin.jobs.close');
         Route::delete('/admin/jobs/{id}', [JobController::class, 'adminDestroy'])->name('admin.jobs.destroy');
     });

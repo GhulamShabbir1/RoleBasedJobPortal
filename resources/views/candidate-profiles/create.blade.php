@@ -200,7 +200,7 @@
                                         <span class="inline-flex items-center px-3 py-1.5 bg-white border border-gray-200 text-gray-700 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200">
                                             <i class="fas fa-tag mr-1.5 text-gray-400"></i>
                                             <span x-text="skill"></span>
-                                            <button type="button" @click="removeSkill(index)" class="ml-2 text-gray-400 hover:text-red-600 transition-colors">
+                                            <button type="button" @click="removeSkill(index)" class="ml-2 text-gray-400 hover:text-red-500 transition-colors">
                                                 <i class="fas fa-times"></i>
                                             </button>
                                         </span>
@@ -264,9 +264,14 @@
                                                 <p class="text-sm text-gray-600" x-text="form.resume_url.split('/').pop() || 'Resume.pdf'"></p>
                                             </div>
                                         </div>
-                                        <a :href="form.resume_url" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                            <i class="fas fa-eye mr-1"></i>View
-                                        </a>
+                                        <div class="flex items-center gap-4">
+                                            <a :href="form.resume_url" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                            <a :href="form.resume_url" download class="text-green-600 hover:text-green-800 text-sm font-medium flex items-center gap-1">
+                                                <i class="fas fa-download"></i> Download
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -351,7 +356,8 @@ function candidateProfileForm() {
                 this.form.city,
                 this.form.skills.length > 0,
                 this.form.experience,
-                this.form.education
+                this.form.education,
+                this.form.resume_url || this.form.resume
             ];
             const filled = fields.filter(f => f).length;
             return Math.round((filled / fields.length) * 100);
@@ -360,7 +366,7 @@ function candidateProfileForm() {
         async loadProfile() {
             this.loading = true;
             try {
-                const response = await axios.get('/api/candidate-profiles/me', {
+                const response = await axios.get('/api/candidate/profiles/me', {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
@@ -469,7 +475,7 @@ function candidateProfileForm() {
 
                 // Try to create first
                 try {
-                    const response = await axios.post('/api/candidate-profiles', formData, {
+                    const response = await axios.post('/api/candidate/profiles', formData, {
                         headers: {
                             'Authorization': `Bearer ${localStorage.getItem('token')}`,
                             'Content-Type': 'multipart/form-data'
@@ -489,7 +495,7 @@ function candidateProfileForm() {
                             const user = JSON.parse(localStorage.getItem('user') || '{}');
                             user.profile_id = response.data.data.id;
                             localStorage.setItem('user', JSON.stringify(user));
-                            console.log('Stored profile ID:', response.data.data.id);
+                            console.log('Stored profile id:', response.data.data.id);
                         }
 
                         setTimeout(() => {
@@ -499,16 +505,17 @@ function candidateProfileForm() {
                         this.error = response.data.message || 'Failed to create profile';
                     }
                 } catch (createError) {
-                    // If 409 Conflict, profile already exists - update it instead
-                    if (createError.response?.status === 409) {
-                        console.log('Profile exists, updating instead...');
-                        const profileResponse = await axios.get('/api/candidate-profiles/me', {
+                    // If 404, profile doesn't exist yet, or if error, try updating if we can get profile
+                    console.log('Error creating profile, checking if profile exists...', createError);
+                    try {
+                        const profileResponse = await axios.get('/api/candidate/profiles/me', {
                             headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                         });
 
                         if (profileResponse.data.success && profileResponse.data.data?.id) {
                             const profileId = profileResponse.data.data.id;
-                            const updateResponse = await axios.put(`/api/candidate-profiles/${profileId}`, formData, {
+                            formData.append('_method', 'PUT');
+                            const updateResponse = await axios.post(`/api/candidate/profiles/${profileId}`, formData, {
                                 headers: {
                                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
                                     'Content-Type': 'multipart/form-data'
@@ -535,7 +542,7 @@ function candidateProfileForm() {
                                 this.error = updateResponse.data.message || 'Failed to update profile';
                             }
                         }
-                    } else {
+                    } catch (updateCheckError) {
                         const errors = createError.response?.data?.errors;
                         if (errors) {
                             this.error = Object.values(errors).flat().join(', ');

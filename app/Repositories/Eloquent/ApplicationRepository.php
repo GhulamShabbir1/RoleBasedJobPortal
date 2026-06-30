@@ -8,14 +8,28 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ApplicationRepository implements ApplicationRepositoryInterface
 {
+    /**
+     * Eager load relationships for complete application data
+     */
+    private function withRelationships()
+    {
+        return Application::with([
+            'candidate',
+            'candidate.candidateProfile',
+            'job',
+            'job.company',
+            'job.category'
+        ]);
+    }
+
     public function findById(string $id): ?Application
     {
-        return Application::find($id);
+        return $this->withRelationships()->find($id);
     }
 
     public function getApplicationById(int $id): ?Application
     {
-        return Application::find($id);
+        return $this->withRelationships()->find($id);
     }
 
     public function getApplicationStatusById(int $id): ?string
@@ -25,7 +39,7 @@ class ApplicationRepository implements ApplicationRepositoryInterface
 
     public function filterApplicationsByCandidateId(int $candidateId, array $filters): LengthAwarePaginator
     {
-        $query = Application::where('candidate_id', $candidateId);
+        $query = $this->withRelationships()->where('candidate_id', $candidateId);
 
         if (!empty($filters['status'])) {
             $query->where('status', $filters['status']);
@@ -40,7 +54,7 @@ class ApplicationRepository implements ApplicationRepositoryInterface
 
     public function filterApplicationsByEmployerId(int $employerId, array $filters): LengthAwarePaginator
     {
-        $query = Application::whereHas('job', function($q) use ($employerId) {
+        $query = $this->withRelationships()->whereHas('job', function($q) use ($employerId) {
             $q->where('user_id', $employerId);
         });
 
@@ -57,7 +71,7 @@ class ApplicationRepository implements ApplicationRepositoryInterface
 
     public function filterAllApplications(array $filters): LengthAwarePaginator
     {
-        $query = Application::query();
+        $query = $this->withRelationships();
 
         if (!empty($filters['status'])) {
             $query->where('status', $filters['status']);

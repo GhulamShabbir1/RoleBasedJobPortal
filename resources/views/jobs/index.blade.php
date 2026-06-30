@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="min-h-screen bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="jobsPage()" x-init="loadJobs(), loadCategories()">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="jobsPage()" x-init="loadUserRole(); loadAppliedJobs(); loadJobs(); loadCategories()">
         <!-- Header -->
         <div class="mb-8">
             <h1 class="text-4xl font-bold text-gray-900 tracking-tight">Find Your Next Opportunity</h1>
@@ -263,12 +263,19 @@
                                         </span>
                                         <span class="text-xs text-gray-500" x-show="job.deadline">
                                             <i class="far fa-clock mr-1"></i>
-                                            <span x-text="'Deadline: ' + new Date(job.deadline).toLocaleDateString()"></span>
+                                            <span x-text="job.deadline ? 'Deadline: ' + new Date(job.deadline).toLocaleDateString() : ''"></span>
                                         </span>
-                                        <span class="inline-flex items-center text-sm font-medium text-gray-900 group-hover:text-gray-700 transition-colors">
-                                            View Details
-                                            <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
-                                        </span>
+                                        <template x-if="isJobApplied(job.id)">
+                                            <span class="inline-flex items-center px-3 py-1 bg-green-50 text-green-700 text-xs font-medium rounded-full border border-green-100">
+                                                <i class="fas fa-check-circle mr-1"></i>Applied
+                                            </span>
+                                        </template>
+                                        <template x-if="!isJobApplied(job.id)">
+                                            <span class="inline-flex items-center text-sm font-medium text-gray-900 group-hover:text-gray-700 transition-colors">
+                                                View Details
+                                                <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                                            </span>
+                                        </template>
                                     </div>
                                 </div>
                             </div>
@@ -319,6 +326,8 @@ function jobsPage() {
         jobs: [],
         categories: [],
         loading: false,
+        userRole: null,
+        appliedJobIds: new Set(), // Track applied jobs
         // Ensure these exist even if Alpine template evaluation happens early.
         selectedJob: null,
         showModal: false,
@@ -349,6 +358,10 @@ function jobsPage() {
             return count;
         },
 
+        isJobApplied(jobId) {
+            return this.appliedJobIds.has(jobId);
+        },
+
         timeAgo(date) {
             const now = new Date();
             const diff = Math.floor((now - new Date(date)) / 1000);
@@ -357,6 +370,38 @@ function jobsPage() {
             if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
             if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
             return new Date(date).toLocaleDateString();
+        },
+
+        loadUserRole() {
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    this.userRole = user.role;
+                } catch (e) {}
+            }
+        },
+
+        async loadAppliedJobs() {
+            if (this.userRole !== 'candidate') return;
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get('/api/candidate/applications', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.data.success && Array.isArray(response.data.data)) {
+                    this.appliedJobIds = new Set(response.data.data.map(app => app.job_id));
+                    // Also add any recently applied jobs from sessionStorage
+                    const recentlyApplied = JSON.parse(sessionStorage.getItem('appliedJobs') || '[]');
+                    recentlyApplied.forEach(jobId => this.appliedJobIds.add(jobId));
+                    // Clear sessionStorage after merging
+                    sessionStorage.removeItem('appliedJobs');
+                }
+            } catch (error) {
+                console.error('Error loading applied jobs:', error);
+            }
         },
 
         async loadJobs() {
@@ -375,13 +420,12 @@ function jobsPage() {
 
                 const response = await axios.get('/api/jobs', { params });
                 if (response.data.success) {
-                    // API may return paginated structure or a plain array depending on backend
                     const payload = response.data.data;
                     this.jobs = Array.isArray(payload) ? payload : (payload?.data ?? []);
-                    this.pagination = response.data.pagination || {"
-                        current_page: 1,
-                        per_page: 10,
-                        total: response.data.data.length
+                    this.pagination = {
+                        current_page: response.data.pagination?.current_page ?? 1,
+                        per_page: response.data.pagination?.per_page ?? 15,
+                        total: response.data.pagination?.total ?? this.jobs.length
                     };
                 }
             } catch (error) {
@@ -437,6 +481,15 @@ function jobsPage() {
         }
     }
 }
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const pageData = window.jobsPageInstance;
+    if (pageData) {
+        pageData.loadUserRole();
+        pageData.loadAppliedJobs();
+    }
+});
 </script>
 
 <style>

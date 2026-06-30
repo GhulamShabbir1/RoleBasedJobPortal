@@ -6,6 +6,7 @@ use App\DTOs\Company\UpdateCompanyDTO;
 use App\Models\Company;
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
 use Exception;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * UpdateCompanyFeature
@@ -54,6 +55,26 @@ class UpdateCompanyFeature
 
             // Update company via repository
             $updatedCompany = $this->companyRepository->update($company, $data);
+
+            // Store logo if uploaded
+            if ($dto->logo) {
+                // Delete old logo if exists
+                if ($updatedCompany->logo) {
+                    Storage::disk('public')->delete($updatedCompany->logo);
+                }
+                $logoPath = $dto->logo->store('companies/logos', 'public');
+                $updatedCompany->update(['logo' => $logoPath]);
+            }
+
+            // Store certificate if uploaded
+            if ($dto->certificate) {
+                // Delete old certificate if exists
+                if ($updatedCompany->certificate) {
+                    Storage::disk('public')->delete($updatedCompany->certificate);
+                }
+                $certPath = $dto->certificate->store('companies/certificates', 'public');
+                $updatedCompany->update(['certificate' => $certPath]);
+            }
 
             return $updatedCompany;
         } catch (Exception $e) {

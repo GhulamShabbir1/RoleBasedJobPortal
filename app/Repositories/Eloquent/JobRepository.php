@@ -50,11 +50,11 @@ class JobRepository implements JobRepositoryInterface
     }
 
     /**
-     * Get all jobs
+     * Get all jobs with eager loaded relationships
      */
     public function getAllJobs(): Collection
     {
-        return Job::all();
+        return Job::with('category', 'company', 'applications')->get();
     }
 
     /**
@@ -62,7 +62,9 @@ class JobRepository implements JobRepositoryInterface
      */
     public function getJobsByCompanyId(string $companyId): Collection
     {
-        return Job::where('company_id', $companyId)->get();
+        return Job::where('company_id', $companyId)
+            ->with('category', 'company', 'applications')
+            ->get();
     }
 
     /**
@@ -70,7 +72,9 @@ class JobRepository implements JobRepositoryInterface
      */
     public function getJobsByCategoryId(string $categoryId): Collection
     {
-        return Job::where('category_id', $categoryId)->get();
+        return Job::where('category_id', $categoryId)
+            ->with('category', 'company', 'applications')
+            ->get();
     }
 
     /**
@@ -78,7 +82,9 @@ class JobRepository implements JobRepositoryInterface
      */
     public function getJobsByJobType(string $jobType): Collection
     {
-        return Job::where('job_type', $jobType)->get();
+        return Job::where('job_type', $jobType)
+            ->with('category', 'company', 'applications')
+            ->get();
     }
 
     /**
@@ -86,7 +92,9 @@ class JobRepository implements JobRepositoryInterface
      */
     public function getJobsByLocation(string $location): Collection
     {
-        return Job::where('city', $location)->get();
+        return Job::where('city', $location)
+            ->with('category', 'company', 'applications')
+            ->get();
     }
 
     /**
@@ -96,6 +104,7 @@ class JobRepository implements JobRepositoryInterface
     {
         return Job::where('min_salary', '>=', $minSalary)
             ->where('max_salary', '<=', $maxSalary)
+            ->with('category', 'company', 'applications')
             ->get();
     }
 
@@ -104,7 +113,9 @@ class JobRepository implements JobRepositoryInterface
      */
     public function getJobsByStatus(string $status): Collection
     {
-        return Job::where('status', $status)->get();
+        return Job::where('status', $status)
+            ->with('category', 'company', 'applications')
+            ->get();
     }
 
     /**
@@ -112,7 +123,9 @@ class JobRepository implements JobRepositoryInterface
      */
     public function getJobsByDeadline(string $deadline): Collection
     {
-        return Job::where('deadline', $deadline)->get();
+        return Job::where('deadline', $deadline)
+            ->with('category', 'company', 'applications')
+            ->get();
     }
 
     /**
@@ -120,7 +133,9 @@ class JobRepository implements JobRepositoryInterface
      */
     public function getJobsByUserId(string $userId): Collection
     {
-        return Job::where('user_id', $userId)->get();
+        return Job::where('user_id', $userId)
+            ->with('category', 'company', 'applications')
+            ->get();
     }
 
     /**
@@ -130,6 +145,7 @@ class JobRepository implements JobRepositoryInterface
     {
         return Job::where('title', 'like', "%$query%")
             ->orWhere('description', 'like', "%$query%")
+            ->with('category', 'company', 'applications')
             ->get();
     }
 
@@ -139,7 +155,8 @@ class JobRepository implements JobRepositoryInterface
     public function filterJobs(array $filters, int $page, int $perPage, ?string $role = null): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
         $query = Job::query()
-            ->select('jobs.*', 'companies.name as company_name')
+            ->with('category', 'company', 'applications')
+            ->select('jobs.*')
             ->join('companies', 'companies.id', '=', 'jobs.company_id');
 
         // Apply role-based filters
@@ -163,6 +180,9 @@ class JobRepository implements JobRepositoryInterface
         }
         if (!empty($filters['city'])) {
             $query->where('jobs.city', $filters['city']);
+        }
+        if (!empty($filters['status'])) {
+            $query->where('jobs.status', $filters['status']);
         }
 
         if (isset($filters['min_salary']) && is_numeric($filters['min_salary'])) {

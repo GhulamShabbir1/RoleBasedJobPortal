@@ -21,6 +21,12 @@ class LoginUserFeature
     public function handle(LoginUserDTO $dto): array
     {
         try {
+            // Check if user exists and is active
+            $user = $this->authRepository->findByEmail($dto->email);
+            if ($user && !$user->is_active) {
+                throw new Exception('Your account has been deactivated. Please contact the administrator.', 403);
+            }
+
             // Attempt login via repository
             $token = $this->authRepository->attemptLogin($dto->toCredentials());
 

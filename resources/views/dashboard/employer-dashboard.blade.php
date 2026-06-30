@@ -26,12 +26,6 @@
                                 <i class="fas fa-calendar-alt mr-1"></i>
                                 <span x-text="new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"></span>
                             </span>
-                            <a href="{{ route('jobs.create') }}" class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg flex items-center transition-all duration-200 hover:shadow-lg hover:scale-105">
-                                <i class="fas fa-plus mr-2"></i>Post New Job
-                            </a>
-                            <button @click="loadStats()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all duration-200 hover:shadow-md">
-                                <i class="fas fa-redo mr-2"></i>Refresh
-                            </button>
                         </div>
                     </div>
 
@@ -228,7 +222,7 @@
                                 <h3 class="text-lg font-semibold text-gray-900">Company Information</h3>
                                 <p class="text-sm text-gray-500">Your company profile details</p>
                             </div>
-                            <a href="{{ route('companies.create') }}" class="text-sm text-gray-900 hover:underline font-medium">
+                            <a href="{{ route('employer.company') }}" class="text-sm text-gray-900 hover:underline font-medium">
                                 <i class="fas fa-edit mr-1"></i>Edit
                             </a>
                         </div>
@@ -288,7 +282,7 @@
                             </div>
                         </a>
 
-                        <a href="{{ route('companies.create') }}" class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-all duration-200 hover:border-gray-300 group">
+                        <a href="{{ route('employer.company') }}" class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow-md transition-all duration-200 hover:border-gray-300 group">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 bg-yellow-50 rounded-lg flex items-center justify-center group-hover:bg-yellow-100 transition-colors">
                                     <i class="fas fa-building text-yellow-600"></i>
@@ -367,8 +361,13 @@ function employerDashboard() {
                     return;
                 }
 
+                const token = localStorage.getItem('token');
+                const authHeaders = {
+                    headers: { Authorization: `Bearer ${token}` }
+                };
+
                 // Load dashboard stats
-                const statsResponse = await axios.get('/api/dashboard/employer');
+                const statsResponse = await axios.get('/api/dashboard/employer', authHeaders);
 
                 if (statsResponse.data.success) {
                     this.stats = { ...this.stats, ...statsResponse.data.data };
@@ -376,15 +375,16 @@ function employerDashboard() {
                 }
 
                 // Load company status
-                const companyResponse = await axios.get('/api/employer/my-company-status');
+                const companyResponse = await axios.get('/api/employer/my-company-status', authHeaders);
 
                 if (companyResponse.data.success) {
-                    this.companyInfo = companyResponse.data.data;
+                    this.companyInfo = companyResponse.data.data.company || {};
                     this.companyApproved = companyResponse.data.data.status === 'approved';
                 }
 
                 // Load recent applications
                 const appsResponse = await axios.get('/api/employer/applications', {
+                    ...authHeaders,
                     params: { limit: 5 }
                 });
 

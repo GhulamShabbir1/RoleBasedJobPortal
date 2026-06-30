@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\DTOs\User\GetUserDTO;
 use App\DTOs\User\UpdateUserDTO;
 use App\DTOs\User\UpdateUserRoleDTO;
+use App\DTOs\User\UpdateUserStatusDTO;
 use App\DTOs\User\UserFilterDTO;
 use App\Features\User\DeleteUserFeature;
 use App\Features\User\FilterUsersFeature;
@@ -13,6 +14,7 @@ use App\Features\User\GetUserFeature;
 use App\Features\User\GetUsersFeature;
 use App\Features\User\UpdateUserFeature;
 use App\Features\User\UpdateUserRoleFeature;
+use App\Features\User\UpdateUserStatusFeature;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Http\Requests\User\UpdateUserRoleRequest;
 use App\Http\Requests\User\UserFilterRequest;
@@ -140,6 +142,31 @@ class UserController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'User role updated successfully',
+                'data' => $user,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], $e->getCode() ?? 500);
+        }
+    }
+
+    /**
+     * Update user active/inactive status (admin only)
+     */
+    public function updateStatus(
+        string $id,
+        UpdateUserStatusFeature $feature
+    ): JsonResponse {
+        try {
+            $isActive = request()->boolean('is_active', true);
+            $dto = new UpdateUserStatusDTO($id, $isActive);
+            $user = $feature->handle($dto);
+
+            return response()->json([
+                'success' => true,
+                'message' => $isActive ? 'User activated successfully' : 'User deactivated successfully',
                 'data' => $user,
             ], 200);
         } catch (\Exception $e) {

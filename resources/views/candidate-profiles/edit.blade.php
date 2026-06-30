@@ -200,7 +200,7 @@
                                         <span class="inline-flex items-center px-3 py-1.5 bg-white border border-gray-200 text-gray-700 rounded-full text-sm shadow-sm hover:shadow-md transition-all duration-200">
                                             <i class="fas fa-tag mr-1.5 text-gray-400"></i>
                                             <span x-text="skill"></span>
-                                            <button type="button" @click="removeSkill(index)" class="ml-2 text-gray-400 hover:text-red-600 transition-colors">
+                                            <button type="button" @click="removeSkill(index)" class="ml-2 text-gray-400 hover:text-red-500 transition-colors">
                                                 <i class="fas fa-times"></i>
                                             </button>
                                         </span>
@@ -264,9 +264,14 @@
                                                 <p class="text-sm text-gray-600" x-text="form.resume_url.split('/').pop() || 'Resume.pdf'"></p>
                                             </div>
                                         </div>
-                                        <a :href="form.resume_url" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                            <i class="fas fa-eye mr-1"></i>View
-                                        </a>
+                                        <div class="flex items-center gap-4">
+                                            <a :href="form.resume_url" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                            <a :href="form.resume_url" download class="text-green-600 hover:text-green-800 text-sm font-medium flex items-center gap-1">
+                                                <i class="fas fa-download"></i> Download
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -352,7 +357,8 @@ function candidateProfileForm() {
                 this.form.city,
                 this.form.skills.length > 0,
                 this.form.experience,
-                this.form.education
+                this.form.education,
+                this.form.resume_url || this.form.resume
             ];
             const filled = fields.filter(f => f).length;
             return Math.round((filled / fields.length) * 100);
@@ -361,7 +367,7 @@ function candidateProfileForm() {
         async loadProfile() {
             this.loading = true;
             try {
-                const response = await axios.get('/api/candidate-profiles/me', {
+                const response = await axios.get('/api/candidate/profiles/me', {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
@@ -478,7 +484,8 @@ function candidateProfileForm() {
                     formData.append('resume', this.form.resume);
                 }
 
-                const response = await axios.put(`/api/candidate-profiles/${this.form.profile_id}`, formData, {
+                formData.append('_method', 'PUT');
+                const response = await axios.post(`/api/candidate/profiles/${this.form.profile_id}`, formData, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('token')}`,
                         'Content-Type': 'multipart/form-data'

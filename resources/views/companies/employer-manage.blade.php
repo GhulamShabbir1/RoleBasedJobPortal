@@ -204,13 +204,13 @@
                     <div x-show="!loading && company" class="space-y-6">
                         <!-- Company Header Card -->
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-                            <div class="flex flex-col md:flex-row gap-8">
-                                <div class="flex-shrink-0">
-                                    <div class="w-32 h-32 bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden">
-                                        <img x-show="company.logo" :src="company.logo" class="w-full h-full object-cover" alt="Company Logo">
-                                        <i x-show="!company.logo" class="fas fa-building text-gray-400 text-4xl"></i>
-                                    </div>
+                        <div class="flex flex-col md:flex-row gap-8">
+                            <div class="flex-shrink-0">
+                                <div class="w-32 h-32 bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden">
+                                    <img x-show="company.logo" :src="company.logo ? '/storage/' + company.logo : ''" class="w-full h-full object-cover" alt="Company Logo">
+                                    <i x-show="!company.logo" class="fas fa-building text-gray-400 text-4xl"></i>
                                 </div>
+                            </div>
                                 <div class="flex-1">
                                     <div class="flex items-center gap-4 mb-4">
                                         <h2 class="text-2xl font-bold text-gray-900" x-text="company.name"></h2>
@@ -450,7 +450,10 @@ function employerCompanyPage() {
         async loadCompany() {
             this.loading = true;
             try {
-                const response = await axios.get('/api/employer/my-company-status');
+                const authHeaders = {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                };
+                const response = await axios.get('/api/employer/my-company-status', authHeaders);
 
                 if (response.data.success) {
                     const statusData = response.data.data;
@@ -539,6 +542,7 @@ function employerCompanyPage() {
 
                 const response = await axios.post('/api/employer/companies', formData, {
                     headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
                         'Content-Type': 'multipart/form-data'
                     }
                 });
@@ -575,7 +579,11 @@ function employerCompanyPage() {
                 if (this.form.certificate) formData.append('certificate', this.form.certificate);
                 formData.append('_method', 'PUT');
 
-                const response = await axios.post(`/api/employer/companies/${this.company.id}`, formData);
+                const response = await axios.post(`/api/employer/companies/${this.company.id}`, formData, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
 
                 if (response.data.success) {
                     alert('Company updated successfully!');

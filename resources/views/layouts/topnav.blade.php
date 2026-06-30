@@ -1,5 +1,5 @@
 <!-- Top Navigation -->
-<div class="bg-white border-b border-gray-200 sticky top-0 z-20">
+{{-- <div class="bg-white border-b border-gray-200 sticky top-0 z-20" x-data="topNavState()">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
         <div class="flex justify-between h-16 items-center">
             <!-- Left: Menu Toggle & Brand -->
@@ -27,7 +27,7 @@
 
             <!-- Right: User Menu -->
             <div class="flex items-center gap-2 sm:gap-4">
-                @if(auth()->check())
+                <template x-if="user">
                     <!-- Search Button (Mobile) -->
                     <button class="md:hidden text-gray-500 hover:text-gray-700 transition-colors p-2 hover:bg-gray-100 rounded-lg">
                         <i class="fas fa-search text-lg"></i>
@@ -95,10 +95,10 @@
                     <div x-data="{ open: false }" class="relative">
                         <button @click="open = !open"
                                 class="flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-colors p-1 hover:bg-gray-100 rounded-lg group">
-                            <img src="https://ui-avatars.com/api/?name={{ auth()->user()->name }}&background=1a1a1a&color=fff&size=32"
+                            <img :src="'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name) + '&background=1a1a1a&color=fff&size=32'"
                                  alt="User"
                                  class="w-8 h-8 rounded-full ring-2 ring-gray-200 group-hover:ring-gray-300 transition-all">
-                            <span class="hidden sm:inline text-sm font-medium">{{ auth()->user()->name }}</span>
+                            <span class="hidden sm:inline text-sm font-medium" x-text="user.name"></span>
                             <i class="fas fa-chevron-down text-xs text-gray-400 group-hover:text-gray-600 transition-colors"></i>
                         </button>
 
@@ -112,15 +112,13 @@
                             <!-- User Info -->
                             <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
                                 <div class="flex items-center gap-3">
-                                    <img src="https://ui-avatars.com/api/?name={{ auth()->user()->name }}&background=1a1a1a&color=fff&size=40"
+                                    <img :src="'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name) + '&background=1a1a1a&color=fff&size=40'"
                                          alt="User"
                                          class="w-10 h-10 rounded-full">
                                     <div class="flex-1 min-w-0">
-                                        <p class="text-sm font-semibold text-gray-900 truncate">{{ auth()->user()->name }}</p>
-                                        <p class="text-xs text-gray-500 truncate">{{ auth()->user()->email }}</p>
-                                        <span class="inline-block mt-1 px-2 py-0.5 bg-gray-200 text-gray-700 text-[10px] font-semibold rounded-full uppercase">
-                                            {{ ucfirst(auth()->user()->role) }}
-                                        </span>
+                                        <p class="text-sm font-semibold text-gray-900 truncate" x-text="user.name"></p>
+                                        <p class="text-xs text-gray-500 truncate" x-text="user.email"></p>
+                                        <span class="inline-block mt-1 px-2 py-0.5 bg-gray-200 text-gray-700 text-[10px] font-semibold rounded-full uppercase" x-text="user.role.charAt(0).toUpperCase() + user.role.slice(1)"></span>
                                     </div>
                                 </div>
                             </div>
@@ -152,7 +150,9 @@
                             </div>
                         </div>
                     </div>
-                @else
+                </template>
+
+                <template x-if="!user">
                     <!-- Guest Links -->
                     <div class="flex items-center gap-3">
                         <a href="{{ route('auth.login') }}" class="text-gray-600 hover:text-gray-900 text-sm font-medium transition-colors px-3 py-2 hover:bg-gray-100 rounded-lg">
@@ -162,7 +162,7 @@
                             <i class="fas fa-user-plus mr-2"></i>Sign Up
                         </a>
                     </div>
-                @endif
+                </template>
             </div>
         </div>
     </div>
@@ -176,7 +176,7 @@
                    class="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none transition-all duration-200">
         </div>
     </div>
-</div>
+</div> --}}
 
 <style>
     /* Badge Pulse Animation */
@@ -200,35 +200,52 @@
 </style>
 
 <script>
-    // Add sample notifications for demo
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('topNav', () => ({
-            notifications: [
-                {
-                    id: 1,
-                    type: 'success',
-                    icon: 'fa-check-circle',
-                    title: 'Application Accepted!',
-                    message: 'Your application for Senior Developer has been accepted.',
-                    time: '2 hours ago'
-                },
-                {
-                    id: 2,
-                    type: 'warning',
-                    icon: 'fa-clock',
-                    title: 'Application Under Review',
-                    message: 'Your application for UX Designer is being reviewed.',
-                    time: '5 hours ago'
-                },
-                {
-                    id: 3,
-                    type: 'info',
-                    icon: 'fa-info-circle',
-                    title: 'New Job Alert',
-                    message: 'Google has posted a new job: Product Manager.',
-                    time: '1 day ago'
+function topNavState() {
+    return {
+        user: null,
+        init() {
+            // Load user from localStorage
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                try {
+                    this.user = JSON.parse(userStr);
+                } catch (e) {
+                    this.user = null;
                 }
-            ]
-        }));
-    });
+            }
+        }
+    };
+}
+
+// Add sample notifications for demo
+document.addEventListener('alpine:init', () => {
+    Alpine.data('topNav', () => ({
+        notifications: [
+            {
+                id: 1,
+                type: 'success',
+                icon: 'fa-check-circle',
+                title: 'Application Accepted!',
+                message: 'Your application for Senior Developer has been accepted.',
+                time: '2 hours ago'
+            },
+            {
+                id: 2,
+                type: 'warning',
+                icon: 'fa-clock',
+                title: 'Application Under Review',
+                message: 'Your application for UX Designer is being reviewed.',
+                time: '5 hours ago'
+            },
+            {
+                id: 3,
+                type: 'info',
+                icon: 'fa-info-circle',
+                title: 'New Job Alert',
+                message: 'Google has posted a new job: Product Manager.',
+                time: '1 day ago'
+            }
+        ]
+    }));
+});
 </script>

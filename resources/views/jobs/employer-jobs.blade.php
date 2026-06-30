@@ -28,12 +28,6 @@
                             <span class="text-sm text-gray-500">
                                 <i class="fas fa-briefcase mr-1"></i> Total: <span x-text="jobs.length"></span> jobs
                             </span>
-                            <a href="{{ route('jobs.create') }}" class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg flex items-center transition-all duration-200 hover:shadow-lg hover:scale-105">
-                                <i class="fas fa-plus mr-2"></i>Post New Job
-                            </a>
-                            <button @click="loadJobs()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all duration-200 hover:shadow-md">
-                                <i class="fas fa-redo mr-2"></i>Refresh
-                            </button>
                         </div>
                     </div>
 
@@ -259,7 +253,7 @@ function employerJobsPage() {
                     return;
                 }
 
-                const response = await axios.get('/api/jobs', {
+                const response = await axios.get('/api/employer/jobs', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
@@ -316,7 +310,7 @@ function employerJobsPage() {
             if (!confirm(`Are you sure you want to ${message} this job posting?`)) return;
 
             try {
-                const response = await axios.post(`/api/jobs/${jobId}/${action}`, {}, {
+                const response = await axios.post(`/api/employer/jobs/${jobId}/${action}`, {}, {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
@@ -335,7 +329,7 @@ function employerJobsPage() {
             if (!confirm('Are you sure you want to delete this job? This action cannot be undone.')) return;
 
             try {
-                const response = await axios.delete(`/api/jobs/${jobId}`, {
+                const response = await axios.delete(`/api/employer/jobs/${jobId}`, {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 

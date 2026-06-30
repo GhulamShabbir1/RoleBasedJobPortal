@@ -259,8 +259,11 @@
         <div class="min-h-screen bg-white">
             @yield('content')
         </div>
+    @elseif(request()->is('dashboard/*') || request()->is('admin/*') || request()->is('employer/*') || request()->is('candidate/*') || request()->is('applications/*') || request()->is('companies/*') || request()->is('categories/*') || request()->is('jobs/create') || request()->is('jobs/*/edit') || request()->is('profile') || request()->is('settings'))
+        <!-- Dashboard/Authenticated Layout (no sidebar/topnav from layout - handled by view) -->
+        @yield('content')
     @else
-        <!-- Main Layout -->
+        <!-- Main Layout (for public pages like /jobs, /, etc.) -->
         <div class="flex h-screen bg-gray-50 overflow-hidden">
             <!-- Mobile Overlay -->
             <div x-show="mobileOpen" @click="mobileOpen = false" class="fixed inset-0 z-30 md:hidden mobile-overlay" x-transition></div>
@@ -328,7 +331,7 @@
                 </main>
 
                 <!-- Footer -->
-                <footer class="bg-white border-t border-gray-200 py-4 px-6">
+                {{-- <footer class="bg-white border-t border-gray-200 py-4 px-6">
                     <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-gray-500">
                         <p>&copy; {{ date('Y') }} JobHub. All rights reserved.</p>
                         <div class="flex items-center gap-4">
@@ -337,12 +340,15 @@
                             <a href="#" class="hover:text-gray-900 transition-colors">Help</a>
                         </div>
                     </div>
-                </footer>
+                </footer> --}}
             </div>
         </div>
     @endif
 
-    <!-- Toast Container -->
+    <!-- Global Error Notification Component -->
+    @include('components.error-notification')
+
+    <!-- Toast Container (Legacy) -->
     <div class="toast" x-data="{ toasts: [] }" x-show="toasts.length > 0" x-transition>
         <template x-for="(toast, index) in toasts" :key="index">
             <div class="mb-3 p-4 bg-white rounded-xl shadow-lg border border-gray-200 flex items-start slide-in"
@@ -515,7 +521,22 @@ logout() {
         axios.interceptors.response.use(
             response => response,
             error => {
-                console.log('Response error FULL DETAILS:', error.response?.data);
+                console.log('API Error Response:', error.response?.data);
+
+                // Dispatch error to error notification component
+                if (error.response?.data) {
+                    window.dispatchEvent(new CustomEvent('error-notification', {
+                        detail: {
+                            title: error.response.data.message || error.response.statusText,
+                            message: error.response.data.message || 'An error occurred',
+                            type: error.response.data.type || 'error',
+                            status: error.response.status,
+                            details: error.response.data.details || [],
+                            errors: error.response.data.errors || {}
+                        }
+                    }));
+                }
+
                 if (error.response?.status === 401) {
                     const originalRequest = error.config;
 

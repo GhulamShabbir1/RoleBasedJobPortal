@@ -66,11 +66,19 @@ class JobController extends Controller
     ): JsonResponse {
         try {
             $dto = FiltreJobDTO::fromRequest($request);
-            $jobs = $feature->handle($dto);
+            $paginated = $feature->handle($dto);
 
             return response()->json([
                 'success' => true,
-                'data' => $jobs,
+                'data' => $paginated->items(),
+                'pagination' => [
+                    'total' => $paginated->total(),
+                    'per_page' => $paginated->perPage(),
+                    'current_page' => $paginated->currentPage(),
+                    'last_page' => $paginated->lastPage(),
+                    'from' => $paginated->firstItem(),
+                    'to' => $paginated->lastItem(),
+                ],
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -226,6 +234,77 @@ class JobController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => $jobs,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500);
+        }
+    }
+
+    /**
+     * Employer: get a single job by id
+     */
+    public function employerShow(string $id): JsonResponse
+    {
+        try {
+            $job = $this->jobRepository->getJobById($id);
+            // Ensure job belongs to authenticated user
+            if ($job->user_id !== auth()->id()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are not authorized to view this job',
+                ], 403);
+            }
+
+            return response()->json([
+                'success' => true,
+                'data' => $job,
+            ], 200);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Job not found',
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500);
+        }
+    }
+
+    /**
+     * Admin: update job status (open/closed)
+     */
+    public function updateStatus(int $id): JsonResponse
+    {
+        try {
+            $status = request()->input('status');
+
+            if (!in_array($status, ['open', 'closed'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid status. Must be "open" or "closed"',
+                ], 400);
+            }
+
+            $updated = $this->jobRepository->updateJob($id, ['status' => $status]);
+
+            if (!$updated) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Job not found',
+                ], 404);
+            }
+
+            $job = $this->jobRepository->findById((string)$id);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Job status updated to {$status}",
+                'data' => $job,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

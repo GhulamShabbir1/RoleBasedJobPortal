@@ -91,7 +91,7 @@
 
                 <!-- View Details -->
                 <div x-show="company.status !== 'pending'" class="flex space-x-3 pt-4 border-t border-gray-200">
-                    <button @click="viewDetails(company)" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition text-sm font-medium">
+                    <button @click="openDetailsModal(company)" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition text-sm font-medium">
                         <i class="fas fa-eye mr-2"></i>View Details
                     </button>
                 </div>
@@ -126,6 +126,74 @@
             </div>
         </div>
     </div>
+
+    <!-- Company Details Modal -->
+    <div x-show="showDetailsModal" @click.away="showDetailsModal = false" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" style="display: none;">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <!-- Header -->
+            <div class="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center">
+                <h3 class="text-2xl font-bold text-gray-900">Company Details</h3>
+                <button @click="showDetailsModal = false" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Content -->
+            <div x-show="selectedCompany" class="p-6 space-y-6">
+                <!-- Basic Info -->
+                <div>
+                    <h4 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm text-gray-600">Company Name</p>
+                            <p class="text-base font-medium text-gray-900" x-text="selectedCompany?.name"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Status</p>
+                            <span :class="getStatusClass(selectedCompany?.status)" class="inline-block px-3 py-1 rounded-full text-xs font-medium" x-text="selectedCompany?.status?.toUpperCase()"></span>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">City</p>
+                            <p class="text-base font-medium text-gray-900" x-text="selectedCompany?.city"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Registered Date</p>
+                            <p class="text-base font-medium text-gray-900" x-text="new Date(selectedCompany?.created_at).toLocaleDateString()"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="border-t pt-4">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-4">Contact Information</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm text-gray-600">Owner Name</p>
+                            <p class="text-base font-medium text-gray-900" x-text="selectedCompany?.user?.name"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Owner Email</p>
+                            <p class="text-base font-medium text-gray-900" x-text="selectedCompany?.user?.email"></p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Website</p>
+                            <a :href="selectedCompany?.website" target="_blank" class="text-blue-600 hover:underline" x-text="selectedCompany?.website"></a>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Phone</p>
+                            <p class="text-base font-medium text-gray-900" x-text="selectedCompany?.phone || 'N/A'"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="border-t pt-4">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-2">Description</h4>
+                    <p class="text-gray-700 leading-relaxed" x-text="selectedCompany?.description"></p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -143,7 +211,9 @@ function companiesPage() {
             rejected: 0
         },
         showRejectModal: false,
+        showDetailsModal: false,
         selectedCompanyId: null,
+        selectedCompany: null,
         rejectReason: '',
 
         getStatusClass(status) {
@@ -226,8 +296,9 @@ function companiesPage() {
             }
         },
 
-        viewDetails(company) {
-            alert(`Company: ${company.name}\nCity: ${company.city}\nWebsite: ${company.website}\nStatus: ${company.status}`);
+        openDetailsModal(company) {
+            this.selectedCompany = company;
+            this.showDetailsModal = true;
         }
     }
 }

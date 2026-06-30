@@ -259,12 +259,7 @@ function adminDashboard() {
             total_companies: 0,
             total_jobs: 0,
             total_applications: 0,
-            pending_companies: 0,
-            user_growth: '+12%',
-            company_growth: '+8%',
-            job_growth: '+15%',
-            application_growth: '+22%',
-            pending_growth: '⏳'
+            pending_companies: 0
         },
         chartData: [],
         recentActivities: [],
@@ -317,9 +312,20 @@ function adminDashboard() {
                 });
 
                 if (response.data.success) {
-                    this.stats = { ...this.stats, ...response.data.data };
+                    // Update stats with real data from API
+                    this.stats.total_users = response.data.data.totalUsers || 0;
+                    this.stats.total_companies = response.data.data.totalCompanies || 0;
+                    this.stats.total_jobs = response.data.data.totalJobs || 0;
+                    this.stats.total_applications = response.data.data.totalApplications || 0;
+                    this.stats.pending_companies = response.data.data.pendingCompanies || 0;
+
+                    // Generate chart data based on real stats
                     this.generateChartData();
+
+                    // Generate recent activities (mock for now)
                     this.generateRecentActivities();
+
+                    console.log('Stats loaded:', this.stats);
                 } else {
                     this.error = response.data.message || 'Failed to load statistics';
                 }
@@ -328,6 +334,7 @@ function adminDashboard() {
                     window.location.href = '/auth/login';
                 } else {
                     this.error = error.response?.data?.message || 'An error occurred while loading the dashboard';
+                    console.error('Dashboard error:', error);
                 }
             } finally {
                 this.loading = false;

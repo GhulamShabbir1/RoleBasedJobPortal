@@ -26,12 +26,12 @@
                                 <i class="fas fa-calendar-alt mr-1"></i>
                                 <span x-text="new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"></span>
                             </span>
-                            <a href="{{ route('jobs.index') }}" class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg flex items-center transition-all duration-200 hover:shadow-lg hover:scale-105">
+                            {{-- <a href="{{ route('jobs.index') }}" class="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg flex items-center transition-all duration-200 hover:shadow-lg hover:scale-105">
                                 <i class="fas fa-search mr-2"></i>Browse Jobs
-                            </a>
-                            <button @click="loadStats()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all duration-200 hover:shadow-md">
+                            </a> --}}
+                            {{-- <button @click="loadStats()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all duration-200 hover:shadow-md">
                                 <i class="fas fa-redo mr-2"></i>Refresh
-                            </button>
+                            </button> --}}
                         </div>
                     </div>
 
@@ -40,7 +40,7 @@
                         <i class="fas fa-exclamation-triangle text-yellow-600 mt-0.5"></i>
                         <div class="flex-1">
                             <p class="text-sm font-medium text-yellow-800">Complete Your Profile</p>
-                            <p class="text-sm text-yellow-700">Your profile is <span x-text="profileCompletion + '%'"></span> complete. <a href="{{ route('candidate.profile.create') }}" class="font-medium underline hover:no-underline">Update now</a> to get noticed by employers.</p>
+                            <p class="text-sm text-yellow-700">Your profile is <span x-text="profileCompletion + '%'"></span> complete. <a :href="profileCompletion > 0 ? '{{ route('candidate.profile.edit') }}' : '{{ route('candidate.profile.create') }}'" class="font-medium underline hover:no-underline">Update now</a> to get noticed by employers.</p>
                         </div>
                         <div class="w-32">
                             <div class="w-full h-2 bg-yellow-200 rounded-full overflow-hidden">
@@ -345,9 +345,13 @@ function candidateDashboard() {
                     return;
                 }
 
+                const authHeaders = {
+                    headers: { Authorization: `Bearer ${token}` }
+                };
+                
                 // Load dashboard stats
                 try {
-                    const statsResponse = await axios.get('/api/dashboard/candidate');
+                    const statsResponse = await axios.get('/api/dashboard/candidate', authHeaders);
 
                     if (statsResponse.data.success) {
                         this.stats = statsResponse.data.data || {
@@ -372,6 +376,7 @@ function candidateDashboard() {
                 // Load recent applications
                 try {
                     const appsResponse = await axios.get('/api/candidate/applications', {
+                        ...authHeaders,
                         params: { limit: 5 }
                     });
 
@@ -393,7 +398,7 @@ function candidateDashboard() {
 
                 // Load profile completion
                 try {
-                    const profileResponse = await axios.get('/api/candidate/profiles/me');
+                    const profileResponse = await axios.get('/api/candidate/profiles/me', authHeaders);
 
                     if (profileResponse.data.success && profileResponse.data.data) {
                         const profile = profileResponse.data.data;

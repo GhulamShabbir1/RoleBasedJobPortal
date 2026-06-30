@@ -151,9 +151,13 @@
             try {
                 const token = localStorage.getItem('token');
                 if (!token) return;
+                
+                const authHeaders = {
+                    headers: { Authorization: `Bearer ${token}` }
+                };
 
                 // Fetch jobs (employer-specific)
-                const jobsResponse = await axios.get('/api/employer/jobs');
+                const jobsResponse = await axios.get('/api/employer/jobs', authHeaders);
 
                 if (jobsResponse.data.success) {
                     const jobs = jobsResponse.data.data;
@@ -165,7 +169,7 @@
                 }
 
                 // Fetch applications
-                const appsResponse = await axios.get('/api/employer/applications');
+                const appsResponse = await axios.get('/api/employer/applications', authHeaders);
 
                 if (appsResponse.data.success) {
                     const apps = appsResponse.data.data;
@@ -177,18 +181,19 @@
                 }
 
                 // Fetch company status
-                const companyResponse = await axios.get('/api/employer/my-company-status');
+                const companyResponse = await axios.get('/api/employer/my-company-status', authHeaders);
 
                 if (companyResponse.data.success) {
-                    const status = companyResponse.data.data;
+                    const responseData = companyResponse.data.data;
+                    const company = responseData.company;
                     const badge = document.getElementById('companyStatusBadge');
                     const text = document.getElementById('companyStatusText');
                     const message = document.getElementById('companyStatusMessage');
 
-                    if (status && status.id) {
-                        text.textContent = status.status?.toUpperCase() || 'PENDING';
-                        badge.className = 'px-2 py-1 text-xs rounded-full ' + getStatusClass(status.status);
-                        message.textContent = status.status === 'approved' ? 'Your company is active' : 'Your company is pending approval';
+                    if (company && company.id) {
+                        text.textContent = responseData.status?.toUpperCase() || 'PENDING';
+                        badge.className = 'px-2 py-1 text-xs rounded-full ' + getStatusClass(responseData.status);
+                        message.textContent = responseData.status === 'approved' ? 'Your company is active' : 'Your company is pending approval';
                     } else {
                         text.textContent = 'NOT SET';
                         badge.className = 'px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-600';
