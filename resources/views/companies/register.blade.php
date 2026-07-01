@@ -415,7 +415,7 @@ function companiesPage() {
                     params
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.companies = response.data.data;
                     this.filterCompanies();
                     this.updateStats();
@@ -461,7 +461,7 @@ function companiesPage() {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     await this.loadCompanies();
                     alert('Company approved successfully!');
                 } else {
@@ -491,7 +491,7 @@ function companiesPage() {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.showRejectModal = false;
                     await this.loadCompanies();
                     alert('Company rejected successfully!');
@@ -514,7 +514,7 @@ function companiesPage() {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     await this.loadCompanies();
                     alert(`Company ${message}d successfully!`);
                 } else {
@@ -533,7 +533,7 @@ function companiesPage() {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     await this.loadCompanies();
                     alert('Company deleted successfully!');
                 } else {

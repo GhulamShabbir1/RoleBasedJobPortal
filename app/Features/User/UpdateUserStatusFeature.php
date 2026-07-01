@@ -3,8 +3,9 @@
 namespace App\Features\User;
 
 use App\DTOs\User\UpdateUserStatusDTO;
+use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
-use Exception;
+use App\Exceptions\ResourceNotFoundException;
 
 class UpdateUserStatusFeature
 {
@@ -14,31 +15,17 @@ class UpdateUserStatusFeature
     }
 
     /**
-     * Update user active/inactive status
+     * Update user active/inactive status using repository manage() method
      */
-    public function handle(UpdateUserStatusDTO $dto): array
+    public function handle(UpdateUserStatusDTO $dto): User
     {
         $user = $this->userRepository->findById($dto->id);
 
         if (!$user) {
-            throw new Exception('User not found', 404);
+            throw new ResourceNotFoundException('User not found');
         }
 
-        $updated = $this->userRepository->updateStatus($dto->id, $dto->isActive);
-
-        if (!$updated) {
-            throw new Exception('Failed to update user status', 500);
-        }
-
-        $updatedUser = $this->userRepository->findById($dto->id);
-
-        return [
-            'id' => $updatedUser->id,
-            'name' => $updatedUser->name,
-            'email' => $updatedUser->email,
-            'role' => $updatedUser->role,
-            'is_active' => $updatedUser->is_active,
-            'created_at' => $updatedUser->created_at,
-        ];
+        // Use manage() method with ID for update
+        return $this->userRepository->manage(['is_active' => $dto->isActive], (int)$dto->id);
     }
 }

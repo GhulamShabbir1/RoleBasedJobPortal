@@ -370,7 +370,7 @@ function candidateProfileForm() {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
-                if (response.data.success && response.data.data) {
+                if (response.data.status && response.data.data) {
                     const data = response.data.data;
                     this.form = {
                         phone: data.phone || '',
@@ -482,7 +482,7 @@ function candidateProfileForm() {
                         }
                     });
 
-                    if (response.data.success && response.data.data) {
+                    if (response.data.status && response.data.data) {
                         this.success = 'Profile created successfully!';
                         console.log('Profile created:', response.data.data);
 
@@ -512,7 +512,7 @@ function candidateProfileForm() {
                             headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                         });
 
-                        if (profileResponse.data.success && profileResponse.data.data?.id) {
+                        if (profileResponse.data.status && profileResponse.data.data?.id) {
                             const profileId = profileResponse.data.data.id;
                             formData.append('_method', 'PUT');
                             const updateResponse = await axios.post(`/api/candidate/profiles/${profileId}`, formData, {
@@ -522,7 +522,7 @@ function candidateProfileForm() {
                                 }
                             });
 
-                            if (updateResponse.data.success) {
+                            if (updateResponse.data.status) {
                                 this.success = 'Profile updated successfully!';
                                 if (updateResponse.data.data?.resume_url) {
                                     this.form.resume_url = updateResponse.data.data.resume_url;

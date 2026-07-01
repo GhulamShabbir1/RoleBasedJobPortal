@@ -7,9 +7,9 @@ use App\Models\User;
 interface AuthRepositoryInterface
 {
     /**
-     * Create a new user in the database
+     * Create or update user using single manage method
      */
-    public function createUser(array $data): User;
+    public function manage(array $data, ?int $id = null): User;
 
     /**
      * Find user by email
@@ -50,4 +50,9 @@ interface AuthRepositoryInterface
      * Change authenticated user password
      */
     public function changePassword(string $userId, string $newPassword): bool;
+
+    /**
+     * Clear related cache
+     */
+    public function clearCache(): void;
 }

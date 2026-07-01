@@ -141,7 +141,7 @@
                 const usersResponse = await axios.get('/api/users', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                if (usersResponse.data.success) {
+                if (usersResponse.data.status) {
                     const usersData = usersResponse.data.data;
                     const users = Array.isArray(usersData) ? usersData : (usersData?.data || []);
                     document.getElementById('totalUsers').textContent = users.length || 0;
@@ -151,7 +151,7 @@
                 const companiesResponse = await axios.get('/api/companies', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                if (companiesResponse.data.success) {
+                if (companiesResponse.data.status) {
                     const companiesData = companiesResponse.data.data;
                     const companies = Array.isArray(companiesData) ? companiesData : (companiesData?.data || []);
                     const pending = companies.filter(c => c.status === 'pending').length;
@@ -162,7 +162,7 @@
                 const jobsResponse = await axios.get('/api/jobs', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                if (jobsResponse.data.success) {
+                if (jobsResponse.data.status) {
                     const jobsData = jobsResponse.data.data;
                     const jobs = Array.isArray(jobsData) ? jobsData : (jobsData?.data || []);
                     const active = jobs.filter(j => j.status !== 'closed').length;

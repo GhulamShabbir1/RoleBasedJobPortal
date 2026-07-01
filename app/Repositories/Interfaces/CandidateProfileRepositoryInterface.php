@@ -9,6 +9,11 @@ use Illuminate\Support\Collection;
 interface CandidateProfileRepositoryInterface
 {
     /**
+     * Create or update candidate profile using single manage method
+     */
+    public function manage(array $data, ?int $id = null): CandidateProfile;
+
+    /**
      * Get all candidate profiles
      */
     public function getAllProfiles(): Collection;
@@ -24,17 +29,12 @@ interface CandidateProfileRepositoryInterface
     public function findByUserId(string $userId): ?CandidateProfile;
 
     /**
-     * Create a new candidate profile
-     */
-    public function createProfile(array $data): CandidateProfile;
-
-    /**
-     * Update candidate profile
-     */
-    public function updateProfile(string $id, array $data): bool;
-
-    /**
      * Delete candidate profile
+     */
+    public function delete(int $id): bool;
+
+    /**
+     * Delete candidate profile (legacy)
      */
     public function deleteProfile(string $id): bool;
 
@@ -42,4 +42,9 @@ interface CandidateProfileRepositoryInterface
      * Filter candidate profiles by search and skills
      */
     public function filterProfiles(?string $search = null, ?string $skills = null, int $page = 1, int $perPage = 15): LengthAwarePaginator;
+
+    /**
+     * Clear related cache
+     */
+    public function clearCache(): void;
 }

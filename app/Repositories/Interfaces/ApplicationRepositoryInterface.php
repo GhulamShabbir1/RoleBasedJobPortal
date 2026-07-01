@@ -7,6 +7,11 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface ApplicationRepositoryInterface
 {
+    /**
+     * Create or update application using single manage method
+     */
+    public function manage(array $data, ?int $id = null): Application;
+
     public function findById(string $id): ?Application;
 
     public function getApplicationById(int $id): ?Application;
@@ -19,9 +24,18 @@ interface ApplicationRepositoryInterface
 
     public function filterAllApplications(array $filters): LengthAwarePaginator;
 
-    public function createApplication(array $data): Application;
+    /**
+     * Delete application
+     */
+    public function delete(int $id): bool;
 
-    public function updateApplication(int $id, array $data): Application;
-
+    /**
+     * Delete application (legacy)
+     */
     public function deleteApplication(int $id): bool;
+
+    /**
+     * Clear related cache
+     */
+    public function clearCache(): void;
 }

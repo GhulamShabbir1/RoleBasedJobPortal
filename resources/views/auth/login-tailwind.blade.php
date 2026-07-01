@@ -287,13 +287,15 @@ function loginForm() {
                     password: this.form.password
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     // Store token
                     localStorage.setItem('token', response.data.data.token);
 
                     // Store user data if needed
                     if (response.data.data.user) {
                         localStorage.setItem('user', JSON.stringify(response.data.data.user));
+                        // Also store role separately for easier access
+                        localStorage.setItem('role', response.data.data.user.role);
                     }
 
                     // Redirect based on role

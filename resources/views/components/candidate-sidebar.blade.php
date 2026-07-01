@@ -130,7 +130,7 @@
 
                 const response = await axios.get('/api/candidate/profiles/me');
 
-                if (response.data.success && response.data.data) {
+                if (response.data.status && response.data.data) {
                     const profile = response.data.data;
                     const fields = [
                         profile.phone,

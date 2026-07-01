@@ -5,7 +5,7 @@ namespace App\Features\User;
 use App\DTOs\User\UpdateUserDTO;
 use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
-use Exception;
+use App\Exceptions\ResourceNotFoundException;
 
 class UpdateUserFeature
 {
@@ -15,30 +15,19 @@ class UpdateUserFeature
     }
 
     /**
-     * Update user profile
-     *
-     * @param UpdateUserDTO $dto Updated user data
-     * @return User
-     * @throws Exception
+     * Update user profile using repository manage() method
      */
     public function handle(UpdateUserDTO $dto): User
     {
-        try {
-            $user = $this->userRepository->findById($dto->id);
-
-            if (!$user) {
-                throw new Exception('User not found', 404);
-            }
-
-            $data = $dto->toArray();
-
-            if (!empty($data)) {
-                $this->userRepository->updateUser($dto->id, $data);
-            }
-
-            return $this->userRepository->findById($dto->id);
-        } catch (Exception $e) {
-            throw $e;
+        // Verify user exists
+        $user = $this->userRepository->findById($dto->id);
+        if (!$user) {
+            throw new ResourceNotFoundException('User not found');
         }
+
+        $data = $dto->toArray();
+
+        // Use manage() method with ID for update
+        return $this->userRepository->manage($data, (int)$dto->id);
     }
 }

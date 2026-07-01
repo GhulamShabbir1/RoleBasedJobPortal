@@ -369,7 +369,7 @@ function employerDashboard() {
                 // Load dashboard stats
                 const statsResponse = await axios.get('/api/dashboard/employer', authHeaders);
 
-                if (statsResponse.data.success) {
+                if (statsResponse.data.status) {
                     this.stats = { ...this.stats, ...statsResponse.data.data };
                     this.generateTrendData();
                 }
@@ -377,7 +377,7 @@ function employerDashboard() {
                 // Load company status
                 const companyResponse = await axios.get('/api/employer/my-company-status', authHeaders);
 
-                if (companyResponse.data.success) {
+                if (companyResponse.data.status) {
                     this.companyInfo = companyResponse.data.data.company || {};
                     this.companyApproved = companyResponse.data.data.status === 'approved';
                 }
@@ -388,7 +388,7 @@ function employerDashboard() {
                     params: { limit: 5 }
                 });
 
-                if (appsResponse.data.success) {
+                if (appsResponse.data.status) {
                     this.recentApplications = appsResponse.data.data.map(app => ({
                         id: app.id,
                         candidate_name: app.candidate?.name || 'Unknown Candidate',

@@ -3,7 +3,8 @@
 namespace App\Features\Job;
 
 use App\Repositories\Interfaces\JobRepositoryInterface;
-use Exception;
+use App\Exceptions\ResourceNotFoundException;
+use App\Exceptions\UnauthorizedException;
 
 class DeleteJobFeature
 {
@@ -12,23 +13,22 @@ class DeleteJobFeature
     ) {
     }
 
+    /**
+     * Delete a job using repository delete()
+     */
     public function handle(int $id): bool
     {
-        try {
-            $job = $this->jobRepository->findById((string)$id);
+        $job = $this->jobRepository->findById((string)$id);
 
-            if (!$job) {
-                throw new Exception('Job not found');
-            }
-
-            $user = auth()->user();
-            if ($user->role !== 'admin' && $job->user_id !== $user->id) {
-                throw new \Illuminate\Auth\Access\AuthorizationException('You do not own this job');
-            }
-
-            return $this->jobRepository->deleteJob((string)$id);
-        } catch (Exception $e) {
-            throw $e;
+        if (!$job) {
+            throw new ResourceNotFoundException('Job not found');
         }
+
+        $user = auth()->user();
+        if ($user->role !== 'admin' && $job->user_id !== $user->id) {
+            throw new UnauthorizedException('You do not own this job');
+        }
+
+        return $this->jobRepository->delete($id);
     }
 }

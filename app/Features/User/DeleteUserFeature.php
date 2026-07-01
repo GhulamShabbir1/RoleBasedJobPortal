@@ -3,7 +3,7 @@
 namespace App\Features\User;
 
 use App\Repositories\Interfaces\UserRepositoryInterface;
-use Exception;
+use App\Exceptions\ResourceNotFoundException;
 
 class DeleteUserFeature
 {
@@ -13,24 +13,16 @@ class DeleteUserFeature
     }
 
     /**
-     * Delete a user (admin only)
-     *
-     * @param string $userId User ID to delete
-     * @return bool
-     * @throws Exception
+     * Delete a user using repository delete() method
      */
     public function handle(string $userId): bool
     {
-        try {
-            $user = $this->userRepository->findById($userId);
+        $user = $this->userRepository->findById($userId);
 
-            if (!$user) {
-                throw new Exception('User not found', 404);
-            }
-
-            return $this->userRepository->deleteUser($userId);
-        } catch (Exception $e) {
-            throw $e;
+        if (!$user) {
+            throw new ResourceNotFoundException('User not found');
         }
+
+        return $this->userRepository->delete((int)$userId);
     }
 }

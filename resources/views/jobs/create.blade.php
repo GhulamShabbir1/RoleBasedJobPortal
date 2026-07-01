@@ -380,7 +380,7 @@ function jobForm() {
         async loadCategories() {
             try {
                 const response = await axios.get('/api/categories');
-                if (response.data.success) {
+                if (response.data.status) {
                     this.categories = response.data.data;
                 }
             } catch (error) {
@@ -467,7 +467,7 @@ function jobForm() {
                     }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.success = 'Job posted successfully! Redirecting...';
                     setTimeout(() => {
                         window.location.href = '/employer/jobs';

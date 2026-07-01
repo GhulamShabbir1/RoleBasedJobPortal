@@ -335,7 +335,7 @@ function profilePage() {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.profile = response.data.data;
                     this.editForm = {
                         name: response.data.data.name,
@@ -413,7 +413,7 @@ function profilePage() {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.profile = response.data.data;
                     this.success = 'Profile updated successfully!';
                     this.editMode = false;
@@ -457,7 +457,7 @@ function profilePage() {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
                     alert('Account deleted successfully');

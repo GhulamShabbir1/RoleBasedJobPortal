@@ -353,7 +353,7 @@ function candidateDashboard() {
                 try {
                     const statsResponse = await axios.get('/api/dashboard/candidate', authHeaders);
 
-                    if (statsResponse.data.success) {
+                    if (statsResponse.data.status) {
                         this.stats = statsResponse.data.data || {
                             total_applications: 0,
                             pending_applications: 0,
@@ -380,7 +380,7 @@ function candidateDashboard() {
                         params: { limit: 5 }
                     });
 
-                    if (appsResponse.data.success && Array.isArray(appsResponse.data.data)) {
+                    if (appsResponse.data.status && Array.isArray(appsResponse.data.data)) {
                         this.recentApplications = appsResponse.data.data
                             .filter(app => app && app.id) // Filter out null/undefined entries
                             .map(app => ({
@@ -400,7 +400,7 @@ function candidateDashboard() {
                 try {
                     const profileResponse = await axios.get('/api/candidate/profiles/me', authHeaders);
 
-                    if (profileResponse.data.success && profileResponse.data.data) {
+                    if (profileResponse.data.status && profileResponse.data.data) {
                         const profile = profileResponse.data.data;
                         const fields = [
                             profile.phone,

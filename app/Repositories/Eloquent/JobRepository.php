@@ -5,15 +5,31 @@ namespace App\Repositories\Eloquent;
 use App\Models\Job;
 use App\Repositories\Interfaces\JobRepositoryInterface;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class JobRepository implements JobRepositoryInterface
 {
-   /**
-     * Create a new job in the database
+    private const CACHE_KEY = 'jobs:';
+    private const CACHE_TTL = 3600;
+
+    /**
+     * Create or update job using single manage method
      */
-    public function createJob(array $data): Job
+    public function manage(array $data, ?int $id = null): Job
     {
-        return Job::create($data);
+        if ($id === null) {
+            // Create new job
+            $job = Job::create($data);
+        } else {
+            // Update existing job
+            $job = Job::findOrFail($id);
+            $job->update($data);
+        }
+
+        // Clear cache
+        $this->clearCache();
+
+        return $job;
     }
 
     /**
@@ -21,32 +37,30 @@ class JobRepository implements JobRepositoryInterface
      */
     public function findById(string $id): ?Job
     {
-        return Job::find($id);
-    }
-
-    /**
-     * Update a job in the database
-     */
-    public function updateJob(string $id, array $data): bool
-    {
-        $job = $this->findById($id);
-        if (!$job) {
-            return false;
-        }
-        $job->update($data);
-        return true;
+        return Job::with('category', 'company', 'applications')->find($id);
     }
 
     /**
      * Delete a job in the database
      */
-    public function deleteJob(string $id): bool
+    public function delete(int $id): bool
     {
-        $job = $this->findById($id);
+        $job = Job::find($id);
+
         if (!$job) {
             return false;
         }
+
+        $this->clearCache();
         return $job->delete();
+    }
+
+    /**
+     * Legacy method for backward compatibility
+     */
+    public function deleteJob(string $id): bool
+    {
+        return $this->delete((int)$id);
     }
 
     /**
@@ -193,5 +207,13 @@ class JobRepository implements JobRepositoryInterface
         }
 
         return $query->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    /**
+     * Clear related cache
+     */
+    public function clearCache(): void
+    {
+        Cache::forget(self::CACHE_KEY . '*');
     }
 }

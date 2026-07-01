@@ -134,12 +134,9 @@
                 <p class="text-sm font-medium text-gray-900 truncate">{{ auth()->user()->name ?? 'Employer' }}</p>
                 <p class="text-xs text-gray-500 truncate">{{ auth()->user()->email ?? 'employer@jobhub.com' }}</p>
             </div>
-<form method="POST" action="{{ url('/api/auth/logout') }}" class="inline" onsubmit="return window.appLogout()">
-                @csrf
-                <button type="button" onclick="window.appLogout()" class="text-gray-400 hover:text-red-500 transition-colors" title="Logout">
+<button type="button" onclick="window.dispatchEvent(new CustomEvent('app-logout'))" class="text-gray-400 hover:text-red-500 transition-colors" title="Logout">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
-            </form>
         </div>
     </div>
 </div>
@@ -159,7 +156,7 @@
                 // Fetch jobs (employer-specific)
                 const jobsResponse = await axios.get('/api/employer/jobs', authHeaders);
 
-                if (jobsResponse.data.success) {
+                if (jobsResponse.data.status) {
                     const jobs = jobsResponse.data.data;
                     const total = jobs.length;
                     const active = jobs.filter(j => j.status !== 'closed').length;
@@ -171,7 +168,7 @@
                 // Fetch applications
                 const appsResponse = await axios.get('/api/employer/applications', authHeaders);
 
-                if (appsResponse.data.success) {
+                if (appsResponse.data.status) {
                     const apps = appsResponse.data.data;
                     const total = apps.length;
                     const pending = apps.filter(a => a.status === 'pending').length;
@@ -183,7 +180,7 @@
                 // Fetch company status
                 const companyResponse = await axios.get('/api/employer/my-company-status', authHeaders);
 
-                if (companyResponse.data.success) {
+                if (companyResponse.data.status) {
                     const responseData = companyResponse.data.data;
                     const company = responseData.company;
                     const badge = document.getElementById('companyStatusBadge');

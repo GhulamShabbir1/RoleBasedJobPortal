@@ -4,7 +4,8 @@ namespace App\Features\Application;
 
 use App\DTOs\Application\UpdateApplicationStatusDTO;
 use App\Repositories\Interfaces\ApplicationRepositoryInterface;
-use Exception;
+use App\Exceptions\ResourceNotFoundException;
+use App\Exceptions\UnauthorizedException;
 
 class UpdateApplicationStatusFeature
 {
@@ -14,39 +15,32 @@ class UpdateApplicationStatusFeature
     }
 
     /**
-     * Update application status
-     *
-     * @param string $applicationId Application ID
-     * @param UpdateApplicationStatusDTO $dto Status update data
-     * @return bool
-     * @throws Exception
+     * Update application status using repository manage()
      */
     public function handle(string $applicationId, UpdateApplicationStatusDTO $dto): bool
     {
-        try {
-            $application = $this->applicationRepository->findById($applicationId);
-            if (!$application) {
-                throw new Exception('Application not found');
-            }
+        $application = $this->applicationRepository->findById($applicationId);
 
-            $user = auth()->user();
-            // Check ownership (admin or job owner)
-            $application->load('job');
-            if ($user->role !== 'admin' && $application->job->user_id !== $user->id) {
-                throw new \Illuminate\Auth\Access\AuthorizationException('You do not own this application');
-            }
-
-            // Validate status is in allowed list
-            if (!in_array($dto->status, ['reviewed', 'accepted', 'rejected'])) {
-                throw new Exception('Invalid status');
-            }
-
-            $this->applicationRepository->updateApplication((int)$applicationId, [
-                'status' => $dto->status,
-            ]);
-            return true;
-        } catch (Exception $e) {
-            throw $e;
+        if (!$application) {
+            throw new ResourceNotFoundException('Application not found');
         }
+
+        $user = auth()->user();
+        // Check ownership (admin or job owner)
+        $application->load('job');
+        if ($user->role !== 'admin' && $application->job->user_id !== $user->id) {
+            throw new UnauthorizedException('You do not own this application');
+        }
+
+        // Validate status is in allowed list
+        if (!in_array($dto->status, ['reviewed', 'accepted', 'rejected'])) {
+            throw new UnauthorizedException('Invalid status');
+        }
+
+        $this->applicationRepository->manage([
+            'status' => $dto->status,
+        ], (int)$applicationId);
+
+        return true;
     }
 }

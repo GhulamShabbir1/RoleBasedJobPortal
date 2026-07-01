@@ -3,7 +3,7 @@
 namespace App\Features\Category;
 
 use App\Repositories\Interfaces\CategoryRepositoryInterface;
-use Exception;
+use App\Exceptions\ResourceNotFoundException;
 
 class DeleteCategoryFeature
 {
@@ -13,24 +13,16 @@ class DeleteCategoryFeature
     }
 
     /**
-     * Delete a category
-     *
-     * @param string $categoryId Category ID to delete
-     * @return bool
-     * @throws Exception
+     * Delete a category using repository delete()
      */
     public function handle(string $categoryId): bool
     {
-        try {
-            $category = $this->categoryRepository->findById($categoryId);
+        $category = $this->categoryRepository->findById($categoryId);
 
-            if (!$category) {
-                throw new Exception('Category not found', 404);
-            }
-
-            return $this->categoryRepository->deleteCategory($categoryId);
-        } catch (Exception $e) {
-            throw $e;
+        if (!$category) {
+            throw new ResourceNotFoundException('Category not found');
         }
+
+        return $this->categoryRepository->delete((int)$categoryId);
     }
 }

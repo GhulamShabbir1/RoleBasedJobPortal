@@ -363,7 +363,7 @@ function adminJobsPage() {
                     params
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.jobs = response.data.data;
                     this.updateStats();
                 }
@@ -411,7 +411,7 @@ function adminJobsPage() {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.showModal = false;
                     this.loadJobs();
                     alert('Job closed successfully');
@@ -439,7 +439,7 @@ function adminJobsPage() {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.showModal = false;
                     this.loadJobs();
                     alert(`Job ${newStatus} successfully`);
@@ -465,7 +465,7 @@ function adminJobsPage() {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.showModal = false;
                     this.loadJobs();
                     alert('Job deleted successfully');

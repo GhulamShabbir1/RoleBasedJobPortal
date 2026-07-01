@@ -356,7 +356,7 @@ function usersPage() {
                     params
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.users = response.data.data;
                     this.applyFilters();
                     this.updateStats();
@@ -454,7 +454,7 @@ function usersPage() {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.showModal = false;
                     this.loadUsers();
                     alert('User updated successfully');
@@ -481,7 +481,7 @@ function usersPage() {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.showModal = false;
                     this.loadUsers();
                     alert(`User ${action}d successfully`);
@@ -502,7 +502,7 @@ function usersPage() {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.showModal = false;
                     this.loadUsers();
                     alert('User deleted successfully');

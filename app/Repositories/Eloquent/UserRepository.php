@@ -6,14 +6,39 @@ use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class UserRepository implements UserRepositoryInterface
 {
     protected $model;
+    private const CACHE_KEY = 'users:';
+    private const CACHE_TTL = 3600;
 
     public function __construct(User $user)
     {
         $this->model = $user;
+    }
+
+    /**
+     * Create or update user using single manage method
+     * If $id is null: creates new user
+     * If $id is provided: finds and updates existing user
+     */
+    public function manage(array $data, ?int $id = null): User
+    {
+        if ($id === null) {
+            // Create new user
+            $user = $this->model->create($data);
+        } else {
+            // Update existing user
+            $user = $this->model->findOrFail($id);
+            $user->update($data);
+        }
+
+        // Clear cache
+        $this->clearCache();
+
+        return $user;
     }
 
     /**
@@ -65,63 +90,26 @@ class UserRepository implements UserRepositoryInterface
     }
 
     /**
-     * Create a new user
-     */
-    public function createUser(array $data): User
-    {
-        return $this->model->create($data);
-    }
-
-    /**
-     * Update user
-     */
-    public function updateUser(string $id, array $data): bool
-    {
-        $user = $this->findById($id);
-
-        if (!$user) {
-            return false;
-        }
-
-        return $user->update($data);
-    }
-
-    /**
      * Delete user
      */
-    public function deleteUser(string $id): bool
+    public function delete(int $id): bool
     {
-        $user = $this->findById($id);
+        $user = $this->model->find($id);
 
         if (!$user) {
             return false;
         }
 
+        $this->clearCache();
         return $user->delete();
     }
 
     /**
-     * Update user password
+     * Legacy method for backward compatibility
      */
-    public function updatePassword(string $id, string $password): bool
+    public function deleteUser(string $id): bool
     {
-        return $this->updateUser($id, ['password' => bcrypt($password)]);
-    }
-
-    /**
-     * Update user role
-     */
-    public function updateRole(string $id, string $role): bool
-    {
-        return $this->updateUser($id, ['role' => $role]);
-    }
-
-    /**
-     * Update user active status
-     */
-    public function updateStatus(string $id, bool $isActive): bool
-    {
-        return $this->updateUser($id, ['is_active' => $isActive]);
+        return $this->delete((int)$id);
     }
 
     /**
@@ -141,5 +129,13 @@ class UserRepository implements UserRepositoryInterface
         }
 
         return $query->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    /**
+     * Clear related cache
+     */
+    public function clearCache(): void
+    {
+        Cache::forget(self::CACHE_KEY . '*');
     }
 }

@@ -5,7 +5,7 @@ namespace App\Features\Category;
 use App\DTOs\Category\CreateCategoryDTO;
 use App\Models\Category;
 use App\Repositories\Interfaces\CategoryRepositoryInterface;
-use Exception;
+use App\Exceptions\ForbiddenException;
 
 class CreateCategoryFeature
 {
@@ -15,24 +15,17 @@ class CreateCategoryFeature
     }
 
     /**
-     * Create a new category
-     *
-     * @param CreateCategoryDTO $dto Category data
-     * @return Category
-     * @throws Exception
+     * Create a new category using repository manage()
      */
     public function handle(CreateCategoryDTO $dto): Category
     {
-        try {
-            // Prevent duplicate category names
-            $existing = $this->categoryRepository->findByName($dto->name);
-            if ($existing) {
-                throw new Exception('A category with this name already exists', 409);
-            }
-
-            return $this->categoryRepository->createCategory($dto->toArray());
-        } catch (Exception $e) {
-            throw $e;
+        // Prevent duplicate category names
+        $existing = $this->categoryRepository->findByName($dto->name);
+        if ($existing) {
+            throw new ForbiddenException('A category with this name already exists');
         }
+
+        // Use manage() method with null ID to create category
+        return $this->categoryRepository->manage($dto->toArray());
     }
 }

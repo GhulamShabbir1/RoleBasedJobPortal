@@ -5,9 +5,13 @@ namespace App\Repositories\Eloquent;
 use App\Models\Application;
 use App\Repositories\Interfaces\ApplicationRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 
 class ApplicationRepository implements ApplicationRepositoryInterface
 {
+    private const CACHE_KEY = 'applications:';
+    private const CACHE_TTL = 3600;
+
     /**
      * Eager load relationships for complete application data
      */
@@ -20,6 +24,26 @@ class ApplicationRepository implements ApplicationRepositoryInterface
             'job.company',
             'job.category'
         ]);
+    }
+
+    /**
+     * Create or update application using single manage method
+     */
+    public function manage(array $data, ?int $id = null): Application
+    {
+        if ($id === null) {
+            // Create new application
+            $application = Application::create($data);
+        } else {
+            // Update existing application
+            $application = Application::findOrFail($id);
+            $application->update($data);
+        }
+
+        // Clear cache
+        $this->clearCache();
+
+        return $application;
     }
 
     public function findById(string $id): ?Application
@@ -88,27 +112,34 @@ class ApplicationRepository implements ApplicationRepositoryInterface
         return $query->paginate(10);
     }
 
-    public function createApplication(array $data): Application
-    {
-        return Application::create($data);
-    }
-
-    public function updateApplication(int $id, array $data): Application
+    /**
+     * Delete application
+     */
+    public function delete(int $id): bool
     {
         $application = $this->getApplicationById($id);
-        if (!$application) {
-            throw new \Exception('Application not found');
-        }
-        $application->update($data);
-        return $application;
-    }
 
-    public function deleteApplication(int $id): bool
-    {
-        $application = $this->getApplicationById($id);
         if (!$application) {
             return false;
         }
+
+        $this->clearCache();
         return $application->delete();
+    }
+
+    /**
+     * Legacy method for backward compatibility
+     */
+    public function deleteApplication(int $id): bool
+    {
+        return $this->delete($id);
+    }
+
+    /**
+     * Clear related cache
+     */
+    public function clearCache(): void
+    {
+        Cache::forget(self::CACHE_KEY . '*');
     }
 }

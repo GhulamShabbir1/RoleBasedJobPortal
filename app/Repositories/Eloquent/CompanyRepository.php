@@ -5,30 +5,35 @@ namespace App\Repositories\Eloquent;
 use App\Models\Company;
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 
-/**
- * CompanyRepository
- * Database operations ONLY - no business logic
- * Implements CompanyRepositoryInterface
- */
 class CompanyRepository implements CompanyRepositoryInterface
 {
+    private const CACHE_KEY = 'companies:';
+    private const CACHE_TTL = 3600;
+
     /**
-     * Create a new company record
-     *
-     * @param array $data Company data
-     * @return Company
+     * Create or update company using single manage method
      */
-    public function create(array $data): Company
+    public function manage(array $data, ?int $id = null): Company
     {
-        return Company::create($data);
+        if ($id === null) {
+            // Create new company
+            $company = Company::create($data);
+        } else {
+            // Update existing company
+            $company = Company::findOrFail($id);
+            $company->update($data);
+        }
+
+        // Clear cache
+        $this->clearCache();
+
+        return $company;
     }
 
     /**
      * Find company by ID
-     *
-     * @param int $id Company ID
-     * @return Company|null
      */
     public function findById(int $id): ?Company
     {
@@ -37,21 +42,15 @@ class CompanyRepository implements CompanyRepositoryInterface
 
     /**
      * Get all companies with optional filters and pagination
-     *
-     * @param array $filters Filter criteria
-     * @param int $perPage Pagination limit
-     * @return LengthAwarePaginator
      */
     public function getAll(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         $query = Company::query();
 
-        // Apply status filter if provided
         if (isset($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 
-        // Apply search filter if provided
         if (isset($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
@@ -61,12 +60,10 @@ class CompanyRepository implements CompanyRepositoryInterface
             });
         }
 
-        // Apply city filter if provided
         if (isset($filters['city'])) {
             $query->where('city', $filters['city']);
         }
 
-        // Apply country filter if provided
         if (isset($filters['country'])) {
             $query->where('country', $filters['country']);
         }
@@ -75,35 +72,22 @@ class CompanyRepository implements CompanyRepositoryInterface
     }
 
     /**
-     * Update company record
-     *
-     * @param Company $company Company instance
-     * @param array $data Data to update
-     * @return Company
-     */
-    public function update(Company $company, array $data): Company
-    {
-        $company->update($data);
-
-        return $company;
-    }
-
-    /**
      * Delete company record
-     *
-     * @param Company $company Company instance
-     * @return bool
      */
-    public function delete(Company $company): bool
+    public function delete(int $id): bool
     {
+        $company = Company::find($id);
+
+        if (!$company) {
+            return false;
+        }
+
+        $this->clearCache();
         return $company->delete();
     }
 
     /**
      * Find company by email
-     *
-     * @param string $email Company email
-     * @return Company|null
      */
     public function findByEmail(string $email): ?Company
     {
@@ -112,9 +96,6 @@ class CompanyRepository implements CompanyRepositoryInterface
 
     /**
      * Find company by user ID
-     *
-     * @param int $userId User ID
-     * @return Company|null
      */
     public function getByUserId(int $userId): ?Company
     {
@@ -122,19 +103,10 @@ class CompanyRepository implements CompanyRepositoryInterface
     }
 
     /**
-     * Update company status
-     *
-     * @param Company $company Company instance
-     * @param string $status New status
-     * @param string|null $notes Optional status notes
-     * @return Company
+     * Clear related cache
      */
-    public function updateStatus(Company $company, string $status, ?string $notes = null): Company
+    public function clearCache(): void
     {
-        $company->update([
-            'status' => $status,
-        ]);
-
-        return $company;
+        Cache::forget(self::CACHE_KEY . '*');
     }
 }

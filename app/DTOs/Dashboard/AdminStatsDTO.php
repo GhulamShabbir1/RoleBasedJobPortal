@@ -16,11 +16,11 @@ class AdminStatsDTO
     public function toArray(): array
     {
         return [
-            'totalUsers' => $this->totalUsers,
-            'totalCompanies' => $this->totalCompanies,
-            'totalJobs' => $this->totalJobs,
-            'totalApplications' => $this->totalApplications,
-            'pendingCompanies' => $this->pendingCompanies
+            'total_users' => $this->totalUsers,
+            'total_companies' => $this->totalCompanies,
+            'total_jobs' => $this->totalJobs,
+            'total_applications' => $this->totalApplications,
+            'pending_companies' => $this->pendingCompanies
         ];
     }
 }

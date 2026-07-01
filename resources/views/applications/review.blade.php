@@ -423,14 +423,23 @@ function applicationsPage() {
                 if (this.filters.search) params.search = this.filters.search;
                 if (this.filters.job_id) params.job_id = this.filters.job_id;
 
-                const response = await axios.get('/api/applications', {
+                const response = await axios.get('/api/employer/applications', {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     params
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.applications = response.data.data;
                     this.updateStats();
+                }
+
+                // Load jobs for filter
+                const jobsResponse = await axios.get('/api/employer/jobs', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (jobsResponse.data.status) {
+                    this.jobs = jobsResponse.data.data;
                 }
             } catch (error) {
                 console.error('Error loading applications:', error);
@@ -454,13 +463,13 @@ function applicationsPage() {
             if (!confirm(`Are you sure you want to ${status} this application?`)) return;
 
             try {
-                const response = await axios.put(`/api/applications/${appId}/review`, {
+                const response = await axios.put(`/api/employer/applications/${appId}/review`, {
                     status: status
                 }, {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.loadApplications();
                     this.showDetailsModal = false;
                     // Show success feedback

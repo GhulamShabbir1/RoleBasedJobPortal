@@ -303,7 +303,7 @@ function categoriesPage() {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.categories = response.data.data;
                     this.filterCategories();
                 }
@@ -387,7 +387,7 @@ function categoriesPage() {
                     });
                 }
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.closeModal();
                     await this.loadCategories();
                     // Show success message
@@ -425,7 +425,7 @@ function categoriesPage() {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     await this.loadCategories();
                     alert('Category deleted successfully');
                 } else {

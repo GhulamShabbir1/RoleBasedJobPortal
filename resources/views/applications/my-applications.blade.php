@@ -318,12 +318,12 @@ function myApplicationsPage() {
             this.loading = true;
             try {
                 const params = this.filters.status ? { status: this.filters.status } : {};
-                const response = await axios.get('/api/applications', {
+                const response = await axios.get('/api/candidate/applications', {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     params
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.applications = response.data.data;
                     this.updateStats();
                 }
@@ -352,7 +352,7 @@ function myApplicationsPage() {
                         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                     });
 
-                    if (response.data.success) {
+                    if (response.data.status) {
                         this.loadApplications();
                         // Show success feedback
                         alert('Application withdrawn successfully');
@@ -375,7 +375,7 @@ function myApplicationsPage() {
 
         async downloadResume(appId) {
             try {
-                const response = await axios.get(`/api/applications/${appId}/download`, {
+                const response = await axios.get(`/api/candidate/resumes/download/${appId}`, {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                     responseType: 'blob'
                 });

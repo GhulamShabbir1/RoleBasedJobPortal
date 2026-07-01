@@ -257,7 +257,7 @@ function employerJobsPage() {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.jobs = response.data.data;
                     this.applyFilters();
                     this.updateStats();
@@ -314,7 +314,7 @@ function employerJobsPage() {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.loadJobs();
                     alert(`Job ${message}d successfully`);
                 } else {
@@ -333,7 +333,7 @@ function employerJobsPage() {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.loadJobs();
                     alert('Job deleted successfully');
                 } else {

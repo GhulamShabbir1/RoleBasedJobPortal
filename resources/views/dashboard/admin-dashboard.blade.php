@@ -311,13 +311,13 @@ function adminDashboard() {
                     }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     // Update stats with real data from API
-                    this.stats.total_users = response.data.data.totalUsers || 0;
-                    this.stats.total_companies = response.data.data.totalCompanies || 0;
-                    this.stats.total_jobs = response.data.data.totalJobs || 0;
-                    this.stats.total_applications = response.data.data.totalApplications || 0;
-                    this.stats.pending_companies = response.data.data.pendingCompanies || 0;
+                    this.stats.total_users = response.data.data.total_users || 0;
+                    this.stats.total_companies = response.data.data.total_companies || 0;
+                    this.stats.total_jobs = response.data.data.total_jobs || 0;
+                    this.stats.total_applications = response.data.data.total_applications || 0;
+                    this.stats.pending_companies = response.data.data.pending_companies || 0;
 
                     // Generate chart data based on real stats
                     this.generateChartData();

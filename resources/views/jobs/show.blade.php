@@ -245,7 +245,7 @@ function jobShowPage() {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
-                if (response.data.success && Array.isArray(response.data.data)) {
+                if (response.data.status && Array.isArray(response.data.data)) {
                     this.hasApplied = response.data.data.some(app => app.job_id === jobId);
                 }
             } catch (error) {
@@ -273,7 +273,7 @@ function jobShowPage() {
                 const id = parts[parts.length - 1];
 
                 const response = await axios.get('/api/jobs/' + id);
-                if (!response.data?.success) {
+                if (!response.data?.status) {
                     throw new Error(response.data?.message || 'Failed to load job');
                 }
 
@@ -344,7 +344,7 @@ function jobShowPage() {
                     }
                 });
 
-                if (response.data?.success) {
+                if (response.data?.status) {
                     this.showModal = false;
                     this.hasApplied = true; // Mark as applied
                     alert('Application submitted successfully!');

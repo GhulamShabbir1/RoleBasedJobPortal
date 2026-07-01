@@ -455,7 +455,7 @@ function employerCompanyPage() {
                 };
                 const response = await axios.get('/api/employer/my-company-status', authHeaders);
 
-                if (response.data.success) {
+                if (response.data.status) {
                     const statusData = response.data.data;
                     // Extract company from nested structure
                     if (statusData.company_found && statusData.company) {
@@ -547,7 +547,7 @@ function employerCompanyPage() {
                     }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     alert('Company created successfully!');
                     await this.loadCompany();
                 } else {
@@ -585,7 +585,7 @@ function employerCompanyPage() {
                     }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     alert('Company updated successfully!');
                     this.showEditForm = false;
                     await this.loadCompany();

@@ -115,6 +115,7 @@ Route::middleware('jwt')->group(function () {
         Route::put('/jobs/{id}', [JobController::class, 'update'])->name('jobs.update');
         Route::delete('/jobs/{id}', [JobController::class, 'destroy'])->name('jobs.destroy');
         Route::post('/jobs/{id}/close', [JobController::class, 'close'])->name('jobs.close');
+        Route::post('/jobs/{id}/open', [JobController::class, 'open'])->name('jobs.open');
 
         // Application review
         Route::get('/applications', [ApplicationController::class, 'index'])->name('employer.applications.index');

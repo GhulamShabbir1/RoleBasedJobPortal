@@ -400,7 +400,7 @@ function resetPasswordForm() {
                     password_confirmation: this.form.password_confirmation
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.success = 'Password reset successfully! Redirecting to login...';
                     setTimeout(() => {
                         window.location.href = '/auth/login';

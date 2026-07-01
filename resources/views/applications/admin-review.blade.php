@@ -321,7 +321,7 @@ function adminApplicationsPage() {
                     params
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     const data = response.data.data;
                     this.applications = Array.isArray(data) ? data : (data?.data || []);
                     this.updateStats();
@@ -359,7 +359,7 @@ function adminApplicationsPage() {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.showDetailsModal = false;
                     await this.loadApplications();
                     alert(`Application ${status} successfully!`);
@@ -378,7 +378,7 @@ function adminApplicationsPage() {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.showDetailsModal = false;
                     await this.loadApplications();
                 }

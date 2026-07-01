@@ -6,14 +6,37 @@ use App\Models\Category;
 use App\Repositories\Interfaces\CategoryRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class CategoryRepository implements CategoryRepositoryInterface
 {
     protected $model;
+    private const CACHE_KEY = 'categories:';
+    private const CACHE_TTL = 3600;
 
     public function __construct(Category $category)
     {
         $this->model = $category;
+    }
+
+    /**
+     * Create or update category using single manage method
+     */
+    public function manage(array $data, ?int $id = null): Category
+    {
+        if ($id === null) {
+            // Create new category
+            $category = $this->model->create($data);
+        } else {
+            // Update existing category
+            $category = $this->model->findOrFail($id);
+            $category->update($data);
+        }
+
+        // Clear cache
+        $this->clearCache();
+
+        return $category;
     }
 
     /**
@@ -41,39 +64,26 @@ class CategoryRepository implements CategoryRepositoryInterface
     }
 
     /**
-     * Create a new category
+     * Delete category
      */
-    public function createCategory(array $data): Category
+    public function delete(int $id): bool
     {
-        return $this->model->create($data);
-    }
-
-    /**
-     * Update category
-     */
-    public function updateCategory(string $id, array $data): bool
-    {
-        $category = $this->findById($id);
+        $category = $this->model->find($id);
 
         if (!$category) {
             return false;
         }
 
-        return $category->update($data);
+        $this->clearCache();
+        return $category->delete();
     }
 
     /**
-     * Delete category
+     * Legacy method for backward compatibility
      */
     public function deleteCategory(string $id): bool
     {
-        $category = $this->findById($id);
-
-        if (!$category) {
-            return false;
-        }
-
-        return $category->delete();
+        return $this->delete((int)$id);
     }
 
     /**
@@ -89,5 +99,13 @@ class CategoryRepository implements CategoryRepositoryInterface
         }
 
         return $query->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    /**
+     * Clear related cache
+     */
+    public function clearCache(): void
+    {
+        Cache::forget(self::CACHE_KEY . '*');
     }
 }

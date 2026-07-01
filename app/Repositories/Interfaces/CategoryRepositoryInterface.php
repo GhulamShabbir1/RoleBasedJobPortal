@@ -9,6 +9,11 @@ use Illuminate\Support\Collection;
 interface CategoryRepositoryInterface
 {
     /**
+     * Create or update category using single manage method
+     */
+    public function manage(array $data, ?int $id = null): Category;
+
+    /**
      * Get all categories
      */
     public function getAllCategories(): Collection;
@@ -24,17 +29,12 @@ interface CategoryRepositoryInterface
     public function findByName(string $name): ?Category;
 
     /**
-     * Create a new category
-     */
-    public function createCategory(array $data): Category;
-
-    /**
-     * Update category
-     */
-    public function updateCategory(string $id, array $data): bool;
-
-    /**
      * Delete category
+     */
+    public function delete(int $id): bool;
+
+    /**
+     * Delete category (legacy)
      */
     public function deleteCategory(string $id): bool;
 
@@ -42,4 +42,9 @@ interface CategoryRepositoryInterface
      * Filter categories by search
      */
     public function filterCategories(?string $search = null, int $page = 1, int $perPage = 15): LengthAwarePaginator;
+
+    /**
+     * Clear related cache
+     */
+    public function clearCache(): void;
 }

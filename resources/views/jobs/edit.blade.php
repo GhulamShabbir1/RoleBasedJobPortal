@@ -346,7 +346,7 @@ function jobEditForm() {
         async loadCategories() {
             try {
                 const response = await axios.get('/api/categories');
-                if (response.data.success) {
+                if (response.data.status) {
                     this.categories = response.data.data;
                 }
             } catch (error) {
@@ -366,7 +366,7 @@ function jobEditForm() {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     const job = response.data.data;
                     this.form = {
                         title: job.title,
@@ -452,7 +452,7 @@ function jobEditForm() {
                     }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.success = 'Job updated successfully! Redirecting...';
                     setTimeout(() => {
                         window.location.href = '/employer/jobs';

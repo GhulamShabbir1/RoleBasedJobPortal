@@ -370,7 +370,7 @@ function registerForm() {
                     role: this.form.role
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.success = 'Account created successfully!';
                     setTimeout(() => {
                         window.location.href = '/auth/login';

@@ -6,14 +6,37 @@ use App\Models\CandidateProfile;
 use App\Repositories\Interfaces\CandidateProfileRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class CandidateProfileRepository implements CandidateProfileRepositoryInterface
 {
     protected $model;
+    private const CACHE_KEY = 'candidate_profiles:';
+    private const CACHE_TTL = 3600;
 
     public function __construct(CandidateProfile $candidateProfile)
     {
         $this->model = $candidateProfile;
+    }
+
+    /**
+     * Create or update candidate profile using single manage method
+     */
+    public function manage(array $data, ?int $id = null): CandidateProfile
+    {
+        if ($id === null) {
+            // Create new profile
+            $profile = $this->model->create($data);
+        } else {
+            // Update existing profile
+            $profile = $this->model->findOrFail($id);
+            $profile->update($data);
+        }
+
+        // Clear cache
+        $this->clearCache();
+
+        return $profile;
     }
 
     /**
@@ -41,39 +64,26 @@ class CandidateProfileRepository implements CandidateProfileRepositoryInterface
     }
 
     /**
-     * Create a new candidate profile
+     * Delete candidate profile
      */
-    public function createProfile(array $data): CandidateProfile
+    public function delete(int $id): bool
     {
-        return $this->model->create($data);
-    }
-
-    /**
-     * Update candidate profile
-     */
-    public function updateProfile(string $id, array $data): bool
-    {
-        $profile = $this->findById($id);
+        $profile = $this->model->find($id);
 
         if (!$profile) {
             return false;
         }
 
-        return $profile->update($data);
+        $this->clearCache();
+        return $profile->delete();
     }
 
     /**
-     * Delete candidate profile
+     * Legacy method for backward compatibility
      */
     public function deleteProfile(string $id): bool
     {
-        $profile = $this->findById($id);
-
-        if (!$profile) {
-            return false;
-        }
-
-        return $profile->delete();
+        return $this->delete((int)$id);
     }
 
     /**
@@ -96,5 +106,13 @@ class CandidateProfileRepository implements CandidateProfileRepositoryInterface
         }
 
         return $query->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    /**
+     * Clear related cache
+     */
+    public function clearCache(): void
+    {
+        Cache::forget(self::CACHE_KEY . '*');
     }
 }

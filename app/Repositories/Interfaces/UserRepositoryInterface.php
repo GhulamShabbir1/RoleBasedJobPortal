@@ -9,6 +9,11 @@ use Illuminate\Support\Collection;
 interface UserRepositoryInterface
 {
     /**
+     * Create or update user using single manage method
+     */
+    public function manage(array $data, ?int $id = null): User;
+
+    /**
      * Get all users
      */
     public function getAllUsers(): Collection;
@@ -39,32 +44,23 @@ interface UserRepositoryInterface
     public function findByEmail(string $email): ?User;
 
     /**
-     * Create a new user
-     */
-    public function createUser(array $data): User;
-
-    /**
-     * Update user
-     */
-    public function updateUser(string $id, array $data): bool;
-
-    /**
      * Delete user
      */
+    public function delete(int $id): bool;
+
+    /**
+     * Delete user (legacy)
+     */
     public function deleteUser(string $id): bool;
-
-    /**
-     * Update user password
-     */
-    public function updatePassword(string $id, string $password): bool;
-
-    /**
-     * Update user role
-     */
-    public function updateRole(string $id, string $role): bool;
 
     /**
      * Filter users by role and search
      */
     public function filterUsers(?string $role = null, ?string $search = null, int $page = 1, int $perPage = 15): LengthAwarePaginator;
+
+    /**
+     * Clear related cache
+     */
+    public function clearCache(): void;
 }
+

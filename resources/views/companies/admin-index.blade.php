@@ -234,7 +234,7 @@ function companiesPage() {
                     params
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.companies = response.data.data;
                     this.loadStats();
                 }
@@ -262,7 +262,7 @@ function companiesPage() {
                         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                     });
 
-                    if (response.data.success) {
+                    if (response.data.status) {
                         alert('Company approved successfully');
                         this.loadCompanies();
                     }
@@ -286,7 +286,7 @@ function companiesPage() {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     alert('Company rejected successfully');
                     this.showRejectModal = false;
                     this.loadCompanies();

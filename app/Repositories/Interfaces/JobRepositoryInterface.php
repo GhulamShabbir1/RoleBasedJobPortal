@@ -8,9 +8,9 @@ use Illuminate\Support\Collection;
 interface JobRepositoryInterface
 {
     /**
-     * Create a new job in the database
+     * Create or update job using single manage method
      */
-    public function createJob(array $data): Job;
+    public function manage(array $data, ?int $id = null): Job;
 
     /**
      * Find job by id
@@ -18,12 +18,12 @@ interface JobRepositoryInterface
     public function findById(string $id): ?Job;
 
     /**
-     * Update a job in the database
+     * Delete a job in the database
      */
-    public function updateJob(string $id, array $data): bool;
+    public function delete(int $id): bool;
 
     /**
-     * Delete a job in the database
+     * Delete a job in the database (legacy)
      */
     public function deleteJob(string $id): bool;
 
@@ -81,4 +81,9 @@ interface JobRepositoryInterface
      * Filter and paginate jobs
      */
     public function filterJobs(array $filters, int $page, int $perPage, ?string $role = null): \Illuminate\Contracts\Pagination\LengthAwarePaginator;
+
+    /**
+     * Clear related cache
+     */
+    public function clearCache(): void;
 }

@@ -404,6 +404,11 @@
                             this.mobileOpen = false;
                         }
                     });
+
+                    // Listen for app-logout events
+                    window.addEventListener('app-logout', () => {
+                        this.logout();
+                    });
                 },
 
                 toggleTheme() {
@@ -466,7 +471,6 @@
                 },
 
 logout() {
-                    // legacy UI logout (not API)
                     if (confirm('Are you sure you want to logout?')) {
                         localStorage.removeItem('token');
                         localStorage.removeItem('user');
@@ -475,7 +479,7 @@ logout() {
                             window.location.href = '/auth/login';
                         }, 1000);
                     }
-                }
+                },
             }
         }
 
@@ -563,7 +567,7 @@ logout() {
                         })
                             .then(response => {
                                 console.log('Token refresh response:', response.data);
-                                if (response.data.success) {
+                                if (response.data.status) {
                                     localStorage.setItem('token', response.data.data.token);
                                     originalRequest.headers['Authorization'] = `Bearer ${response.data.data.token}`;
                                     return axios(originalRequest);

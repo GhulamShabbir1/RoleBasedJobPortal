@@ -5,12 +5,9 @@ namespace App\Features\Company;
 use App\DTOs\Company\CreateCompanyDTO;
 use App\Models\Company;
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
-use Exception;
+use App\Exceptions\UnauthorizedException;
+use Illuminate\Support\Facades\Storage;
 
-/**
- * CreateCompanyFeature
- * Business logic for creating a new company
- */
 class CreateCompanyFeature
 {
     public function __construct(
@@ -19,56 +16,44 @@ class CreateCompanyFeature
     }
 
     /**
-     * Create a new company with pending status
-     *
-     * @param CreateCompanyDTO $dto Company creation data
-     * @return Company
-     * @throws Exception
+     * Create a new company using repository manage()
      */
     public function handle(CreateCompanyDTO $dto): Company
     {
-        try {
-            $userId = auth()->id();
-            
-            // One company per employer rule
-            $existing = $this->companyRepository->getByUserId($userId);
-            if ($existing) {
-                throw new Exception('You already have a registered company.', 400);
-            }
-            
-            // Check if company with same email already exists
-            $existingCompany = $this->companyRepository->findByEmail($dto->email);
-            if ($existingCompany) {
-                throw new Exception('Company with this email already exists', 400);
-            }
+        $userId = auth()->id();
 
-            // Create company data array with pending status
-            $data = $dto->toArray();
-            $data['status'] = 'pending';
-            $data['user_id'] = $userId;
-
-            // Create company via repository
-            $company = $this->companyRepository->create($data);
-
-            // Store logo
-            if ($dto->logo) {
-                $logoPath = $dto->logo->store('companies/logos', 'public');
-                $company->update(['logo' => $logoPath]);
-            }
-
-            // Store certificate
-            if ($dto->certificate) {
-                $certPath = $dto->certificate->store('companies/certificates', 'public');
-                $company->update(['certificate' => $certPath]);
-            }
-
-            return $company;
-        } catch (Exception $e) {
-            // Clean up directory if creation failed and we somehow got here
-            if (isset($company)) {
-                \Illuminate\Support\Facades\Storage::disk('public')->deleteDirectory("companies/{$company->id}");
-            }
-            throw $e;
+        // One company per employer rule
+        $existing = $this->companyRepository->getByUserId($userId);
+        if ($existing) {
+            throw new UnauthorizedException('You already have a registered company.');
         }
+
+        // Check if company with same email already exists
+        $existingCompany = $this->companyRepository->findByEmail($dto->email);
+        if ($existingCompany) {
+            throw new UnauthorizedException('Company with this email already exists.');
+        }
+
+        // Create company data array with pending status
+        $data = $dto->toArray();
+        $data['status'] = 'pending';
+        $data['user_id'] = $userId;
+
+        // Use manage() method with null ID to create company
+        $company = $this->companyRepository->manage($data);
+
+        // Store logo
+        if ($dto->logo) {
+            $logoPath = $dto->logo->store('companies/logos', 'public');
+            $company = $this->companyRepository->manage(['logo' => $logoPath], $company->id);
+        }
+
+        // Store certificate
+        if ($dto->certificate) {
+            $certPath = $dto->certificate->store('companies/certificates', 'public');
+            $company = $this->companyRepository->manage(['certificate' => $certPath], $company->id);
+        }
+
+        return $company;
     }
 }

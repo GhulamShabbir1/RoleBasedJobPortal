@@ -300,7 +300,7 @@ function forgotPasswordForm() {
                     email: this.form.email
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.success = 'Password reset link sent successfully! Check your email inbox.';
                     this.lastResendTime = Date.now();
                     this.resendCount++;

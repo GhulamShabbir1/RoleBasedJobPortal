@@ -6,20 +6,39 @@ use App\Models\User;
 use App\Repositories\Interfaces\AuthRepositoryInterface;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Cache;
 
 class AuthRepository implements AuthRepositoryInterface
 {
+    private const CACHE_KEY = 'auth:';
+    private const CACHE_TTL = 3600;
+
     /**
-     * Create a new user in the database
+     * Create or update user using single manage method
+     * Note: Auth operations use manage() for consistency
      */
-    public function createUser(array $data): User
+    public function manage(array $data, ?int $id = null): User
     {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-            'role' => $data['role'] ?? 'candidate',
-        ]);
+        if ($id === null) {
+            // Create new user (register)
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+                'role' => $data['role'] ?? 'candidate',
+            ]);
+        } else {
+            // Update existing user
+            $user = User::findOrFail($id);
+            $updateData = $data;
+            if (isset($updateData['password'])) {
+                $updateData['password'] = Hash::make($updateData['password']);
+            }
+            $user->update($updateData);
+        }
+
+        $this->clearCache();
+        return $user;
     }
 
     /**
@@ -35,7 +54,6 @@ class AuthRepository implements AuthRepositoryInterface
      */
     public function attemptLogin(array $credentials): ?string
     {
-        // First verify that the user exists and is active
         $user = User::where('email', $credentials['email'])->first();
 
         if (!$user || !$user->is_active) {
@@ -102,6 +120,15 @@ class AuthRepository implements AuthRepositoryInterface
     {
         $user = User::findOrFail($userId);
         $user->password = Hash::make($newPassword);
+        $this->clearCache();
         return $user->save();
+    }
+
+    /**
+     * Clear related cache
+     */
+    public function clearCache(): void
+    {
+        Cache::forget(self::CACHE_KEY . '*');
     }
 }

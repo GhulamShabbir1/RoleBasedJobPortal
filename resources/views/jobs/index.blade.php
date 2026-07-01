@@ -391,7 +391,7 @@ function jobsPage() {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
-                if (response.data.success && Array.isArray(response.data.data)) {
+                if (response.data.status && Array.isArray(response.data.data)) {
                     this.appliedJobIds = new Set(response.data.data.map(app => app.job_id));
                     // Also add any recently applied jobs from sessionStorage
                     const recentlyApplied = JSON.parse(sessionStorage.getItem('appliedJobs') || '[]');
@@ -419,13 +419,13 @@ function jobsPage() {
                 };
 
                 const response = await axios.get('/api/jobs', { params });
-                if (response.data.success) {
+                if (response.data.status) {
                     const payload = response.data.data;
                     this.jobs = Array.isArray(payload) ? payload : (payload?.data ?? []);
                     this.pagination = {
-                        current_page: response.data.pagination?.current_page ?? 1,
-                        per_page: response.data.pagination?.per_page ?? 15,
-                        total: response.data.pagination?.total ?? this.jobs.length
+                        current_page: response.data.data?.current_page ?? 1,
+                        per_page: response.data.data?.per_page ?? 15,
+                        total: response.data.data?.total ?? this.jobs.length
                     };
                 }
             } catch (error) {
@@ -439,7 +439,7 @@ function jobsPage() {
         async loadCategories() {
             try {
                 const response = await axios.get('/api/categories');
-                if (response.data.success) {
+                if (response.data.status) {
                     this.categories = response.data.data;
                 }
             } catch (error) {

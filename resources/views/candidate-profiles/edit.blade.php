@@ -371,7 +371,7 @@ function candidateProfileForm() {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
 
-                if (response.data.success && response.data.data) {
+                if (response.data.status && response.data.data) {
                     const data = response.data.data;
                     this.form = {
                         phone: data.phone || '',
@@ -492,7 +492,7 @@ function candidateProfileForm() {
                     }
                 });
 
-                if (response.data.success) {
+                if (response.data.status) {
                     this.success = 'Profile updated successfully!';
                     // Update resume_url if new file was uploaded
                     if (response.data.data?.resume_url) {
